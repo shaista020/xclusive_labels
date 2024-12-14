@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard-Volusion</title>
+
+    <link rel="icon" type="image/x-icon" href="images/images/logo1.png" />
+    <script
+      type="text/javascript"
+      src="https://www.gstatic.com/charts/loader.js"
+    ></script>
+    <link rel="stylesheet" href="../../static/index.css" />
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script> -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+    
+
+    <link
+      href="bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .card {
+        padding: 20px;
+      }
+      .dashboard .card {
+        height: 80%;
+        padding: 10px 0px;
+        margin-left: -5px;
+        margin-right: 10px;
+        text-align: center;
+        width: 100%;
+        font-size: 30px;
+      }
+      .dashboard {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-top: 30px;
+      }
+      .dashboard :hover {
+        font-size: 32px;
+        opacity: 10px;
+      }
+      .graph {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 10px;
+        align-items: center;
+      }
+      .graphs {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 20px;
+        align-items: center;
+      }
+      #piechart1 {
+        width: 48%;
+        height: 400px;
+        margin-top: 80px;
+        margin-right: 15px;
+        margin-left: -5px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      #piechart {
+        width: 50%;
+        height: 400px;
+        margin-top: 80px;
+        margin-left: 10px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      #chart_div2,
+      #chart_div3 {
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        width: 99%;
+        height: 600px;
+        margin-bottom: 50px;
+      }
+      #histogram_chart {
+        width: 48%;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        height: 500px;
+      }
+      #histogram_chart1 {
+        width: 49%;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        height: 500px;
+        margin-left: 25px;
+      }
+      #piechart2 {
+        width: 49%;
+        height: 400px;
+        margin-top: 0px;
+        margin-right: 15px;
+        margin-left: -5px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      #topUsers {
+        width: 50%;
+        height: 400px;
+        margin-top: 0px;
+        margin-left: 10px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      #pieChart {
+        width: 48%;
+        height: 400px;
+        margin-top: 10px;
+        margin-right: 15px;
+        margin-left: -5px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      #histogramChart2 {
+        width: 50%;
+        height: 400px;
+        margin-top: -5px;
+        margin-left: 10px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      /* Desktop & Large Screens (Default) */
+      /* Your original code remains unchanged for screens wider than 1200px */
+
+      /* Tablet Devices (Screen width between 768px and 1199px) */
+      @media (max-width: 1200px) {
+        .dashboard {
+          grid-template-columns: repeat(2, 1fr); /* 2 cards per row */
+        }
+        .dashboard .card {
+          font-size: 30px;
+          height: 150px;
+        }
+        .graph{
+          width: 90%;
+        }
+      }
+
+      /* Mobile Devices (Screen width below 769px) */
+      @media (max-width: 768px) {
+        .dashboard {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr); /* 1 card per row */
+        }
+
+        .dashboard .card {
+          font-size: 20px; /* Adjust font size for mobile */
+          height: 100px;
+        }
+
+        #piechart1,
+        #piechart2,
+        #pieChart,
+        #histogram_chart {
+          width: 100%;
+          height: 300px; /* Adjust height for smaller screens */
+          margin: 10px 0; /* Add some margin between sections */
+        }
+        #topUsers,
+        #histogramChart2,
+        #piechart,
+        #histogram_chart1 {
+          width: 100%;
+          height: 300px; /* Adjust height for smaller screens */
+          margin: 10px 0; /* Add some margin between sections */
+          margin-left: 5px;
+        }
+        #chart_div2,
+        #chart_div3 {
+          height: 400px; /* Reduce height for smaller screens */
+        }
+      }
+
+      /* Small Mobile Devices (Screen width below 480px) */
+      @media (max-width: 480px) {
+        .dashboard .card {
+          font-size: 18px; /* Smaller font size */
+          padding: 2px; /* Adjust padding */
+          align-items: center !important;
+          margin-bottom: 2px;
+          max-height: max-content;
+          height: 100%;
+        }
+
+        .dashboard {
+          gap: 1px; /* Reduce gap between cards */
+          align-items: center !important;
+          display: grid;
+          grid-template-columns: repeat(1, 1fr);
+        }
+
+        #histogramChart2,
+        #piechart1,
+        #piechart {
+          margin-top: 20px;
+          height: 250px;
+          margin-left: 10px;
+          width: 50%; /* Further reduce height */
+        }
+
+        #topUsers {
+          margin-top: 20px;
+          height: 250px;
+          margin-left: 10px;
+          width: 50%; /* Further reduce height */
+          font-size: x-small;
+        }
+        #piechart2,
+        #pieChart {
+          margin-top: 20px;
+          height: 250px;
+          margin-left: 1px;
+          width: 48%; /* Further reduce height */
+        }
+      }
+    </style>
+    </style>
+  </head>
+  <body>
+    <div class="row bigDiv">
+      <!-- sidebar -->
+      <div
+        class="sidebar nav col-5 col-sm-4 col-md-3 col-xl-3 col-xxl-2 col-lg-3"
+      >
+        <div id="sidebar">
+          {% include  'sidebarAdmin.html' %}
+       
+            
+        </div>
+      </div>
+      <!-- Header -->
+      <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9 col-xxl-10">
+        <div class="row">
+          <div id="header" class="p-0">
+            {% include 'navbarAdmin.html' %}
+          </div>
+        </div>
+        <main style="padding: 15px">
+          <div>
+            <h2 style="padding: 10px">Admin Dashboard</h2>
+            <div class="dashboard">
+              <div>
+                <div class="card">Total Users<br />{{total_users}}</div>
+              </div>
+              <div>
+                <div class="card">New Registered Users<br />{{today_registered}}</div>
+              </div>
+              <!-- <div> 
+                <div class="card">Active Refund Requests<br />$37</div>
+              </div> -->
+              <div>
+                <div class="card">Opened Tickets <br />{{open_tickets}}</div>
+              </div>
+            </div>
+            <div class="graphs">
+              <div id="piechart1" class="graph"></div>
+
+              <div id="piechart" class="graph"></div>
+            </div>
+            <br />
+            <div id="chart_div2" class="graph"></div>
+            <div class="graphs">
+              <div id="histogram_chart" class="graph"></div>
+              <div id="histogram_chart1" class="graph"></div>
+            </div>
+            <br />
+            <div id="chart_div3" class="graph"></div>
+
+            <div class="graphs">
+              <div id="piechart2" class="graph"></div>
+
+              <div
+                class="graph"
+                style="
+                  background-color: #f5f5f5;
+                  display: flex;
+                  flex-direction: column;
+                  padding: 10px;
+                "
+                id="topUsers"
+              >
+                <h3>Top Referral Users</h3>
+                <p style="word-spacing: 3px">
+                  Sakib Hasan shakibhasan.me09@gmail.com 0 referrals
+                </p>
+                <hr />
+              </div>
+            </div>
+
+            <div class="graphs">
+              <div id="pieChart" class="graph"></div>
+              <div id="histogramChart2" class="graph"></div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="../../static/index.js"></script>
+  </body>
+</html>
+<script>
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(drawChart1);
+
+  function drawChart1() {
+    var data1 = google.visualization.arrayToDataTable([
+      ["Task", "Hours per Day"],
+      ["Work", 23.5],
+      ["Other Method", 0.1],
+    ]);
+
+    var options1 = {
+      title: "Earnings & Refunds",
+      backgroundColor: "#f5f5f5",
+      pieHole: 0.0, // Full pie chart
+      is3D: false,
+    };
+
+    var pchart1 = new google.visualization.PieChart(
+      document.getElementById("piechart1")
+    );
+
+    pchart1.draw(data1, options1);
+  }
+
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(drawChart2);
+
+  function drawChart2() {
+    var data = google.visualization.arrayToDataTable([
+      ["Task", "Hours per Day"],
+      ["Work", 16],
+      ["Eat", 1],
+      ["Sleep", 7],
+    ]);
+
+    var options = {
+      title: "Revenue Breakdown by Category",
+      backgroundColor: "#f5f5f5",
+    };
+
+    var pchart = new google.visualization.PieChart(
+      document.getElementById("piechart")
+    );
+
+    pchart.draw(data, options);
+  }
+
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(drawBackgroundColor);
+  function drawBackgroundColor() {
+    var data = google.visualization.arrayToDataTable([
+      ["Month", "Revenue"],
+      ["Jan", 1000],
+      ["Feb", 1170],
+      ["Mar", 1250],
+      ["Apr", 3500], // High revenue in April
+      ["May", 1400],
+      ["Jun", 1300],
+      ["Jul", 1150],
+      ["Aug", 1220],
+      ["Sep", 1350],
+      ["Oct", 1280],
+      ["Nov", 1400],
+      ["Dec", 1500],
+    ]);
+
+    var options = {
+      title: "Monthly Revenue Trend",
+      curveType: "function", // Smooths the line
+      legend: { position: "none" },
+      hAxis: { title: "Month" },
+      vAxis: { title: "Revenue" },
+      pointSize: 5,
+      backgroundColor: "#f5f5f5",
+    };
+
+    var chart2 = new google.visualization.LineChart(
+      document.getElementById("chart_div2")
+    );
+    chart2.draw(data, options);
+  }
+
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(drawChart3);
+
+  function drawChart3() {
+    var hdata = google.visualization.arrayToDataTable([
+      ["Order Time"],
+
+      [21],
+      [21],
+      [21],
+      [21],
+      [20],
+      [20],
+      [20],
+      [19],
+      [18],
+      [17],
+      [16],
+      [15],
+      [15],
+      [15],
+      [14],
+      [14],
+      [14],
+    ]);
+
+    var hoptions = {
+      title: "Peak Order Times",
+      legend: { position: "none" },
+      backgroundColor: "#f5f5f5",
+
+      hAxis: {
+        gridlines: { count: 12 },
+        format: "0",
+      },
+
+      histogram: { bucketSize: 1 }, // Group orders by hour
+      bar: { groupWidth: "75%" }, // Adjust bar width
+      colors: ["#1b9e77"],
+    };
+    var hchart = new google.visualization.Histogram(
+      document.getElementById("histogram_chart")
+    );
+    hchart.draw(hdata, hoptions);
+  }
+
+  google.charts.load("current", { packages: ["corechart"] });
+
+  // Set a callback to run when the Google Visualization API is loaded.
+  google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+    // Create the data table.
+    var hdata1 = google.visualization.arrayToDataTable([
+      ["State", "Orders"],
+      ["NY", 26],
+      ["GA", 15],
+      ["CA", 10],
+      ["PA", 5],
+      ["VA", 5],
+    ]);
+
+    // Set chart options
+    var hoptions1 = {
+      title: "Most Popular States",
+      legend: { position: "none" },
+      backgroundColor: "#f5f5f5",
+
+      chartArea: { width: "60%" },
+      hAxis: {
+        title: "State ",
+        minValue: 0,
+      },
+      vAxis: {
+        title: "Orders",
+      },
+    };
+
+    // Instantiate and draw our chart, passing in the options.
+    var hchart1 = new google.visualization.ColumnChart(
+      document.getElementById("histogram_chart1")
+    );
+    hchart1.draw(hdata1, hoptions1);
+  }
+
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(drawBackgroundColor1);
+  function drawBackgroundColor1() {
+    var data3 = google.visualization.arrayToDataTable([
+      ["Month", "Profit"],
+      ["Jan", 100],
+      ["Feb", 1170],
+      ["Mar", 1250],
+      ["Apr", 300], // High revenue in April
+      ["May", 140],
+      ["Jun", 130],
+      ["Jul", 115],
+      ["Aug", 120],
+      ["Sep", 130],
+      ["Oct", 120],
+      ["Nov", 140],
+      ["Dec", 0],
+    ]);
+
+    var options3 = {
+      title: "Profits",
+      curveType: "function", // Smooths the line
+      backgroundColor: "#f5f5f5",
+
+      legend: { position: "none" },
+      hAxis: { title: "Month" },
+      vAxis: { title: "Profits" },
+      pointSize: 5,
+    };
+
+    var chart3 = new google.visualization.LineChart(
+      document.getElementById("chart_div3")
+    );
+    chart3.draw(data3, options3);
+  }
+
+  google.charts.load("current", { packages: ["corechart"] });
+
+  // Set a callback to run when the Google Visualization API is loaded.
+  google.charts.setOnLoadCallback(drawChart4);
+
+  function drawChart4() {
+    // Create the data table.
+    var data = google.visualization.arrayToDataTable([
+      ["Payment Method", "Amount"],
+      ["Venmo", 1000000001290],
+      ["Other Method", 1290],
+    ]);
+
+    // Set chart options
+    var options = {
+      title: "Payment Methods Breakdown",
+      backgroundColor: "#f5f5f5",
+
+      pieHole: 0.0, // Full pie chart
+      is3D: false, // Optional: make it flat (2D)
+      backgroundColor: "#f5f5f5",
+    };
+    // Instantiate and draw our chart, passing in the options.
+    var chart = new google.visualization.PieChart(
+      document.getElementById("piechart2")
+    );
+    chart.draw(data, options);
+  }
+
+  google.charts.load("current", { packages: ["corechart"] });
+  google.charts.setOnLoadCallback(drawChart5);
+
+  function drawChart5() {
+    var data5 = google.visualization.arrayToDataTable([
+      ["Task", "Hours per Day"],
+      ["ups", 12],
+      ["usps", 10],
+    ]);
+
+    var options5 = {
+      title: "Refunds By Carrier",
+      backgroundColor: "#f5f5f5",
+      pieHole: 0.0, // Full pie chart
+      is3D: false,
+    };
+
+    var pchart5 = new google.visualization.PieChart(
+      document.getElementById("pieChart")
+    );
+
+    pchart5.draw(data5, options5);
+  }
+
+  google.charts.load("current", { packages: ["corechart"] });
+
+  // Set a callback to run when the Google Visualization API is loaded.
+  google.charts.setOnLoadCallback(drawChart6);
+
+  function drawChart6() {
+    // Create the data table.
+    var hdata6 = google.visualization.arrayToDataTable([
+      ["Month", "orders"],
+      ["NY", 0],
+      ["GA", 3],
+      ["CA", 0], // High revenue in April
+      ["PA", 0],
+      ["VA", 0],
+    ]);
+
+    // Set chart options
+    var hoptions6 = {
+      title: "Most Popular States",
+      backgroundColor: "#f5f5f5",
+
+      legend: { position: "none" },
+      chartArea: { width: "60%" },
+      // hAxis: {
+      //   title: "State ",
+      //   minValue: 0,
+      // },
+      // vAxis: {
+      //   title: "Orders",
+      // },
+    };
+
+    // Instantiate and draw our chart, passing in the options.
+    var hchart6 = new google.visualization.ColumnChart(
+      document.getElementById("histogramChart2")
+    );
+    hchart6.draw(hdata6, hoptions6);
+  }
+
+ </script>

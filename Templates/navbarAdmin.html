@@ -1,0 +1,217 @@
+{% load static %}
+<script>
+  document.addEventListener("DOMContentLoaded", function (event2) {
+    document.getElementById("nBtn").addEventListener("click", function () {
+      document.getElementById("nMenu").style.display = "block";
+      event.stopPropagation();
+    });
+  });
+  document.addEventListener("click", function (event2) {
+    if (
+      nMenu.style.display == "block" &&
+      !nMenu.contains(event.target) &&
+      event.target !== nBtn
+    ) {
+      nMenu.style.display = "none";
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", function (event1) {
+    document
+      .getElementById("customizeBtn")
+      .addEventListener("click", function () {
+        document.getElementById("customizeMenu").style.display = "block";
+        event.stopPropagation();
+      });
+  });
+  document.addEventListener("click", function (event1) {
+    if (
+      customizeMenu.style.display == "block" &&
+      !customizeMenu.contains(event.target) &&
+      event.target !== customizeBtn
+    ) {
+      customizeMenu.style.display = "none";
+    }
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<nav class="navbar navbar-expand-lg navbar-light bg-light p-3">
+  <div class="container-fluid" style="margin-left: 10px">
+    <!-- Account Info Section -->
+    <div class="d-flex align-items-center me-auto">
+      <div class="account-info d-flex align-items-center">
+        <button
+          type="button"
+          id="customizeBtn"
+          class="btn btn-light d-flex align-items-center"
+          aria-haspopup="true"
+          aria-expanded="false"
+          style="background-color: transparent; border: none"
+        >
+          <!-- Avatar Image -->
+          {% if user.get_full_name %}
+          <!-- Avatar Image with Dynamic Initials -->
+          <img 
+            src="https://ui-avatars.com/api/?name={{ user.get_full_name|default:user.username|urlencode }}&size=64&background=random" 
+            alt="{{ user.get_full_name|default:user.username }}'s Profile Image" 
+            class="profile-icon rounded-circle mr-3" 
+            style="width: 1.8rem; height: 1.8rem; object-fit: cover" 
+          />
+          {% else %}
+          <!-- Fallback Initials -->
+          <div
+            class="rounded-circle d-flex justify-content-center ms-3 align-items-center bg-secondary text-white"
+            style="width: 35px; height: 35px; margin-right: 10px"
+          >
+            {{ user.first_name|default:user.username|slice:":1"|upper }}{{ user.last_name|default:""|slice:":1"|upper }}
+          </div>
+          {% endif %}
+    
+          <!-- Display User Name and Email -->
+          <div class="text-start me-2">
+            <h6 class="mb-0">{{ user.get_full_name|default:user.username }}</h6>
+            <small>{{ user.email }}</small>
+          </div>
+    
+          <!-- Profile Image -->
+         
+          <img
+          src="{% static 'images/john-doe.svg' %}"
+          alt="Profile"
+          class="rounded-circle"
+          style="width: 35px; height: 35px"
+        />
+        </button>
+    
+        <!-- Customize Menu (Dropdown) -->
+        <div
+          id="customizeMenu"
+          class="customize-menu card position-absolute mt-2"
+          style="display: none; z-index: 1"
+        >
+          <div class="card-body">
+            <h6 class="card-title">My Account</h6>
+            <hr />
+            <a
+              href="/set"
+              class="d-flex align-items-center text-dark text-decoration-none mb-2"
+            >
+              <img
+                src="{% static 'images/profile.svg' %}"
+                class="me-2"
+                alt="Profile"
+              />
+              Profile
+            </a>
+            <hr />
+            <a
+              class="d-flex align-items-center text-dark text-decoration-none"
+              href="{% url 'logout' %}"
+            >
+              <img
+                src="{% static 'images/logout.svg' %}"
+                class="me-2"
+                alt="Logout"
+              />
+              Logout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Collapsible Section for Menu Items -->
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav gap-2 ms-auto">
+        <!-- Balance Section -->
+        <li class="nav-item mb-2 mb-lg-0">
+          <div class="balance p-2 border rounded bg-light">
+            Balance: $1,059.00
+          </div>
+        </li>
+
+        <!-- Action Buttons (Create Label & Add Funds) -->
+        <li class="nav-item d-flex align-items-center">
+          <a href="/new" class="btn btn-outline-primary me-2">
+            <img
+              src="{% static 'images/create-label.svg' %}"
+              class="me-1"
+              alt="Create Label"
+            />
+            Create New Label
+          </a>
+          <a href="/addFunds" class="btn btn-outline-success">
+            <img
+              src="{% static 'images/add-funds.svg' %}"
+              class="me-1"
+              alt="Add Funds"
+            />
+            Add Funds
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Notifications Section -->
+    <div class="nav-item position-relative">
+      <button
+        type="button"
+        id="nBtn"
+        class="btn btn-light"
+        aria-haspopup="true"
+        aria-expanded="false"
+        style="display: flex; align-items: center"
+      >
+        <img src="{% static 'images/menu.svg' %}" alt="Notifications" />
+      </button>
+
+      <!-- Notifications Dropdown -->
+      <div
+        id="nMenu"
+        class="customize-menu card position-absolute mt-2"
+        style="display: none; right: 0; z-index: 1"
+      >
+        <div class="card-body">
+          <h6>Notifications</h6>
+          <p>You have 0 unread messages.</p>
+          <div class="notification-item border p-2 mb-2">
+            <h6 class="mb-1">New Label Created</h6>
+            <p class="mb-0 text-muted">6 hours ago</p>
+            <p>Your label has been created successfully</p>
+          </div>
+          <button class="btn btn-dark w-100 mt-2">Mark all as read</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dropdown for small devices -->
+    <div class="d-lg-none position-relative">
+      <button
+        class="btn btn-secondary"
+        type="button"
+        id="smallDeviceDropdown"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        style="
+          background: none;
+          border: none;
+          padding: 0;
+          font-size: 24px;
+          color: #000;
+        "
+      >
+        ⋮
+      </button>
+      <ul
+        class="dropdown-menu dropdown-menu-end position-absolute end-0"
+        aria-labelledby="smallDeviceDropdown"
+      >
+        <li>
+          <a class="dropdown-item" href="/newLable">Create New Label</a>
+        </li>
+        <li><a class="dropdown-item" href="/addfund">Add Funds</a></li>
+        <li><a class="dropdown-item" href="#">Balance: $1,059.00</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin-Settings</title>
+    {% load static %}
+    <link rel="icon" type="image/x-icon" href="images/images/logo1.png" />
+
+    <link rel="stylesheet" href="../../static/index.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <link
+      href="bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include jQuery -->
+
+    <style>
+      .card {
+        display: flex;
+        flex-direction: row;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        font-size: 16px;
+      }
+      .notification-card .card {
+        display: flex;
+        flex-direction: row;
+        background-color: white;
+        padding: 50px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        font-size: 18px;
+      }
+
+      .btnList {
+        min-width: 250px;
+        width: 25%;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        padding-top: 1.5rem;
+      }
+      .btnList:hover {
+        background-color: #fff;
+        font-size: large;
+      }
+      .btnList button {
+        margin-bottom: 2rem;
+        height: 20%;
+      }
+      .signup-box:hover {
+        background-color: #fff;
+        font-size: medium;
+      }
+      .signup-box {
+        margin: 0;
+        padding: 0;
+        margin-left: 30px;
+        width: 70% !important;
+        display: none;
+        height: fit-content;
+      }
+      .signup-box p {
+        margin: 0;
+      }
+      .signup-box button {
+        margin-top: 2rem;
+      }
+      .signup-box.active {
+        display: block;
+        margin: 0;
+      }
+      .pDIv {
+        display: flex;
+        flex-direction: row;
+        margin-top: 10px;
+        gap: 30px;
+      }
+      .signup-box,
+      label {
+        text-align: left;
+        margin-bottom: 5px;
+      }
+      .signup-box,
+      input {
+        margin-bottom: 10px;
+      }
+      .toggle-item,
+      .notification-item {
+        border: 1px solid rgb(43, 42, 42);
+        margin-bottom: 10px;
+        border-radius: 10px;
+        padding: 10px;
+      }
+      .toggle-item {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .toggle-item span {
+        flex-grow: 1;
+        text-align: left;
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .notification-card {
+        width: 700px;
+        height: 360px;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 34px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 12px;
+        width: 12px;
+        border-radius: 50%;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.4s;
+      }
+
+      input:checked + .slider {
+        background-color: #4caf50;
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+      @media (max-width: 769px) {
+        .pDIv {
+          display: flex;
+          flex-direction: column;
+        }
+        .btnList {
+          gap: 5px;
+          display: flex;
+          margin-right: 0px;
+          flex-direction: row;
+          margin-bottom: 20px;
+          width: 100%;
+          min-width: 100%;
+        }
+        .signup-box {
+          min-width: 100%;
+          width: 100%;
+        }
+        .btnList button {
+          min-inline-size: fit-content;
+          display: flex;
+          margin-bottom: 0;
+          padding: 10px;
+          flex-direction: column;
+          align-items: center;
+        }
+      }
+      @media (max-width: 620px) {
+        main {
+          margin: 2rem !important;
+        }
+        .tabs {
+          display: none;
+        }
+        .tabs-img {
+          width: 25px;
+        }
+        .btnList button {
+          height: auto !important;
+        }
+      }
+      @media (max-width: 500px) {
+        .card .btn-light {
+          width: 80px;
+          margin-left: 0px;
+          margin-right: 0px;
+          align-items: center;
+          height: 100px;
+        }
+      }
+
+      .head {
+        background: #000;
+        color: white;
+        padding: 20px 30px;
+        border-radius: 7px 7px 0px 0px;
+      }
+      .inner {
+        padding: 30px 40px;
+      }
+      input,
+      select {
+        padding: 0.75rem !important;
+      }
+      .float-right {
+        float: right;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="row bigDiv">
+      <!-- sidebar -->
+      <div
+        class="sidebar nav col-5 col-sm-4 col-md-3 col-xl-3 col-xxl-2 col-lg-3"
+      >
+        <div id="sidebar">{% include 'sidebarAdmin.html' %}</div>
+      </div>
+      <!-- Header -->
+      <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9 col-xxl-10">
+        <div class="row">
+          <div id="header" class="p-0">{% include 'navbarAdmin.html' %}</div>
+        </div>
+        <main style="margin: 1rem">
+          <div>
+            <h2>Settings</h2>
+            <br />
+            <div class="pDIv">
+              <div class="btnList card">
+                <button
+                  onclick="showCard(0)"
+                  class="form-control btn btn-light"
+                  id="pBtn"
+                >
+                  <img
+                    class="tabs-img"
+                    src="{% static '/images/payment-config.svg' %}"
+                  />
+                  <p class="tabs">Payments Configuration</p>
+                </button>
+                <button
+                  onclick="showCard(1)"
+                  class="form-control btn btn-light"
+                  id="cBtn"
+                >
+                  <img
+                    class="tabs-img"
+                    src="{% static '/images/email-config.svg' %}"
+                  />
+
+                  <p class="tabs">Email Configuration</p>
+                </button>
+                <button
+                  onclick="showCard(2)"
+                  class="form-control btn btn-light"
+                  id="nBtn"
+                >
+                  <img
+                    class="tabs-img"
+                    src=" {% static '/images/label-api.svg' %}"
+                  />
+
+                  <p class="tabs">Label API Configuration</p>
+                </button>
+              </div>
+              <div class="signup-box card" id="Profile">
+                <div class="head">
+                  <h2>Payment Configuration</h2>
+                  <p>
+                    You can change or update your payment keys information from
+                    here
+                  </p>
+                </div>
+                <form action="#" class="inner">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="stripeKey">Stripe Key</label>
+                        <input
+                          type="text"
+                          id="stripeKey"
+                          name="stripeKey"
+                          class="form-control"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="stripeSecret">Stripe Secret</label>
+                        <input
+                          type="text"
+                          id="stripeSecret"
+                          name="stripeSecret"
+                          class="form-control"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="stripeWebhookSecret"
+                          >Stripe Webhook Secret</label
+                        >
+                        <input
+                          type="text"
+                          id="stripeWebhookSecret"
+                          name="stripeWebhookSecret"
+                          class="form-control"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="coinbaseKey">Coinbase Key</label>
+                        <input
+                          type="text"
+                          id="coinbaseKey"
+                          name="coinbaseKey"
+                          class="form-control"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="coinbaseWebhookSecret"
+                          >Coinbase Webhook Secret</label
+                        >
+                        <input
+                          type="text"
+                          id="coinbaseWebhookSecret"
+                          name="coinbaseWebhookSecret"
+                          class="form-control"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="venmoEmail">Venmo Email</label>
+                        <input
+                          type="email"
+                          id="venmoEmail"
+                          name="venmoEmail"
+                          class="form-control"
+                          placeholder="example@hotmail.com"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="cashappEmail">Cashapp Email</label>
+                        <input
+                          type="email"
+                          id="cashappEmail"
+                          name="cashappEmail"
+                          class="form-control"
+                          placeholder="example@hotmail.com"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="zelleEmail">Zelle Email</label>
+                        <input
+                          type="email"
+                          id="zelleEmail"
+                          name="zelleEmail"
+                          class="form-control"
+                          placeholder="example@hotmail.com"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="text-end">
+                    <button type="submit" class="btn btn-dark mt-3 py-2 px-4">
+                      Update Payment Configuration
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <div class="card signup-box" id="Coupons">
+                <div class="head">
+                  <h3>Email Configuration</h3>
+                  <p>
+                    You can change or update your email keys information from
+                    here
+                  </p>
+                </div>
+                <div class="inner">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>From Email</label>
+                        <input class="form-control" type="email" />
+                      </div>
+                    </div>
+
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>From Name</label>
+                        <input class="form-control" type="text" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Smtp Host</label>
+                        <input class="form-control" type="email" />
+                      </div>
+                    </div>
+
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Smtp Port</label>
+                        <input class="form-control" type="number" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Smtp User</label>
+                        <input class="form-control" type="email" />
+                      </div>
+                    </div>
+
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label>Smtp Password</label>
+                        <input class="form-control" type="password" />
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    class="form-control btn btn-dark mt-3 mb-5 py-2 px-4 float-right"
+                    style="width: fit-content"
+                  >
+                    Update Email Configuration
+                  </button>
+                </div>
+              </div>
+
+              <div class="card signup-box" id="Account">
+                <div class="head">
+                  <h2>Label Configuration</h2>
+                  <p>
+                    You can change or update your label keys information from
+                    here
+                  </p>
+                </div>
+
+                <div class="inner">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label>Label Api key</label>
+                      <input class="form-control" type="text" />
+                    </div>
+                  </div>
+
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label>Label host</label>
+                      <input class="form-control" type="text" />
+                    </div>
+                  </div>
+                  <button
+                    class="form-control btn btn-dark mt-3 mb-5 py-2 px-4 float-right btn-block"
+                    style="width: fit-content"
+                  >
+                    Update Label Api Configuration
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      const cards = document.querySelectorAll(".signup-box");
+
+      // Show first card by default
+      if (cards[0]) {
+        cards[0].classList.add("active");
+      }
+
+      function showCard(index) {
+        // Hide all cards
+        cards.forEach((card) => card.classList.remove("active"));
+
+        // Show the selected card
+        if (cards[index]) {
+          cards[index].classList.add("active");
+        }
+      }
+    </script>
+    <script src="../../static/index.js"></script>
+  </body>
+</html>

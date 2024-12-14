@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin-Payments</title>
+    <link rel="icon" type="image/x-icon" href="images/images/logo1.png" />
+
+    <link rel="stylesheet" href="../../static/index.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include jQuery -->
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <link
+      href="bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qbtdOARb87GzPe7NiN6yRT3/1hcx2qmxZWvsJM4rL5RCVyAWwbRNScgPptFTaqdM" crossorigin="anonymous"></script>
+
+    <style>
+      .table {
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .table th,
+      .table td {
+        vertical-align: middle;
+        padding: 15px;
+        text-align: left;
+      }
+
+      .table thead {
+        background-color: #343a40;
+        color: white;
+      }
+
+      .headDiv {
+        margin-left: 0px;
+      }
+      .hidden {
+        display: none;
+      }
+      /* Pagination Styles */
+      .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .pagination .page-item.active .page-link {
+        background-color: #67e6be;
+        border-color: #67e6be;
+      }
+
+      .pagination .page-link {
+        background-color: white;
+        color: black;
+        padding: 10px 15px;
+        margin: 0 5px;
+      }
+
+      .heading {
+        @media (max-width: 758px) {
+          margin: 10px !important;
+        }
+      }
+
+      .pagination .page-link:hover {
+        background-color: #e9ecef;
+        color: black;
+      }
+      .prev {
+        background-color: #6c757d !important;
+        opacity: 30%;
+      }
+      label {
+        text-align: left;
+        margin-bottom: 5px;
+      }
+      input {
+        margin-bottom: 20px;
+      }
+      select {
+        margin-bottom: 20px;
+      }
+      .form-control {
+        padding: 0.75rem 0.75rem;
+      }
+      .form-select {
+        padding: 0.75rem 2.25rem 0.75rem 0.75rem;
+      }
+      .blur-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(5px);
+        z-index: 1;
+        padding: 50px;
+      }
+
+      .form-container {
+        background-color: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        width: 500px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2;
+        display: none;
+      }
+
+      select {
+        width: 100%;
+        border: 1px solid rgb(224, 224, 224);
+        padding: 10px;
+        border-radius: 10px;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .radio-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 5px;
+      }
+      .ship {
+        margin: 2rem;
+      }
+      .ship:hover {
+        background-color: white;
+        font-size: large;
+      }
+
+      @media (max-width: 570px) {
+        .form-container {
+          width: 250px;
+        }
+      }
+    </style>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function (event3) {
+        const cBtn = document.getElementById("cBtn");
+        var cMenu = document.getElementById("cMenu");
+
+        cBtn.addEventListener("click", function (event3) {
+          cMenu = document.getElementById("cMenu");
+          cMenu.style.display = "block";
+          event.stopPropagation();
+        });
+        document.querySelectorAll(".toggle-col").forEach(function (checkbox) {
+          console.log("gfjgh");
+          checkbox.addEventListener("change", function () {
+            const colClass = this.getAttribute("data-col");
+            const isVisible = this.checked;
+            console.log("eee");
+
+            document
+              .querySelectorAll(
+                "th:nth-child(" + colClass + "), td:nth-child(" + colClass + ")"
+              )
+              .forEach(function (cell) {
+                cell.style.display = isVisible ? "" : "none";
+              });
+          });
+        });
+        document.addEventListener("click", function (event3) {
+          if (
+            cMenu.style.display == "block" &&
+            !cMenu.contains(event.target) &&
+            event.target !== cBtn
+          ) {
+            cMenu.style.display = "none";
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="row bigDiv">
+      <!-- sidebar -->
+      <div
+        class="sidebar nav col-5 col-sm-4 col-md-3 col-xl-3 col-xxl-2 col-lg-3"
+      >
+        <div id="sidebar">{% include 'sidebarAdmin.html' %}</div>
+      </div>
+      <!-- Header -->
+      <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9 col-xxl-10">
+        <div class="row">
+          <div id="header" class="p-0">{% include 'navbarAdmin.html' %}</div>
+        </div>
+        <main style="margin: 1rem">
+          <div style="margin-bottom: 50px" class="headDiv" id="packageDiv">
+            <div class="heading row m-5 mb-0">
+              <h2 class="col-sm-6 col-md-7 col-lg-7">Payment</h2>
+              <div
+                class="head d-flex justify-content-end col-sm-6 col-md-5 col-lg-5 mt-2"
+              >
+                <button
+                  class="form-control btn btn-light"
+                  style="width: fit-content"
+                  id="sBtn"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="lucide lucide-search"
+                  >
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path>
+                  </svg>
+                </button>
+                <button
+                  id="cBtn"
+                  class="form-control btn btn-dark"
+                  style="width: fit-content"
+                >
+                  Customize Columns
+                </button>
+              </div>
+            </div>
+
+            <br />
+
+            <div
+              id="cMenu"
+              class="c-menu hidden card"
+              style="
+                position: absolute;
+                right: 30px;
+                z-index: 1;
+                text-align: left;
+              "
+            >
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="1"
+                  checked
+                />
+                Payment #</label
+              ><br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="2"
+                  checked
+                />
+                Name</label
+              ><br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="3"
+                  checked
+                />
+                Email</label
+              ><br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="4"
+                  checked
+                />
+                Gateway</label
+              ><br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="5"
+                  checked
+                />
+                Previous Balance</label
+              >
+              <br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="5"
+                  checked
+                />
+                Request Balance</label
+              >
+              <br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="5"
+                  checked
+                />
+                New Balance</label
+              >
+              <br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="5"
+                  checked
+                />
+                Request At</label
+              >
+              <br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="5"
+                  checked
+                />
+                Status</label
+              >
+            </div>
+            <div class="blur-bg" id="blurBg">
+              <div id="sMenu" class="form-container s-menu hidden">
+                <form>
+                  <div>
+                    <label>Label</label>
+                    <select>
+                      <option>Lable</option>
+                      <option>Batch</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="labelId">Label ID</label>
+                    <input
+                      type="text"
+                      id="labelId"
+                      placeholder="375ef169-ec23-445f-9c6e-3f580cc4fcbc"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+                  <button class="form-control btn btn-dark">Search</button>
+                </form>
+              </div>
+            </div>
+
+            <div class="card mt-5">
+              <div class="table-responsive">
+                <table class="table table-hover" id="user">
+                  <thead>
+                    <tr>
+                      <th>Payment #</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Gateway</th>
+                      <th>Previous Balance</th>
+                      <th>Request Balance</th>
+                      <th>New Balance</th>
+                      <th>Status</th>
+                      <th>Request At</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pay_list"></tbody>
+                </table>
+              </div>
+
+              <!-- Pagination -->
+              <nav aria-label="Page navigation" class="my-4">
+                <ul class="pagination justify-content-end">
+                  <li class="page-item">
+                    <a class="page-link prev text-white" href="#" tabindex="-1"
+                      >Previous</a
+                    >
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">1</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">2</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">3</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link bg-black text-white" href="#">Next</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="../../static/index.js"></script>
+    <script>
+      $(document).ready(function () {
+        pay_list();
+      });
+
+      function pay_list() {
+        $.ajax({
+          url: "/api/pay/",
+          type: "GET",
+          success: function (response) {
+            console.log(response);
+
+            // Clear the table before appending new data
+            $("#pay_list").html("");
+
+            $.each(response, function (index, pay) {
+              $("#pay_list").append(`
+                <tr>
+                  <td>${pay.payment_number}</td>
+                  <td>${pay.name}</td>            
+                  <td>${pay.email}</td>                  
+                  <td>${pay.gateway}</td>               
+                  <td>${pay.previous_balance}</td>
+                  <td>${pay.request_balance}</td>
+                  <td>${pay.new_balance}</td>
+                  <td>${pay.status}</td>
+                  <td>${pay.request_at}</td>
+                  <td class="d-flex gap-1">
+                        <button class="form-control btn btn-dark" onclick="updatePaymentStatus(${pay.id}, 'accept')">
+                          Accept
+                        </button>
+                        <button class="form-control btn btn-danger" onclick="updatePaymentStatus(${pay.id}, 'reject')">
+                          Reject
+                        </button>
+                    </td>
+                 </tr>
+             `);
+            });
+          },
+          error: function (error) {
+            console.error("Error fetching payments:", error);
+          },
+        });
+      }
+
+      function getCSRFToken() {
+        let token = null;
+        const cookies = document.cookie.split(";");
+        cookies.forEach(function (cookie) {
+          if (cookie.trim().startsWith("csrftoken=")) {
+            token = cookie.split("=")[1];
+          }
+        });
+        return token;
+      }
+
+      function updatePaymentStatus(paymentId, action) {
+        const csrfToken = getCSRFToken(); // Get CSRF token
+
+        $.ajax({
+          url: `/api/pay/${paymentId}/`, // Endpoint for updating payment
+          type: "PUT",
+          data: JSON.stringify({ action: action }),
+          contentType: "application/json",
+          headers: {
+            "X-CSRFToken": csrfToken, // Add CSRF token to the request headers
+          },
+          success: function (response) {
+            alert(response.message);
+            pay_list(); // Refresh the payment list after updating
+          },
+          error: function (error) {
+            console.error("Error updating payment status:", error);
+            alert("Failed to update payment status.");
+          },
+        });
+      }
+      $(document).ready(function () {
+  $('#user').DataTable({
+      "paging": true,
+      "ordering": true,
+      "searching": true,
+      "info": true,
+      "responsive": true,
+  });
+});
+    </script>
+  </body>
+</html>

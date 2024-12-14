@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Referrals-Volusion</title>
+    <link rel="icon" type="image/x-icon" href="../images/images/logo1.png" />
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'index.css' %}" />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <link
+      href="../bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+
+      .table {
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .heading {
+        @media (max-width: 758px) {
+          margin: 10px !important;
+        }
+      }
+
+      .table th,
+      .table td {
+        vertical-align: middle;
+        padding: 15px;
+        text-align: center;
+      }
+
+      .table thead {
+        background-color: #343a40;
+        color: white;
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 10px;
+        top: 30px;
+        background-color: #f9f9f9;
+        min-width: 120px;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+      }
+
+      .dropdown:hover .dropdown-content {
+        display: block;
+      }
+
+      .dropdown-btn {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 20px;
+      }
+
+      .card {
+        border: none;
+        margin-bottom: 20px;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* Pagination Styles */
+      .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .pagination .page-item.active .page-link {
+        background-color: #67e6be;
+        border-color: #67e6be;
+      }
+
+      .pagination .page-link {
+        background-color: white;
+        color: black;
+        padding: 10px 15px;
+        margin: 0 5px;
+      }
+
+      .pagination .page-link:hover {
+        background-color: #e9ecef;
+        color: black;
+      }
+      .prev {
+        background-color: #6c757d !important;
+        opacity: 30%;
+      }
+      #no-data-image {
+        display: none;
+        text-align: center;
+      }
+    </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", function (event3) {
+        const cBtn = document.getElementById("cBtn");
+        var cMenu = document.getElementById("cMenu");
+
+        cBtn.addEventListener("click", function (event3) {
+          cMenu = document.getElementById("cMenu");
+          cMenu.style.display = "block";
+          event.stopPropagation();
+        });
+
+        document.querySelectorAll(".toggle-col").forEach(function (checkbox) {
+          console.log("gfjgh");
+          checkbox.addEventListener("change", function () {
+            const colClass = this.getAttribute("data-col");
+            const isVisible = this.checked;
+            console.log("eee");
+
+            document
+              .querySelectorAll(
+                "th:nth-child(" + colClass + "), td:nth-child(" + colClass + ")"
+              )
+              .forEach(function (cell) {
+                cell.style.display = isVisible ? "" : "none";
+              });
+          });
+        });
+        document.addEventListener("click", function (event3) {
+          if (
+            cMenu.style.display == "block" &&
+            !cMenu.contains(event.target) &&
+            event.target !== cBtn
+          ) {
+            cMenu.style.display = "none";
+          }
+        });
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        const tbody = document.getElementById("dataTableBody");
+        const noDataImage = document.getElementById("no-data-image");
+
+        // Check if tbody has any rows
+        const hasData = tbody.querySelectorAll("td").length > 0;
+
+        // Show or hide the table body and image based on data availability
+        if (hasData) {
+          tbody.style.display = "table-row-group";
+          noDataImage.style.display = "none !important";
+        } else {
+          tbody.style.display = "none";
+          noDataImage.style.display = "block";
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div class="row bigDiv">
+      <!-- sidebar -->
+      <div
+        class="sidebar nav col-5 col-sm-4 col-md-3 col-xl-3 col-xxl-2 col-lg-3"
+      >
+        <div id="sidebar">{% include 'sidebar.html' %}</div>
+      </div>
+      <!-- Header -->
+      <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9 col-xxl-10">
+        <div class="row">
+          <div id="header" class="p-0">{% include 'navbar.html' %}</div>
+        </div>
+        <main style="margin: 1rem">
+          <div style="margin-bottom: 50px" class="headDiv" id="packageDiv">
+            <div class="heading m-5">
+              <!-- Referrals Heading and Customize Columns Button -->
+              <div class="row align-items-center mb-4">
+                <h2 class="col-12 col-md-7">Referrals</h2>
+                <div class="col-12 col-md-5 text-md-end mt-2 mt-md-0">
+                  <button id="cBtn" class="btn btn-dark">
+                    Customize Columns
+                  </button>
+                </div>
+              </div>
+
+              <!-- Referral Bonus Section -->
+              <div class="p-3 bg-light rounded shadow-sm mb-4">
+                <div class="d-flex align-items-center mb-2">
+                  <img
+                    src="{% static 'images/referral-bonus.svg' %}"
+                    alt="Referral Bonus"
+                    class="me-2"
+                    style="width: 24px; height: 24px"
+                  />
+                  <span class="fw-bold">Referral Bonus!</span>
+                </div>
+                <div class="row align-items-center">
+                  <p class="col-12 col-md-9 mb-2 mb-md-0">
+                    You will get 10% from every referral you made.
+                  </p>
+                  <div class="col-12 col-md-3 text-md-end">
+                    <button class="btn btn-dark w-100 w-md-auto">
+                      Copy Your Referral Link
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Customize Columns Menu (Initially Hidden) -->
+              <div
+                id="cMenu"
+                class="card p-3 position-absolute hidden"
+                style="right: 30px; z-index: 1"
+              >
+                <div class="form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input toggle-col"
+                    data-col="1"
+                    id="nameCol"
+                    checked
+                  />
+                  <label class="form-check-label" for="nameCol">Name</label>
+                </div>
+                <div class="form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input toggle-col"
+                    data-col="2"
+                    id="emailCol"
+                    checked
+                  />
+                  <label class="form-check-label" for="emailCol">Email</label>
+                </div>
+                <div class="form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input toggle-col"
+                    data-col="3"
+                    id="withdrawCol"
+                    checked
+                  />
+                  <label class="form-check-label" for="withdrawCol"
+                    >Available for Withdraw</label
+                  >
+                </div>
+                <div class="form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input toggle-col"
+                    data-col="4"
+                    id="joinedAtCol"
+                    checked
+                  />
+                  <label class="form-check-label" for="joinedAtCol"
+                    >Joined At</label
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="card mt-5">
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Available for Withdraw</th>
+                      <th>Joined At</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tb"></tbody>
+                </table>
+              </div>
+
+              {% comment %}
+              <div id="no-data-image" class="text-center">
+                <img
+                  src="{% static 'images/no-results.svg' %}"
+                  class="img-fluid"
+                  style="height: 200px"
+                  alt="No results"
+                />
+                <p>No referrals available at the moment.</p>
+              </div>
+              {% endcomment %}
+
+              <!-- Pagination -->
+              <nav aria-label="Page navigation" class="my-4">
+                <ul class="pagination justify-content-end">
+                  <li class="page-item">
+                    <a class="page-link prev text-white" href="#" tabindex="-1"
+                      >Previous</a
+                    >
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">1</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">2</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">3</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link bg-black text-white" href="#">Next</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script src="../../static/index.js"></script>
+    <script>
+      $(document).ready(function () {
+        $.ajax({
+          url: "http://127.0.0.1:8000/api/referrals/",
+          method: "GET",
+          success: function (response) {
+            console.log(response);
+            let tbody = $("#tb");
+            tbody.empty();
+            response.forEach(function (referrals) {
+              let row = `<tr>
+                      <td>${referrals.name}</td>
+                      <td>${referrals.email}</td>
+                      <td>${referrals.available_for_withdraw}</td>
+                      <td>${referrals.joined_at}</td>
+                      
+                    </tr>`;
+
+              tbody.append(row);
+            });
+          },
+          error: function (error) {
+            console.log("Error:", error);
+            alert("Failed to retrieve data from the server.");
+          },
+        });
+      });
+    </script>
+  </body>
+</html>

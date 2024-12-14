@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Support-Volusion</title>
+    <link rel="icon" type="image/x-icon" href="../images/images/logo1.png" />
+    {% load static %}
+    <!-- Load custom CSS (ensure this path is correct) -->
+    <link rel="stylesheet" href="../../static/index.css" />
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <!-- jQuery (important: always load jQuery before DataTables JS) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <!-- Bootstrap 5 JS (optional, depending on your needs) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Bootstrap 5 additional CSS (if needed, you can remove if redundant) -->
+    <link href="bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css" rel="stylesheet" />
+  
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+
+      .table {
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .table th,
+      .table td {
+        vertical-align: middle;
+        padding: 15px;
+        text-align: left;
+      }
+
+      .table thead {
+        background-color: #343a40;
+        color: white;
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 10px;
+        top: 30px;
+        background-color: #f9f9f9;
+        min-width: 120px;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+      }
+
+      .dropdown:hover .dropdown-content {
+        display: block;
+      }
+
+      .dropdown-btn {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 20px;
+      }
+
+      .card {
+        border: none;
+        margin-bottom: 20px;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* Pagination Styles */
+      .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .pagination .page-item.active .page-link {
+        background-color: #67e6be;
+        border-color: #67e6be;
+      }
+
+      .pagination .page-link {
+        background-color: white;
+        color: black;
+        padding: 10px 15px;
+        margin: 0 5px;
+      }
+
+      .pagination .page-link:hover {
+        background-color: #e9ecef;
+        color: black;
+      }
+      .prev {
+        background-color: #6c757d !important;
+        opacity: 30%;
+      }
+
+      .heading {
+        @media (max-width: 758px) {
+          margin: 10px !important;
+        }
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .dropdown-content a {
+        color: black;
+        padding: 8px 12px;
+        text-decoration: none;
+        display: block;
+      }
+
+      .dropdown-content a:hover {
+        background-color: #f1f1f1;
+      }
+
+      .ship {
+        margin: 2rem;
+      }
+      .ship:hover {
+        background-color: white;
+        font-size: large;
+      }
+      label {
+        text-align: left;
+      }
+      input {
+        margin-bottom: 10px;
+      }
+      #ViewMassage {
+        width: 700px;
+        margin-bottom: 30px;
+      }
+
+      @media (max-width: 570px) {
+        #ViewMassage {
+          width: 350px;
+        }
+      }
+    </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", function (event3) {
+        const cBtn = document.getElementById("cBtn");
+        var cMenu = document.getElementById("cMenu");
+
+        cBtn.addEventListener("click", function (event3) {
+          cMenu = document.getElementById("cMenu");
+          cMenu.style.display = "block";
+          event.stopPropagation();
+        });
+
+        document.querySelectorAll(".toggle-col").forEach(function (checkbox) {
+          console.log("gfjgh");
+          checkbox.addEventListener("change", function () {
+            const colClass = this.getAttribute("data-col");
+            const isVisible = this.checked;
+            console.log("eee");
+
+            document
+              .querySelectorAll(
+                "th:nth-child(" + colClass + "), td:nth-child(" + colClass + ")"
+              )
+              .forEach(function (cell) {
+                cell.style.display = isVisible ? "" : "none";
+              });
+          });
+        });
+        document.addEventListener("click", function (event3) {
+          if (
+            cMenu.style.display == "block" &&
+            !cMenu.contains(event.target) &&
+            event.target !== cBtn
+          ) {
+            cMenu.style.display = "none";
+          }
+        });
+      });
+
+      document.addEventListener("DOMContentLoaded", function (event5) {
+        document
+          .getElementById("ticketBtn")
+          .addEventListener("click", function () {
+            document.getElementById("createticket").style.display = "block";
+            document.getElementById("packageDiv").style.display = "none";
+
+            event.stopPropagation();
+          });
+      });
+
+      function messageBtn(event6) {
+  document.getElementById("ViewMassage").style.display = "block";
+  document.getElementById("packageDiv").style.display = "none";  // Hide other sections, if needed
+
+  event6.stopPropagation();  // Prevent event propagation
+}
+    </script>
+  </head>
+  <body>
+    <div class="row bigDiv">
+      <!-- sidebar -->
+      <div
+        class="sidebar nav col-5 col-sm-4 col-md-3 col-xl-3 col-xxl-2 col-lg-3"
+      >
+        <div id="sidebar">{% include 'sidebar.html' %}</div>
+      </div>
+      <!-- Header -->
+      <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9 col-xxl-10">
+        <div class="row">
+          <div id="header" class="p-0">{% include 'navbar.html' %}</div>
+        </div>
+        <main style="margin: 1rem">
+          <div style="margin-bottom: 50px" class="headDiv" id="packageDiv">
+            <div class="heading row m-5 mb-0">
+              <h2 class="col-sm-6 col-md-7 col-lg-7">Tickets</h2>
+              <div
+                class="head d-flex justify-content-end gap-2 col-sm-6 col-md-5 col-lg-5 mt-2"
+              >
+                <button
+                  id="ticketBtn"
+                  class="form-control btn btn-secondary"
+                  style="width: fit-content"
+                >
+                  New Ticket
+                </button>
+                <button
+                  id="cBtn"
+                  class="form-control btn btn-dark"
+                  style="width: fit-content"
+                >
+                  Customize Columns
+                </button>
+              </div>
+            </div>
+            <br />
+
+            <div
+              id="cMenu"
+              class="c-menu hidden card"
+              style="
+                position: absolute;
+                right: 30px;
+                z-index: 1;
+                text-align: left;
+              "
+            >
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="1"
+                  checked
+                />
+                Ticket Title</label
+              ><br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="2"
+                  checked
+                />
+                Type</label
+              ><br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="5"
+                  checked
+                />
+                Status</label
+              >
+              <br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="5"
+                  checked
+                />
+                Created At</label
+              >
+            </div>
+
+            <div class="card mt-5">
+              <div class="table-responsive">
+               
+                <table class="table table-hover" id="user">
+                  <thead>
+                    <tr>
+                      <th>Ticket Title</th>
+                      <th>Type</th>
+                      <th>Status</th>
+                      <th>Created At</th>
+                      <th>Chat</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for ticket in support %}
+                      <tr>
+                        <td>{{ ticket.title }}</td>
+                        <td>{{ ticket.type }}</td>
+                        <td>{{ ticket.status }}</td>
+                        <td>{{ ticket.created_at|date:"Y-m-d"  }}</td>
+                        <td class="d-flex gap-1">
+                          <a href="/view_tickets_user/{{ ticket.id }}" class="form-control btn btn-light">
+                            <img src="{% static 'images/view-message.svg' %}" alt="View Message" />
+                            View Message
+                          </a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                
+              </div>
+
+              <!-- Pagination -->
+              <!-- <nav aria-label="Page navigation" class="my-4">
+                <ul class="pagination justify-content-end">
+                  <li class="page-item">
+                    <a class="page-link prev text-white" href="#" tabindex="-1"
+                      >Previous</a
+                    >
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">1</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">2</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">3</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link bg-black text-white" href="#">Next</a>
+                  </li>
+                </ul>
+              </nav> -->
+            </div>
+          </div>
+          <div id="createticket" style="display: none; margin-bottom: 30px">
+            <div style="margin-left: 2rem">
+              <h2>New Ticket</h2>
+              <div style="display: flex">
+                <div>
+                  <div>
+                    <a
+                      style="text-decoration: none; color: black"
+                      href="/supports"
+                      ><div>
+                        <div>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="lucide lucide-ticket"
+                          >
+                            <path
+                              d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"
+                            ></path>
+                            <path d="M13 5v2"></path>
+                            <path d="M13 17v2"></path>
+                            <path d="M13 11v2"></path>
+                          </svg>
+                          <span>Tickets </span>
+                        </div>
+                      </div></a
+                    >
+                  </div>
+                </div>
+                <p style="margin-left: 10px">></p>
+                <a
+                  href="#"
+                  style="text-decoration: none; color: black; margin-left: 10px"
+                >
+                  New Ticket
+                </a>
+              </div>
+            </div>
+
+            <div class="card ship">
+              <label>Subject</label>
+              <input
+                class="form-control"
+                id="title"
+                type="text"
+                required
+                value=""
+              />
+              <label>Type</label>
+              <select id="type" class="form-control">
+                <option >Other</option>
+                <option>Referral</option>
+                <option>Payment</option>
+                <option>Label</option>
+              </select>
+              <label>Message</label>
+              <textarea id="message" class="form-control"></textarea>
+
+              <button
+                class="form-control btn btn-dark mt-2"
+                style="width: fit-content"
+                id="submitCourse"
+              >
+                Submit Ticket
+              </button>
+            </div>
+          </div>
+          <form id="ViewMassage" style="display: none">
+            <h2>Testing</h2>
+            <div style="display: flex; flex-direction: row">
+                <a style="text-decoration: none; color: black" href="/supports">
+                    <div>
+                        <div>
+                          <img src="/static/images/Atickets.svg" alt="Tickets" />
+
+                            <span>Tickets </span>
+                        </div>
+                    </div>
+                </a>
+                <p style="margin-left: 10px">></p>
+                <a href="#" style="text-decoration: none; color: black; margin-left: 10px">testing</a>
+            </div>
+        
+            <div class="card tmaindiv vMDiv" style="text-align: center">
+                <h6 style="border: 1px solid rgb(82, 82, 82); padding: 20px; text-align: left; border-radius: 5px; margin-bottom: 20px;">
+                    Subject: <span id="subject"></span>
+                </h6>
+        
+                <p id="ticketDate" style="border: 1px solid rgb(82, 82, 82); padding: 20px; text-align: left; border-radius: 5px;">
+                    Date
+                </p>
+        
+                <textarea
+                    id="messages"
+                    style="border: 1px solid rgb(82, 82, 82); padding: 20px; text-align: left; border-radius: 5px;"
+                    rows="5"
+                ></textarea>
+        
+                <button id="updateTicketBtn" class="form-control btn btn-dark mt-4" style="width: fit-content; padding: 15px 30px" id="updateTicketBtn">
+                    Send
+                </button>
+            </div>
+          </form>
+        
+          
+          
+        </main>
+      </div>
+    </div>
+    <script src="../../static/index.js"></script>
+    <script>
+let currentTicketId = null; 
+function viewmessage(ticketId) {
+    currentTicketId = ticketId; 
+    console.log("Ticket ID:", ticketId);
+
+    $.ajax({
+        url: `http://127.0.0.1:8000/api/tickets/${ticketId}/`,
+        type: 'GET',
+        success: function (data) {
+            console.log("Fetched data:", data);
+
+            $('#ticketDate').text(data.created_at);
+
+            $('#messages').val(data.message || "No message available");
+
+            $('#subject').text(data.title || "No subject available");
+
+            $('#ViewMassage').show();
+            $('#packageDiv').hide();
+        },
+        error: function (error) {
+            console.log('Error fetching ticket:', error);
+            alert('Failed to retrieve ticket data.');
+        }
+    });
+}
+
+
+  $(document).ready(function () {
+        $.ajax({
+          url: "http://127.0.0.1:8000/api/tickets/",
+          method: "GET",
+          success: function (response) {
+            console.log(response);
+            let tbody = $("#tb");
+            tbody.empty();
+            response.forEach(function (tickets) {
+              let row = `<tr>
+                      <td>${tickets.title}</td>
+                      <td>${tickets.type}</td>
+                      <td>${tickets.status}</td>
+  <td>${tickets.created_at}</td>
+                         <td class="d-flex gap-1">
+                          <a href="/view_tickets_user/${tickets.id}" class="form-control btn btn-light"  >
+                             <img src="{% static '/images/view-message.svg' %}" />
+                      View Message
+                            </a>
+                    
+
+                  </td>
+                    </tr>`;
+
+              tbody.append(row);
+            });
+          },
+          error: function (error) {
+            console.log("Error:", error);
+            alert("Failed to retrieve data from the server.");
+          },
+        });
+       
+       
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === name + "=") {
+                cookieValue = decodeURIComponent(
+                  cookie.substring(name.length + 1)
+                );
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+
+        const csrfToken = getCookie("csrftoken");
+
+        $("#submitCourse").click(function (e) {
+    e.preventDefault();
+
+    const messageValue = $("#message").val();
+    console.log("Message content before submit:", messageValue); 
+    const courseData = {
+        title: $("#title").val(),
+        type: $("#type").val(),
+        message: messageValue
+    };
+    console.log(courseData, "Submitted data:");
+
+    $.ajax({
+        url: "http://127.0.0.1:8000/api/tickets/",
+        type: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,
+        },
+        data: JSON.stringify(courseData),
+        success: function (response) {
+            alert("Ticket added successfully!");
+            $("#ViewMassage")[0].reset();
+                console.log("Redirecting to /supports/");
+                window.location.href = "/supports/";
+        },
+        error: function (xhr, status, error) {
+            console.log(xhr.responseText); 
+            alert("Failed to add ticket.");
+        },
+    });
+});
+
+      });
+      $(document).ready(function () {
+  $('#user').DataTable({
+      "paging": true,
+      "ordering": false,
+      "searching": true,
+      "info": true,
+      "responsive": true,
+  });
+});
+    </script>
+  </body>
+</html>

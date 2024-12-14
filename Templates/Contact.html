@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Us</title>
+    <link rel="icon" type="image/x-icon" href="images/images/logo1.png" />
+
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Font Awesome for icons -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background:  rgba(8, 8, 8, 0.1);;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .contact-container {
+        margin: 20px;
+        display: flex;
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 1200px;
+        max-height: 500px;
+        height: 100%;
+      }
+
+      .contact-info {
+        background-color: #f8f8f8;
+        padding: 20px;
+        width: 40%;
+        text-align: center;
+      }
+
+      .contact-info h2 {
+        font-size: 24px;
+        font-style: italic;
+        margin-top: 140px;
+      }
+
+      .contact-info p {
+        font-size: 20px;
+        margin-bottom: 15px;
+      }
+
+      .contact-form {
+        padding: 20px;
+        width: 60%;
+      }
+
+      .contact-form h2 {
+        font-size: 24px;
+        margin-bottom: 30px;
+      }
+
+      .contact-form input {
+        width: 100%;
+        height: 40px;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .contact-form textarea {
+        width: 100%;
+        height: 230px;
+        padding: 10px;
+        margin-bottom: 25px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      /* .contact-form button {
+        background-color: #67e6be;
+        color: black;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+      }
+
+      .contact-form button:hover {
+        background-color: #98f1d5;
+      } */
+      button {
+    background: transparent;          /* Transparent background */
+    border: 1px solid black;          /* Black border */
+    color: black;                     /* Text color black */
+    padding: 10px 20px;               /* Optional: Adjust padding for size */
+    cursor: pointer;                  /* Optional: Change cursor to pointer */
+    border-radius: 4px;               /* Optional: Rounded corners */
+}
+
+button:hover {
+    background: black;                /* Black background on hover */
+    color: white;                     /* White text on hover */
+}
+
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+        padding-top: 60px;
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 8px;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
+        .contact-container {
+          flex-direction: column;
+          max-height: fit-content;
+        }
+
+        .contact-info,
+        .contact-form {
+          width: 100%;
+        }
+
+        .contact-info {
+          text-align: center;
+        }
+
+        .contact-info h2 {
+          font-size: 24px;
+          font-style: italic;
+          margin-top: 0;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .contact-container {
+          flex-direction: column;
+          max-height: fit-content;
+        }
+        .contact-info h2,
+        .contact-form h2 {
+          font-size: 20px;
+          margin-top: 0;
+        }
+
+        .contact-info p,
+        .contact-form input,
+        .contact-form textarea {
+          font-size: 14px;
+        }
+
+        .contact-form button {
+          font-size: 14px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="contact-container">
+      <div class="contact-info">
+        <h2>Contact Information</h2>
+
+        <i
+          style="margin-bottom: 10px; font-size: xx-large; margin-top: 20px"
+          class="fas fa-envelope"
+        ></i>
+        <p>support@xclusivelabels.com</p>
+      </div>
+      <div class="contact-form">
+        <h2>Send us a message</h2>
+        <form id="contact-form">
+          <input type="text" name="name" placeholder="Enter your name" required />
+          <input type="email" name="email" placeholder="Enter your email" required />
+          <textarea placeholder="Enter your message" name="message" required></textarea>
+          <button type="submit">Send Now</button>
+        </form>
+      </div>
+    </div>
+
+  <!-- Success Message Popup Modal -->
+  <div id="success-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <p id="modal-message">Message sent successfully!</p>
+    </div>
+  </div>
+    <!-- jQuery CDN -->
+
+    <script>
+      $(document).ready(function () {
+        // Get the CSRF token from the cookie
+        function getCsrfToken() {
+          var name = "csrftoken=";
+          var decodedCookie = decodeURIComponent(document.cookie);
+          var ca = decodedCookie.split(";");
+          for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == " ") {
+              c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length);
+            }
+          }
+          return "";
+        }
+
+        $('#contact-form').submit(function (e) {
+          e.preventDefault();
+
+          var formData = $(this).serialize();
+
+          $.ajax({
+            url: 'http://127.0.0.1:8000/api/contact/', // Django URL for the backend API
+            method: 'POST',
+            data: formData,
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
+            },
+            success: function (response) {
+              $('#modal-message').html('Message sent successfully!');
+              $('#success-modal').fadeIn(); // Show the modal
+              $('#contact-form')[0].reset();
+            },
+            error: function () {
+              $('#modal-message').html('Failed to send message. Please try again.');
+              $('#success-modal').fadeIn(); // Show the modal on error as well
+            }
+          });
+        });
+
+        $('.close').click(function () {
+          $('#success-modal').fadeOut(); // Hide the modal
+        });
+      });
+    </script>
+
+  </body>
+</html>

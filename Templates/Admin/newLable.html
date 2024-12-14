@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create New Lable-Volusion</title>
+  <link rel="icon" type="image/x-icon" href="images/images/logo1.png" />
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'index.css' %}" />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  <link href="bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    /* .card:hover {
+        background-color: white;
+        font-size: large;
+      } */
+    .card {
+      border: dashed 1.5px whitesmoke;
+      padding: 20px;
+      margin: 30px;
+    }
+
+    .mt-3 {
+      width: 1000px;
+      margin-left: -210px;
+    }
+
+    .mt-4 {
+      align-items: center;
+      gap: 100px;
+    }
+
+    input {
+      margin-bottom: 20px;
+    }
+
+    label {
+      text-align: left;
+      float: left;
+      margin-bottom: 10px;
+    }
+
+    .col-13 {
+      width: fit-content;
+      margin-left: 10px;
+    }
+
+    .col-14 {
+      width: fit-content;
+      margin-bottom: 30px;
+      margin-right: 350px;
+    }
+
+    /* .lablefdiv{
+        width: 990px;
+      }
+      @media (max-width: 998px) {
+        .lablefdiv{
+        width: 900px;
+      }
+     
+      }*/
+
+    @media (max-width: 768px) {
+      .lablefdiv {
+        max-width: 700px;
+      }
+
+      .opt {
+        max-width: 350px;
+      }
+    }
+
+    @media (max-width: 550px) {
+      .lablefdiv {
+        width: 350px;
+        margin-left: 10px;
+        align-content: center;
+      }
+
+      .opt {
+        max-width: 200px;
+      }
+
+      .col-13 {
+        margin-left: -10px;
+        height: auto;
+      }
+    }
+
+    .form-control {
+      padding: 0.75rem 0.75rem !important;
+    }
+
+    .form-select {
+      padding: 0.75rem 2.25rem 0.75rem 0.75rem !important;
+    }
+  </style>
+  <script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+      const brand = document.getElementById("brand");
+      if (brand) {
+        brand.addEventListener("click", function () {
+          var mynav = document.getElementById("snavbarTogglerDemo03");
+          mynav.style.display = "block";
+        });
+      }
+    });
+    document.addEventListener("click", function (event) {
+      var nav = document.getElementById("snavbarTogglerDemo03");
+
+      if (
+        nav.style.display == "block" &&
+        !nav.contains(event.target) &&
+        event.target !== brand
+      ) {
+        nav.style.display = "none";
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function (event1) {
+      document
+        .getElementById("customizeBtn")
+        .addEventListener("click", function () {
+          document.getElementById("customizeMenu").style.display = "block";
+          event.stopPropagation();
+        });
+    });
+    document.addEventListener("click", function (event1) {
+      if (
+        customizeMenu.style.display == "block" &&
+        !customizeMenu.contains(event.target) &&
+        event.target !== customizeBtn
+      ) {
+        customizeMenu.style.display = "none";
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", function (event2) {
+      document.getElementById("nBtn").addEventListener("click", function () {
+        document.getElementById("nMenu").style.display = "block";
+        event.stopPropagation();
+      });
+    });
+    document.addEventListener("click", function (event2) {
+      if (
+        nMenu.style.display == "block" &&
+        !nMenu.contains(event.target) &&
+        event.target !== nBtn
+      ) {
+        nMenu.style.display = "none";
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <div class="row bigDiv">
+    <!-- sidebar -->
+    <div class="sidebar nav col-5 col-sm-4 col-md-3 col-xl-3 col-xxl-2 col-lg-3">
+      <div id="sidebar">
+        {% include 'sidebarAdmin.html' %}
+      </div>
+    </div>
+    <!-- Header -->
+    <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9 col-xxl-10">
+      <div class="row">
+        <div id="header" class="p-0">
+          {% include 'navbarAdmin.html' %}
+        </div>
+      </div>
+      <main class="my-4">
+        <form  id="label" class="container">
+          <h2 class="mb-4">Create New Label</h2>
+
+          <div class="card p-4 mb-4">
+            <div class="row mb-3">
+              <div class="col-md-6 mb-3">
+                <label for="delivery-type">Delivery Type</label>
+                <select id="delivery-type" class="form-select">
+                  <option selected>Choose a delivery type</option>
+                </select>
+                
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="package">Package</label>
+                <select id="package" class="form-select">
+                  <option selected>Choose a Package</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="ship-from">Ship From</label>
+              <select id="ship-from" class="form-select">
+                <option selected>Choose an address</option>
+              </select>
+            </div>
+
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <label for="weight">Weight (lb)</label>
+                <input class="form-control" type="number" id="weight" required />
+              </div>
+              <div class="col-md-3 mb-3">
+                <label for="length">Length (inch)</label>
+                <input class="form-control" type="number" id="length" required />
+              </div>
+              <div class="col-md-3 mb-3">
+                <label for="width">Width (inch)</label>
+                <input class="form-control" type="number" id="width" required />
+              </div>
+              <div class="col-md-3 mb-3">
+                <label for="height">Height (inch)</label>
+                <input class="form-control" type="number" id="height" required />
+              </div>
+            </div>
+          </div>
+
+          <div class="card p-4 d-flex align-items-center mb-4">
+            <label for="csv-upload" class="btn btn-outline-primary mx-2">
+              Import from CSV
+              <input type="file" id="csv-upload" accept=".csv" style="display: none;" />
+            </label>
+            <p class="mx-2 mb-0">--OR--</p>
+            <button class="btn btn-outline-primary mx-2">
+              Import from Store
+            </button>
+          </div>
+          
+
+          <div class="row">
+            <div class="col-lg-8 mb-4">
+              <div class="card p-0">
+                <h4 class="mb-4 p-3 bg-black text-white">Ship To</h4>
+                <div class="p-4">
+                  <div class="row mb-3">
+                    <div class="col-md-6 mb-3">
+                      <label for="name">Name</label>
+                      <input class="form-control" type="text" id="name" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="company">Company (optional)</label>
+                      <input class="form-control" type="text" id="company" />
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-md-6 mb-3">
+                      <label for="address">Address</label>
+                      <input class="form-control" type="text" id="address" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="apt">Apt/Unit/Suite (optional)</label>
+                      <input class="form-control" type="text" id="apt" />
+                    </div>
+                  </div>
+                  <div class="row mb-3">
+                    <div class="col-md-6 mb-3">
+                      <label for="city">City</label>
+                      <input class="form-control" type="text" id="city" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="zip-code">Zip Code</label>
+                      <input class="form-control" type="text" id="zip-code" required />
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="state">State</label>
+                      <input class="form-control" type="text" id="state" required />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="phone">Phone Number</label>
+                      <input class="form-control" type="number" id="phone" required />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <div class="card p-4 mb-4">
+                <p>Single Label Cost: $0.00</p>
+                <p>Total Recipients: 1</p>
+                <hr />
+                <p>You will pay in total: $0.00</p>
+                <button id="confirmPayButton" class="btn btn-dark w-100">Confirm & Pay</button>
+
+              </div>
+              <div class="card p-3">
+                <small class="text-muted">
+                  Note: You are responsible for all variable and transactional
+                  costs of using the service (including but not limited to:
+                  postage, fees for carrier services, package insurance,
+                  direct and indirect costs of third-party service providers
+                  and carriers, transaction fees charged directly by Xclusive
+                  Labels for shipping or other services, or other special
+                  services selected). We hold no responsibility for lost,
+                  stolen, damaged, or undeliverable packages and any other
+                  issues with the carrier or delivery that used a shipping
+                  label provided by Xclusive Labels. You can create a support
+                  ticket and we will assist you if you do encounter an issue,
+                  but please remember we are a label provider and we hold no
+                  responsibility for any issues after a transaction has been
+                  completed on our platform.
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <div class="card p-4 mt-4">
+            <p>Imported recipients will show here</p>
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ 
+  <script src="../../static/index.js"></script>
+  <script>
+    $(document).ready(function () {
+      // Manually populate Delivery Types
+      const deliveryTypes = [
+        { id: 1, name: 'USPS Priority' },
+        { id: 2, name: 'FedEx Ground' },
+        { id: 3, name: 'UPS Next Day Air' }
+      ];
+  
+      const deliveryTypeSelect = $('#delivery-type');
+      deliveryTypes.forEach(type => {
+        const option = $('<option></option>')
+          .val(type.id)
+          .text(type.name);
+        deliveryTypeSelect.append(option);
+      });
+  
+      // Fetch and populate Packages
+      $.ajax({
+        url: 'http://127.0.0.1:8000/api/packages/',
+        method: 'GET',
+        success: function (data) {
+          const packageSelect = $('#package');
+          data.forEach(item => {
+            const option = $('<option></option>')
+              .val(item.id)
+              .text(item.name);
+            packageSelect.append(option);
+          });
+        },
+        error: function (xhr, status, error) {
+          console.error('Failed to load packages:', error);
+          alert('Could not load package options.');
+        }
+      });
+  
+      // Fetch and populate Ship From Addresses
+      $.ajax({
+    url: 'http://127.0.0.1:8000/api/addresses/',
+    method: 'GET',
+    success: function (data) {
+        const shipFromSelect = $('#ship-from');
+        data.forEach(item => {
+            const option = $('<option></option>')
+                .val(item.id)
+                .text(`${item.name}, ${item.address}, ${item.city}, ${item.zip_code}, ${item.state}`);
+            shipFromSelect.append(option);
+        });
+    },
+    error: function (xhr, status, error) {
+        console.error('Failed to load addresses:', error);
+        alert('Could not load address options.');
+    }
+});
+
+      $('#confirmPayButton').on('click', function () {
+    const labelData = {
+        delivery_type: $('#delivery-type').val(),   // Ensure this is the ID of the selected delivery type
+        package: $('#package').val(),                // Ensure this is the ID of the selected package
+        ship_from: $('#ship-from').val(),            // Ensure this is the ID of the selected ship-from address
+        name: $('#name').val(),
+        company: $('#company').val(),
+        address: $('#address').val(),
+        apt_unit: $('#apt').val(),
+        city: $('#city').val(),
+        zip_code: $('#zip-code').val(),
+        state: $('#state').val(),
+        phone: $('#phone').val(),
+    };
+
+    console.log(labelData);  // Log the data to verify it's correct before sending
+
+    $.ajax({
+        url: 'http://127.0.0.1:8000/api/newlabels/',
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken  // Include CSRF token in the request header
+        },
+        contentType: 'application/json',
+        data: JSON.stringify(labelData),
+        success: function (data) {
+            alert('Label created successfully!');
+            $('#label')[0].reset();
+        },
+        error: function (xhr, status, error) {
+            console.error('Error:', error);
+            console.log(xhr.responseText);  // Log the full response for more insights
+            alert('Failed to create the label. Please check the form and try again.');
+        }
+    });
+});
+
+    });
+  </script>
+  <script type="text/javascript">
+    var csrfToken = "{{ csrf_token }}";
+</script>
+
+
+
+</body>
+
+</html>

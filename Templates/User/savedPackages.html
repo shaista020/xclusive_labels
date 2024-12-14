@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saved Packages-Volusion</title>
+    <link rel="icon" type="image/x-icon" href="../images/images/logo1.png" />
+    {% load static %}
+    <!-- Load custom CSS (ensure this path is correct) -->
+    <link rel="stylesheet" href="../../static/index.css" />
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <!-- jQuery (important: always load jQuery before DataTables JS) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <!-- Bootstrap 5 JS (optional, depending on your needs) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Bootstrap 5 additional CSS (if needed, you can remove if redundant) -->
+    <link href="bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css" rel="stylesheet" />
+  
+
+  <style>
+      body {
+        background-color: #f8f9fa;
+      }
+
+      .table {
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .table th,
+      .table td {
+        vertical-align: middle;
+        padding: 15px;
+        text-align: left;
+      }
+
+      .table thead {
+        background-color: #343a40;
+        color: white;
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 10px;
+        top: 30px;
+        background-color: #f9f9f9;
+        min-width: 120px;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+      }
+
+      .dropdown:hover .dropdown-content {
+        display: block;
+      }
+
+      .dropdown-btn {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 20px;
+      }
+
+      .card {
+        border: none;
+        margin-bottom: 20px;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* Pagination Styles */
+      .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .pagination .page-item.active .page-link {
+        background-color: #67e6be;
+        border-color: #67e6be;
+      }
+
+      .pagination .page-link {
+        background-color: white;
+        color: black;
+        padding: 10px 15px;
+        margin: 0 5px;
+      }
+
+      .pagination .page-link:hover {
+        background-color: #e9ecef;
+        color: black;
+      }
+      .prev{
+        background-color: #6c757d !important;
+        opacity: 30%;
+      }
+
+    .hidden {
+      display: none;
+    }
+
+    .heading {
+  @media (max-width: 758px) {
+    margin: 10px !important;
+  }
+}
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content a {
+      color: black;
+      padding: 8px 12px;
+      text-decoration: none;
+      display: block;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+    .ship{
+      margin: 2rem;
+    }
+    .ship:hover{
+      background-color:white;
+      font-size: large;
+    }
+    label{
+      text-align: left;
+      margin-bottom: 10px;
+    }
+    input{
+      margin-bottom: 10px;
+    }
+    @media (max-width:560px) {
+      .tableDiv{
+        height: 300px;
+      }
+    }
+    input.form-control {
+    display: block;
+    width: 100%;
+    padding: .75rem .75rem;
+  }
+   
+  </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", function (event3) {
+        const cBtn = document.getElementById("cBtn");
+        var cMenu = document.getElementById("cMenu");
+
+        cBtn.addEventListener("click", function (event3) {
+          cMenu = document.getElementById("cMenu");
+          cMenu.style.display = "block";
+          event.stopPropagation();
+        });
+
+        document.querySelectorAll(".toggle-col").forEach(function (checkbox) {
+          console.log("gfjgh");
+          checkbox.addEventListener("change", function () {
+            const colClass = this.getAttribute("data-col");
+            const isVisible = this.checked;
+            console.log("eee");
+
+            document
+              .querySelectorAll(
+                "th:nth-child(" + colClass + "), td:nth-child(" + colClass + ")"
+              )
+              .forEach(function (cell) {
+                cell.style.display = isVisible ? "" : "none";
+              });
+          });
+        });
+        document.addEventListener("click", function (event3) {
+          if (
+            cMenu.style.display == "block" &&
+            !cMenu.contains(event.target) &&
+            event.target !== cBtn
+          ) {
+            cMenu.style.display = "none";
+          }
+        });
+      });
+
+      document.addEventListener("DOMContentLoaded", function (event5) {
+        document
+          .getElementById("packageBtn")
+          .addEventListener("click", function () {
+            document.getElementById("createPackage").style.display = "block";
+            document.getElementById("packageDiv").style.display = "none";
+
+            event.stopPropagation();
+          });
+      });
+    </script>
+</head>
+<body>
+  <div class="row bigDiv">
+    <!-- sidebar -->
+    <div
+        class="sidebar nav col-5 col-sm-4 col-md-3 col-xl-3 col-xxl-2 col-lg-3"
+      >
+        <div id="sidebar"> {% include 'sidebar.html' %}</div>
+      </div>
+      <!-- Header -->
+      <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9 col-xxl-10">
+      <div class="row">
+        <div id="header" class="p-0"> {% include 'navbar.html' %}</div>
+      </div>
+          
+          <main style="margin: 1rem;">
+            <div style="margin-bottom: 50px" class="headDiv" id="packageDiv">
+          
+              <div  class="heading row m-5 mb-0">
+                <h2 class="col-sm-6 col-md-6 col-lg-7">Packages</h2>
+                <div class="head d-flex justify-content-end gap-2 col-sm-6 col-md-6 col-lg-5 mt-2">
+                  <button
+                    id="packageBtn"
+                    class="form-control btn btn-secondary"
+                    style="width: fit-content"
+                  >
+                  Create Saved Package          
+                  </button>
+                  <button
+                    id="cBtn"
+                    class="form-control btn btn-dark"
+                    style="width: fit-content"
+                  >
+                    Customize Columns
+                  </button>
+                </div>
+              </div>
+              <br />
+          
+        
+              <div
+                id="cMenu"
+                class="c-menu hidden card"
+                style="position: absolute; right: 30px; z-index: 1; text-align: left"
+              >
+                <label
+                  ><input type="checkbox" class="toggle-col" data-col="1" checked />
+                  Package Name</label
+                ><br />
+                <label
+                  ><input type="checkbox" class="toggle-col" data-col="2" checked />
+                  Weight</label
+                ><br />
+                <label
+                  ><input type="checkbox" class="toggle-col" data-col="3" checked />
+                  Length</label
+                ><br />
+                <label
+                  ><input type="checkbox" class="toggle-col" data-col="4" checked />
+                  Width</label
+                ><br />
+                <label
+                  ><input type="checkbox" class="toggle-col" data-col="5" checked />
+                  Height</label
+                >
+              </div>
+        
+              <div class="card mt-5">
+                <div class="table-responsive">
+                  <table class="table table-hover" id="user">
+                    <thead>
+                      <tr>
+                        <th>Package Name</th>
+                        <th>Weight</th>
+                        <th>Length</th>
+                        <th>Width</th>
+                        <th>Height</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for package in packages %}
+                        <tr>
+                          <td>{{ package.name }}</td>
+                          <td>{{ package.weight }}</td>
+                          <td>{{ package.length }}</td>
+                          <td>{{ package.width }}</td>
+                          <td>{{ package.height }}</td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  
+                </div>
+  
+                <!-- Pagination -->
+                <!-- <nav aria-label="Page navigation" class="my-4">
+                  <ul class="pagination justify-content-end">
+                    <li class="page-item">
+                      <a class="page-link prev text-white" href="#" tabindex="-1"
+                        >Previous</a
+                      >
+                    </li>
+                    <li class="page-item">
+                      <a class="page-link" href="#">1</a>
+                    </li>
+                    <li class="page-item">
+                      <a class="page-link" href="#">2</a>
+                    </li>
+                    <li class="page-item">
+                      <a class="page-link" href="#">3</a>
+                    </li>
+                    <li class="page-item">
+                      <a class="page-link bg-black text-white" href="#">Next</a>
+                    </li>
+                  </ul>
+                </nav> -->
+              </div>
+            </div>
+            <div id="createPackage" style="display: none">
+              <div style="margin-left:2rem ;">
+
+              <h2>Create Saved Package</h2>
+              <div style="display: flex">
+                <div>
+                  <div>
+                    <a style="text-decoration: none ;color: black;" href="/packages"
+                        ><div >
+                          <div >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="20"
+                              height="20"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="#000"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              class="lucide lucide-boxes"
+                            >
+                              <path
+                                d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"
+                              ></path>
+                              <path d="m7 16.5-4.74-2.85"></path>
+                              <path d="m7 16.5 5-3"></path>
+                              <path d="M7 16.5v5.17"></path>
+                              <path
+                                d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"
+                              ></path>
+                              <path d="m17 16.5-5-3"></path>
+                              <path d="m17 16.5 4.74-2.85"></path>
+                              <path d="M17 16.5v5.17"></path>
+                              <path
+                                d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"
+                              ></path>
+                              <path d="M12 8 7.26 5.15"></path>
+                              <path d="m12 8 4.74-2.85"></path>
+                              <path d="M12 13.5V8"></path>
+                              </svg>
+                              <span 
+                              >Saved Packages
+                              <!-- text-base font-normal text-primary-foreground -->
+                            </span>
+                          </div>
+                        </div></a
+                      >
+                  </div>
+                </div>
+                <p style=" margin-left: 10px;">></p>
+                <a href="#" style="text-decoration: none; color: black; margin-left: 10px;">
+                  Create Saved Package        </a>
+              </div>
+            </div>
+        
+                <div class="card ship ">
+        
+                    <label>Saved Package Name</label>
+                    <input class="form-control" id="name" type="text" required value="" />
+        
+                    <label>Weight</label>
+                    <input class="form-control"  id="weight"  type="number" required value="" />
+                    <div >
+                      <label>Type</label>
+                      <input type="radio" id="lb" name="weightUnit" value="lb" />
+                      <label for="lb">lb</label>
+                      <input
+                        type="radio"
+                        id="oz"
+                        name="weightUnit"
+                        value="oz"
+                        checked
+                      />
+                      <label for="oz">oz</label>
+                    </div>
+                    <label>Length (inch)</label>
+                    <input class="form-control" id="length" type="number" required value="" />
+        
+                    <label>Width (inch)</label>
+                    <input class="form-control" id="width" type="number" required value="" />
+        
+                    <label>Height (inch)</label>
+                    <input class="form-control" id="height" type="number" required value="" />
+              
+                    <button class="form-control btn btn-dark" 
+                id="submitCourse"
+                     style="width: fit-content; padding: 15px 30px; margin-top: 20px;"> Save Package</button>
+                </div>
+            </div>
+          </main>
+  </div>
+  <script src="../../static/index.js"></script>
+  <script>
+    $(document).ready(function () {
+      $.ajax({
+        url: "http://127.0.0.1:8000/api/packages/",
+        method: "GET",
+        success: function (response) {
+          console.log(response);
+          let tbody = $("#tb");
+          tbody.empty();
+          response.forEach(function (packages) {
+            let row = `<tr>
+                    <td>${packages.name}</td>
+                    <td>${packages.weight}</td>
+                    <td>${packages.length}</td>
+                    <td>${packages.
+                      width
+                      }</td>
+                    <td>${packages.height}</td>                    
+                  </tr>`;
+
+            tbody.append(row);
+          });
+        },
+        error: function (error) {
+          console.log("Error:", error);
+          alert("Failed to retrieve data from the server.");
+        },
+      });
+
+      // Function to get CSRF token from cookies
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+          }  
+      }
+  }
+  return cookieValue;
+}
+
+// CSRF token setup for AJAX
+const csrfToken = getCookie('csrftoken');
+
+$("#submitCourse").click(function (e) {
+  e.preventDefault();
+
+  // Collect course data from form fields
+  const courseData = {
+    name: $("#name").val(),
+    weight: $("#weight").val()  ,// Send the batch ID (not batch_no)
+    length: $("#length").val(),
+    width: $("#width").val(),
+    height: $("#height").val(),
+
+
+
+    };
+  console.log(courseData, "hiiiiiiiiiii");
+
+  $.ajax({
+      url: "http://127.0.0.1:8000/api/packages/",
+      type: "POST",
+      headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken  // Add CSRF token if required
+      },
+      data: JSON.stringify(courseData),  // Send the correct course data
+      success: function () {
+          alert("Package Added Successfully!");
+          // $("#typeForm")[0].reset();
+                console.log("Redirecting to /types/");
+                window.location.href = "/packages/";
+          // Optionally clear form fields and refresh list
+          // $("#courseName").val("");  
+          // loadCourses();  
+      },
+      error: function (xhr, status, error) {
+          console.log(xhr.responseText);  // Log error details to console
+          alert("Failed to add package.");
+      }
+  });
+});
+
+    });
+    $(document).ready(function () {
+  $('#user').DataTable({
+      "paging": true,
+      "ordering": false,
+      "searching": true,
+      "info": true,
+      "responsive": true,
+  });
+});
+  </script>
+</body>
+</html>

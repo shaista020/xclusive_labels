@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {% load static %}
+    <title>SignUp-Volusion</title>
+    <link rel="icon" type="image/x-icon" href="images/images/logo1.png" />
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+
+    <link rel="stylesheet" href="styles.css" />
+    
+  <link rel="stylesheet" href="../../static/index.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <link href="bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Include jQuery -->
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f5f5f5;
+        overflow-x: hidden;
+        padding: 50px;
+        @media (max-width: 750px) {
+          padding: 10px;
+        }
+      }
+
+      .container {
+        display: flex;
+        padding: 0;
+        margin: 20px;
+        max-width: 1200px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        /* margin-top: 120px; */
+      }
+
+      .checkbox {
+        margin-bottom: 0 !important;
+      }
+
+      .left-panel {
+        background: linear-gradient(to bottom right, #3ad2a1, #e3f8f1);
+        color: black;
+        padding: 40px;
+        width: 50%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .branding h1 {
+        font-size: 24px;
+        margin-bottom: 30px;
+      }
+
+      .content h2 {
+        font-size: 32px;
+        margin-bottom: 20px;
+      }
+
+      .content p {
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .right-panel {
+        background-color: white;
+        padding: 40px;
+        width: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .signin-box {
+        width: 100%;
+        max-width: 350px;
+      }
+
+      .signin-box h2 {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+
+      .signin-box p {
+        color: #777;
+        margin-bottom: 20px;
+      }
+
+      .signin-box input {
+        /* width: 100%;
+        padding: 10px; */
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+
+      .remember-me {
+        display: flex;
+        flex-direction: column;
+        float: inline-start;
+
+        /* align-items: center; */
+        /* gap: 10px; */
+        margin-bottom: 20px;
+      }
+
+      .signin-box button {
+        width: 100%;
+        padding: 10px;
+        background-color: #3ad2a1;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .signin-box button:hover {
+        background-color: #555;
+      }
+
+      .signup-link {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .signup-link a {
+        color: #007bff;
+        text-decoration: none;
+      }
+
+      @media (max-width: 750px) {
+        .content {
+          display: none;
+        }
+
+        .left-panel {
+          height: 70px;
+          width: 100%;
+        }
+        .container {
+          display: flex;
+          flex-direction: column;
+          /* margin-top: 200px; */
+          width: auto;
+          float: left;
+        }
+        .right-panel {
+          width: 100%;
+        }
+        .remember-me {
+          display: flex;
+          flex-direction: row;
+          margin-bottom: 20px;
+          justify-content: space-between;
+        }
+      }
+      @media (max-width: 450px) {
+        .left-panel {
+          height: 70px;
+          width: auto;
+        }
+        .container {
+          display: flex;
+          flex-direction: column;
+          /* margin-top: 200px; */
+          width: auto;
+          float: left;
+        }
+        .right-panel {
+          width: auto;
+        }
+        .remember-me {
+          display: flex;
+          flex-direction: row;
+          margin-bottom: 20px;
+          justify-content: space-between;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="left-panel">
+        <a href="/details.html">
+          <img style="width: 50%" src="{% static 'images/logo.png' %}" alt="Logo" />
+        </a>
+        <div class="content">
+          <h2>Fast, Efficient and Productive</h2>
+          <p style="font-style: italic">
+            In this kind of post, the blogger introduces a person they've
+            interviewed and provides some background information about the
+            interviewee and their work. Following this is a transcript of the
+            interview.
+          </p>
+        </div>
+      </div>
+      <div class="right-panel">
+        <div class="signin-box">
+            <h2>Sign Up</h2>
+            <p>Hey there, please sign Up to continue</p>
+            <form action="/auth/signup/" method="POST">
+                {% csrf_token %}
+                <div>
+                <label for="text">Name</label>
+                <input type="text" id="text" name="username" class="form-control" required />
+                {% if error_username %}
+                    <small style="color: red;">{{ error_username }}</small>
+                {% endif %}
+              </div>
+              <div>
+                <label for="email">Email address</label>
+                <input type="email" id="email" name="email" class="form-control" placeholder="example@hotmail.com" required />
+                {% if error_email %}
+                    <small style="color: red;">{{ error_email }}</small>
+                {% endif %}
+              </div>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" required />
+            
+                <div class="remember-me">
+                    <div style="display: flex; flex-direction: row">
+                        <input class="checkbox" type="checkbox" id="remember" name="remember" />
+                        <label style="margin-left: 10px" for="remember">Remember Me</label>
+                    </div>
+                    <br />
+                </div>
+                <button type="submit">Sign Up</button>
+            </form>
+            <p class="signup-link">
+                Already have an account? <a href="/auth/signin/">Sign In</a>
+            </p>
+        </div>
+    </div>
+    
+ 
+    </div>
+    <script>
+     $(document).ready(function () {
+  function getCSRFToken() {
+    let token = null;
+    const cookies = document.cookie.split(";");
+    cookies.forEach(function (cookie) {
+      if (cookie.trim().startsWith("csrftoken=")) {
+        token = cookie.split("=")[1];
+      }
+    });
+    return token;
+  }
+
+  const csrfToken = getCSRFToken();
+
+  $('#signup-form').on('submit', function (e) {
+    e.preventDefault(); 
+    const formData = {
+      full_name: $('#text').val(), 
+      email_address: $('#email').val(), 
+      password: $('#password').val(),
+      remember: $('#remember').is(':checked') 
+    };
+
+    $.ajax({
+      url: '/api/signup/', 
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(formData),
+      headers: {
+        'X-CSRFToken': csrfToken 
+      },
+      success: function (response) {
+        alert('Signup successful! Redirecting to the sign-in page...');
+        console.log(response); 
+        window.location.href = '/signin/'; 
+      },
+      error: function (xhr, status, error) {
+        alert('Signup failed. Please check your input and try again.');
+        console.error(xhr.responseText);
+      }
+    });
+  });
+
+  $.ajaxSetup({
+    headers: { 'X-CSRFToken': csrfToken }
+  });
+});
+
+    </script>
+    
+  </body>
+</html>

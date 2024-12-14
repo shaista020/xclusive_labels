@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>From Addresses-Volusion</title>
+    <link rel="icon" type="image/x-icon" href="../images/images/logo1.png" />
+    {% load static %}
+    <!-- Load custom CSS (ensure this path is correct) -->
+    <link rel="stylesheet" href="../../static/index.css" />
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <!-- jQuery (important: always load jQuery before DataTables JS) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <!-- Bootstrap 5 JS (optional, depending on your needs) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Bootstrap 5 additional CSS (if needed, you can remove if redundant) -->
+    <link href="bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css" rel="stylesheet" />
+  
+    <style>
+      .ship {
+        margin: 2rem;
+      }
+      .ship:hover {
+        background-color: white;
+        font-size: large;
+      }
+      label {
+        text-align: left;
+        margin-bottom: 10px;
+      }
+      input {
+        margin-bottom: 10px;
+      }
+      body {
+        background-color: #f8f9fa;
+      }
+      input.form-control {
+        padding: 0.75rem 0.75rem;
+      }
+
+      .heading {
+        @media (max-width: 758px) {
+          margin: 10px !important;
+        }
+      }
+
+      .table {
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .table th,
+      .table td {
+        vertical-align: middle;
+        padding: 15px;
+        text-align: left;
+      }
+
+      .table thead {
+        background-color: #343a40;
+        color: white;
+      }
+
+      .card {
+        border: none;
+        margin-bottom: 20px;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* Pagination Styles */
+      .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 20px;
+      }
+
+      .pagination .page-item.active .page-link {
+        background-color: #67e6be;
+        border-color: #67e6be;
+      }
+
+      .pagination .page-link {
+        background-color: white;
+        color: black;
+        padding: 10px 15px;
+        margin: 0 5px;
+      }
+
+      .pagination .page-link:hover {
+        background-color: #e9ecef;
+        color: black;
+      }
+      .prev {
+        background-color: #6c757d !important;
+        opacity: 30%;
+      }
+    </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", function (event3) {
+        const cBtn = document.getElementById("cBtn");
+        var cMenu = document.getElementById("cMenu");
+
+        cBtn.addEventListener("click", function (event3) {
+          cMenu = document.getElementById("cMenu");
+          cMenu.style.display = "block";
+          event.stopPropagation();
+        });
+
+        document.querySelectorAll(".toggle-col").forEach(function (checkbox) {
+          console.log("gfjgh");
+          checkbox.addEventListener("change", function () {
+            const colClass = this.getAttribute("data-col");
+            const isVisible = this.checked;
+            console.log("eee");
+
+            document
+              .querySelectorAll(
+                "th:nth-child(" + colClass + "), td:nth-child(" + colClass + ")"
+              )
+              .forEach(function (cell) {
+                cell.style.display = isVisible ? "" : "none";
+              });
+          });
+        });
+        document.addEventListener("click", function (event3) {
+          if (
+            cMenu.style.display == "block" &&
+            !cMenu.contains(event.target) &&
+            event.target !== cBtn
+          ) {
+            cMenu.style.display = "none";
+          }
+        });
+      });
+
+      document.addEventListener("DOMContentLoaded", function (event5) {
+        document
+          .getElementById("shipBtn")
+          .addEventListener("click", function () {
+            document.getElementById("createShip").style.display = "block";
+            document.getElementById("adressDiv").style.display = "none";
+
+            event.stopPropagation();
+          });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="row bigDiv">
+      <!-- sidebar -->
+      <div
+        class="sidebar nav col-5 col-sm-4 col-md-3 col-xl-3 col-xxl-2 col-lg-3"
+      >
+        <div id="sidebar">{% include 'sidebar.html' %}</div>
+      </div>
+      <!-- Header -->
+      <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9 col-xxl-10">
+        <div class="row">
+          <div id="header" class="p-0">{% include 'navbar.html' %}</div>
+        </div>
+        <main style="margin: 1rem">
+          <div style="margin-bottom: 50px" class="headDiv" id="adressDiv">
+            <div class="heading row m-5 mb-0">
+              <h2 class="col-sm-6 col-md-7 col-lg-7">
+                Manage Ship From Addresses
+              </h2>
+              <div
+                class="head d-flex justify-content-end col-sm-6 col-md-5 col-lg-5 mt-2 d-flex gap-2"
+              >
+                <button
+                  id="shipBtn"
+                  class="form-control btn btn-secondary"
+                  style="width: fit-content"
+                >
+                  Create Ship From Addresse
+                </button>
+                <button
+                  id="cBtn"
+                  class="form-control btn btn-dark"
+                  style="width: fit-content"
+                >
+                  Customize Columns
+                </button>
+              </div>
+            </div>
+            <br />
+
+            <div
+              id="cMenu"
+              class="c-menu hidden card"
+              style="
+                position: absolute;
+                right: 30px;
+                z-index: 1;
+                text-align: left;
+              "
+            >
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="1"
+                  checked
+                />
+                Full Name</label
+              ><br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="2"
+                  checked
+                />
+                Company Name</label
+              ><br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="3"
+                  checked
+                />
+                Phone Number</label
+              ><br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="4"
+                  checked
+                />
+                Street One</label
+              ><br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="5"
+                  checked
+                />
+                Street Two</label
+              ><br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="6"
+                  checked
+                />
+                City</label
+              >
+              <br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="7"
+                  checked
+                />
+                Zip</label
+              >
+              <br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="8"
+                  checked
+                />
+                State</label
+              >
+              <br />
+              <label
+                ><input
+                  type="checkbox"
+                  class="toggle-col"
+                  data-col="8"
+                  checked
+                />
+                Country</label
+              >
+            </div>
+
+            <div class="card mt-5">
+              <div class="table-responsive">
+                <table class="table table-hover" id="user">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Company / Reference</th>
+                      <th>Phone Number</th>
+                      <th>Address</th>
+                      <th>Apt / Unit / Suite</th>
+                      <th>City</th>
+                      <th>Zip Code</th>
+                      <th>State</th>
+                      <th>Country</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for address in address %}
+                      <tr>
+                        <td>{{ address.name }}</td>
+                        <td>{{ address.company_reference }}</td>
+                        <td>{{ address.phone_number }}</td>
+                        <td>{{ address.address }}</td>
+                        <td>{{ address.apt_unit_suite }}</td>
+                        <td>{{ address.city }}</td>
+                        <td>{{ address.zip_code }}</td>
+                        <td>{{ address.state }}</td>
+                        <td>{{ address.country }}</td>
+                        <td>
+                          <div class="d-flex gap-1">
+                            <button id="editAdresses" data-id="{{ address.id }}" class="btn btn-sm btn-primary">Edit</button>
+                            <button class="btn btn-sm btn-danger" data-id="{{ address.id }}">Delete</button>
+                          </div>
+                        </td>
+                        
+                        
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                
+              </div>
+
+             
+            </div>
+          </div>
+          <div id="createShip" style="display: none">
+            <div style="margin-left: 2rem">
+              <h2>Manage Ship From Addresses</h2>
+              <div style="display: flex">
+                <div>
+                  <a
+                    style="text-decoration: none; color: black"
+                    href="/address "
+                    id="addressDetails"
+                    ><div>
+                      <div>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#000"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          class="lucide lucide-map-pin"
+                        >
+                          <path
+                            d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"
+                          ></path>
+                          <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                        <span>Manage Ship From Addresses </span>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                <p style="margin-left: 10px">></p>
+                <a
+                  href="#"
+                  style="text-decoration: none; color: black; margin-left: 10px"
+                >
+                  Create Ship From Addresse
+                </a>
+              </div>
+            </div>
+
+            <form class="card ship" id="addressForm">
+              <input
+                type="hidden"
+                id="csrf_token"
+                name="csrfmiddlewaretoken"
+                value="{{ csrf_token }}"
+              />
+
+              <label>Name</label>
+              <input
+                id="name"
+                class="form-control"
+                type="text"
+                required
+                value=""
+              />
+
+              <label>Company (optional)</label>
+              <input
+                class="form-control"
+                id="company_reference"
+                type="text"
+                required
+                value=""
+              />
+
+              <label>Address</label>
+              <input
+                class="form-control"
+                id="address"
+                type="text"
+                required
+                value=""
+              />
+              <label>Apt/Unit/Suite (optional)</label>
+              <input
+                class="form-control"
+                id="apt_unit_suite"
+                type="text"
+                required
+                value=""
+              />
+
+              <label>City</label>
+              <input
+                type="text"
+                id="city"
+                class="form-control"
+                value=""
+                required
+              />
+              <label>Zip Code</label>
+              <input
+                class="form-control"
+                id="zip_code"
+                type="text"
+                required
+                value=""
+              />
+
+              <label>State</label>
+              <input
+                class="form-control"
+                id="state"
+                type="text"
+                required
+                value=""
+              />
+              <label>Phone Number</label>
+              <input
+                class="form-control"
+                id="phone_number"
+                type="number"
+                required
+                value=""
+              />
+              <label>Country</label>
+              <input
+                class="form-control"
+                id="country"
+                type="text"
+                required
+                value=""
+              />
+              <button
+                class="form-control btn btn-dark submitAddress"
+                style="width: fit-content; padding: 15px 30px; margin-top: 20px"
+                id="submitCourse"
+              >
+                Save Address
+              </button>
+            </form>
+          </div>
+        </main>
+      </div>
+    </div>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/So7d+cmY8kK4F0me1DkGPqr4DhD/Itj7DxITtW"
+      crossorigin="anonymous"
+    ></script>
+
+    <script src="../../static/index.js"></script>
+    <script>
+      $(document).ready(function () {
+        // Function to get CSRF token from the cookie
+        function getCSRFToken() {
+          let token = null;
+          const cookies = document.cookie.split(";");
+          cookies.forEach(function (cookie) {
+            if (cookie.trim().startsWith("csrftoken=")) {
+              token = cookie.split("=")[1];
+            }
+          });
+          return token;
+        }
+
+        const csrfToken = getCSRFToken();
+
+        fetchAddresses();
+
+        function fetchAddresses() {
+          $.ajax({
+            url: "http://127.0.0.1:8000/api/addresses/",
+            method: "GET",
+            success: function (response) {
+              let tbody = $("#tb");
+              tbody.empty();
+              response.forEach(function (address) {
+                let row = `<tr>
+                            <td>${address.name}</td>
+                            <td>${address.company_reference}</td>
+                            <td>${address.phone_number}</td>
+                            <td>${address.address}</td>
+                            <td>${address.apt_unit_suite}</td>
+                            <td>${address.city}</td>
+                            <td>${address.zip_code}</td>
+                            <td>${address.state}</td>
+                            <td>${address.country}</td>
+                            <td>
+                              <button id="editAdresses" data-id="${address.id}" class="btn btn-sm btn-primary">Edit</button>
+                              <button class="btn btn-sm btn-danger">Delete</button>
+                            </td>
+                          </tr>`;
+                tbody.append(row);
+              });
+            },
+            error: function () {
+              alert("Failed to retrieve data from the server.");
+            },
+          });
+        }
+
+        $("#submitCourse").click(function (e) {
+          e.preventDefault();
+
+          const isEdit = $(this).hasClass("editMode");
+          const AdressesId = $(this).data("id");
+
+          const addressData = {
+            name: $("#name").val(),
+            company_reference: $("#company_reference").val(),
+            address: $("#address").val(),
+            apt_unit_suite: $("#apt_unit_suite").val(),
+            city: $("#city").val(),
+            zip_code: $("#zip_code").val(),
+            state: $("#state").val(),
+            phone_number: $("#phone_number").val(),
+            country: $("#country").val(),
+          };
+
+          console.log("Form Data: ", addressData);
+          if (isEdit) {
+            // Handle edit (PUT request)
+            $.ajax({
+              url: `http://127.0.0.1:8000/api/addresses/${AdressesId}/`,
+              type: "PUT",
+              headers: {
+                "X-CSRFToken": csrfToken,
+                "Content-Type": "application/json",
+              },
+              data: JSON.stringify(addressData),
+              success: function () {
+                console.log("Address updated successfully!");
+                alert("Address updated successfully!");
+                fetchAddresses();
+                $("#submitCourse").removeClass("editMode").text("Save Address");
+                $("#addressForm")[0].reset();
+                console.log("Redirecting to /address/");
+                window.location.href = "/address/";
+              },
+              error: function (xhr, status, error) {
+                console.error("Failed to update address:", error);
+                alert("Failed to update address.");
+              },
+            });
+          } else {
+            // Handle add (POST request)
+            $.ajax({
+              url: "http://127.0.0.1:8000/api/addresses/",
+              type: "POST",
+              headers: {
+                "X-CSRFToken": csrfToken,
+                "Content-Type": "application/json",
+              },
+              data: JSON.stringify(addressData),
+              success: function () {
+                console.log("Address added successfully!");
+                alert("Address added successfully!");
+                fetchAddresses();
+                $("#addressForm")[0].reset();
+                console.log("Redirecting to /address/");
+                window.location.href = "/address/";
+              },
+              error: function (xhr, status, error) {
+                console.error("Failed to add address:", error);
+                alert("Failed to add address.");
+              },
+            });
+          }
+        });
+
+        // Edit address details
+        $(document).on("click", "#editAdresses", function () {
+          const AdressesId = $(this).data("id");
+
+          $.ajax({
+            url: `http://127.0.0.1:8000/api/addresses/${AdressesId}/`,
+            type: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            success: function (response) {
+              // Populate the form fields with the fetched data
+              $("#name").val(response.name);
+              $("#company_reference").val(response.company_reference);
+              $("#address").val(response.address);
+              $("#apt_unit_suite").val(response.apt_unit_suite);
+              $("#city").val(response.city);
+              $("#zip_code").val(response.zip_code);
+              $("#state").val(response.state);
+              $("#phone_number").val(response.phone_number);
+              $("#country").val(response.country);
+
+              // Update the button for editing
+              $("#submitCourse")
+                .text("Save Changes")
+                .addClass("editMode")
+                .data("id", AdressesId);
+
+              $("#shipBtn").click();
+            },
+            error: function () {
+              alert("Failed to load address details for editing.");
+            },
+          });
+        });
+
+        // Delete address
+        $(document).on("click", ".btn-danger", function () {
+          const AdressesId = $(this)
+            .closest("tr")
+            .find("#editAdresses")
+            .data("id");
+
+          if (confirm("Are you sure you want to delete this address?")) {
+            $.ajax({
+              url: `http://127.0.0.1:8000/api/addresses/${AdressesId}/`,
+              type: "DELETE",
+              headers: {
+                "X-CSRFToken": csrfToken,
+              },
+              success: function () {
+                alert("Address deleted successfully!");
+                fetchAddresses();
+              },
+              error: function () {
+                alert("Failed to delete address.");
+              },
+            });
+          }
+        });
+      });
+      $(document).ready(function () {
+  $('#user').DataTable({
+      "paging": true,
+      "ordering": false,
+      "searching": true,
+      "info": true,
+      "responsive": true,
+  });
+});
+    </script>
+  </body>
+</html>
