@@ -518,7 +518,7 @@ def newlable(request):
 def addFunds(request):
     return render(request,'Admin/addFunds.html')
 
-@login_required(login_url="/auth/signin/")
+# @login_required(login_url="/auth/signin/")
 def home(request):
     return render(request,'home.html')
 
