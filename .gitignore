@@ -1,1 +1,12 @@
 env
+__pycache__
+db.sqlite3
+.vscode
+
+
+# Ignore everything in the migrations folder
+*/migrations/*
+# Except for the __init__.py file
+!*/migrations/__init__.py
+# Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+# .\env\Scripts\activate

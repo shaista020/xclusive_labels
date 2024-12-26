@@ -6,25 +6,12 @@
     <title>Support-Volusion</title>
     <link rel="icon" type="image/x-icon" href="../images/images/logo1.png" />
     {% load static %}
-    <!-- Load custom CSS (ensure this path is correct) -->
     <link rel="stylesheet" href="../../static/index.css" />
-
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-
-    <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
-    <!-- jQuery (important: always load jQuery before DataTables JS) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
-    <!-- Bootstrap 5 JS (optional, depending on your needs) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Bootstrap 5 additional CSS (if needed, you can remove if redundant) -->
     <link href="bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css" rel="stylesheet" />
   
     <style>
@@ -581,6 +568,7 @@ function viewmessage(ticketId) {
         data: JSON.stringify(courseData),
         success: function (response) {
             alert("Ticket added successfully!");
+            addNotification("Your Ticket has been created successfully!"); 
             $("#ViewMassage")[0].reset();
                 console.log("Redirecting to /supports/");
                 window.location.href = "/supports/";

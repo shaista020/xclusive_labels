@@ -495,6 +495,7 @@ $("#submitCourse").click(function (e) {
       data: JSON.stringify(courseData),  // Send the correct course data
       success: function () {
           alert("Package Added Successfully!");
+          addNotification("Your Package has been Saved successfully!"); 
           // $("#typeForm")[0].reset();
                 console.log("Redirecting to /types/");
                 window.location.href = "/packages/";

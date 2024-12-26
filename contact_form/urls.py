@@ -4,6 +4,7 @@ from . import views
 from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r'transactions', TransactionViewSet)
+router.register('notifications', views.NotificationViewSet, basename='notification')
 
 urlpatterns = [
     path('api/contact/', ContactInfoView.as_view(), name='contact_api'),
@@ -29,8 +30,8 @@ urlpatterns = [
    path('api/coupons/', CouponView.as_view(), name='coupons_api'),
    path('api/delete-account/', DeleteAccountView.as_view(), name='delete_account_api'),
    path('api/referrals/', ReferralView.as_view(), name='referral-list'),
-   path('api/notifications/', Notificationview.as_view(), name='notification-api'),
-   path('api/notifications/<int:pk>/', Notificationview.as_view(), name='notification-details'),
+   # path('api/notifications/', Notificationview.as_view(), name='notification-api'),
+   # path('api/notifications/<int:pk>/', Notificationview.as_view(), name='notification-details'),
    path('api/', include(router.urls)),
    path('user_dashboard/', views.dashboard,name='dashboard'),
    path('orders/', views.order,name='orders'),

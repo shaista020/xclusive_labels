@@ -33,6 +33,8 @@
       customizeMenu.style.display = "none";
     }
   });
+
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <nav class="navbar navbar-expand-lg navbar-light bg-light p-3">
@@ -40,79 +42,47 @@
     <!-- Account Info Section -->
     <div class="d-flex align-items-center me-auto">
       <div class="account-info d-flex align-items-center">
-        <button
-          type="button"
-          id="customizeBtn"
-          class="btn btn-light d-flex align-items-center"
-          aria-haspopup="true"
-          aria-expanded="false"
-          style="background-color: transparent; border: none"
-        >
+        <button type="button" id="customizeBtn" class="btn btn-light d-flex align-items-center" aria-haspopup="true"
+          aria-expanded="false" style="background-color: transparent; border: none">
           <!-- Avatar Image -->
           {% if user.get_full_name %}
           <!-- Avatar Image with Dynamic Initials -->
-          <img 
-            src="https://ui-avatars.com/api/?name={{ user.get_full_name|default:user.username|urlencode }}&size=64&background=random" 
-            alt="{{ user.get_full_name|default:user.username }}'s Profile Image" 
-            class="profile-icon rounded-circle mr-3" 
-            style="width: 1.8rem; height: 1.8rem; object-fit: cover" 
-          />
+          <img
+            src="https://ui-avatars.com/api/?name={{ user.get_full_name|default:user.username|urlencode }}&size=64&background=random"
+            alt="{{ user.get_full_name|default:user.username }}'s Profile Image"
+            class="profile-icon rounded-circle mr-3" style="width: 1.8rem; height: 1.8rem; object-fit: cover" />
           {% else %}
           <!-- Fallback Initials -->
-          <div
-            class="rounded-circle d-flex justify-content-center ms-3 align-items-center bg-secondary text-white"
-            style="width: 35px; height: 35px; margin-right: 10px"
-          >
+          <div class="rounded-circle d-flex justify-content-center ms-3 align-items-center bg-secondary text-white"
+            style="width: 35px; height: 35px; margin-right: 10px">
             {{ user.first_name|default:user.username|slice:":1"|upper }}{{ user.last_name|default:""|slice:":1"|upper }}
           </div>
           {% endif %}
-    
+
           <!-- Display User Name and Email -->
           <div class="text-start me-2">
             <h6 class="mb-0">{{ user.get_full_name|default:user.username }}</h6>
             <small>{{ user.email }}</small>
           </div>
-    
+
           <!-- Profile Image -->
-         
-          <img
-          src="{% static 'images/john-doe.svg' %}"
-          alt="Profile"
-          class="rounded-circle"
-          style="width: 35px; height: 35px"
-        />
+
+          <img src="{% static 'images/john-doe.svg' %}" alt="Profile" class="rounded-circle"
+            style="width: 35px; height: 35px" />
         </button>
-    
+
         <!-- Customize Menu (Dropdown) -->
-        <div
-          id="customizeMenu"
-          class="customize-menu card position-absolute mt-2"
-          style="display: none; z-index: 1"
-        >
+        <div id="customizeMenu" class="customize-menu card position-absolute mt-2" style="display: none; z-index: 1">
           <div class="card-body">
             <h6 class="card-title">My Account</h6>
             <hr />
-            <a
-              href="/set"
-              class="d-flex align-items-center text-dark text-decoration-none mb-2"
-            >
-              <img
-                src="{% static 'images/profile.svg' %}"
-                class="me-2"
-                alt="Profile"
-              />
+            <a href="/set" class="d-flex align-items-center text-dark text-decoration-none mb-2">
+              <img src="{% static 'images/profile.svg' %}" class="me-2" alt="Profile" />
               Profile
             </a>
             <hr />
-            <a
-              class="d-flex align-items-center text-dark text-decoration-none"
-              href="{% url 'logout' %}"
-            >
-              <img
-                src="{% static 'images/logout.svg' %}"
-                class="me-2"
-                alt="Logout"
-              />
+            <a class="d-flex align-items-center text-dark text-decoration-none" href="{% url 'logout' %}">
+              <img src="{% static 'images/logout.svg' %}" class="me-2" alt="Logout" />
               Logout
             </a>
           </div>
@@ -133,19 +103,11 @@
         <!-- Action Buttons (Create Label & Add Funds) -->
         <li class="nav-item d-flex align-items-center">
           <a href="/newLable" class="btn btn-outline-primary me-2">
-            <img
-              src="{% static 'images/create-label.svg' %}"
-              class="me-1"
-              alt="Create Label"
-            />
+            <img src="{% static 'images/create-label.svg' %}" class="me-1" alt="Create Label" />
             Create New Label
           </a>
           <a href="/addfund" class="btn btn-outline-success">
-            <img
-              src="{% static 'images/add-funds.svg' %}"
-              class="me-1"
-              alt="Add Funds"
-            />
+            <img src="{% static 'images/add-funds.svg' %}" class="me-1" alt="Add Funds" />
             Add Funds
           </a>
         </li>
@@ -154,58 +116,44 @@
 
     <!-- Notifications Section -->
     <div class="nav-item position-relative">
-      <button
-        type="button"
-        id="nBtn"
-        class="btn btn-light"
-        aria-haspopup="true"
-        aria-expanded="false"
-        style="display: flex; align-items: center"
-      >
+      <button type="button" id="nBtn" class="btn btn-light" aria-haspopup="true" aria-expanded="false"
+        style="display: flex; align-items: center" onclick="toggleNotifications()">
         <img src="{% static 'images/menu.svg' %}" alt="Notifications" />
+        <span id="notificationBadge"
+          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          style="display: none; font-size: 0.8rem;">
+          0
+        </span>
       </button>
 
       <!-- Notifications Dropdown -->
-      <div
-        id="nMenu"
-        class="customize-menu card position-absolute mt-2"
-        style="display: none; right: 0; z-index: 1"
-      >
+      <div id="nMenu" class="customize-menu card position-absolute mt-2"
+        style="display: none; right: 0; z-index: 1; max-height: 400px; overflow-y: auto;">
         <div class="card-body">
           <h6>Notifications</h6>
-          <p>You have 0 unread messages.</p>
-          <div class="notification-item border p-2 mb-2">
-            <h6 class="mb-1">New Label Created</h6>
-            <p class="mb-0 text-muted">6 hours ago</p>
-            <p>Your label has been created successfully</p>
+          <p id="noNotificationsMessage">You have 0 unread messages.</p>
+          <div id="notificationItemsContainer">
+            <!-- Dynamic notifications will be added here -->
           </div>
-          <button class="btn btn-dark w-100 mt-2">Mark all as read</button>
+          <button class="btn btn-dark w-100 mt-2" onclick="markAllAsRead()">Mark all as read</button>
         </div>
       </div>
     </div>
 
+
     <!-- Dropdown for small devices -->
     <div class="d-lg-none position-relative">
-      <button
-        class="btn btn-secondary"
-        type="button"
-        id="smallDeviceDropdown"
-        data-bs-toggle="dropdown"
-        aria-expanded="false"
-        style="
+      <button class="btn btn-secondary" type="button" id="smallDeviceDropdown" data-bs-toggle="dropdown"
+        aria-expanded="false" style="
           background: none;
           border: none;
           padding: 0;
           font-size: 24px;
           color: #000;
-        "
-      >
+        ">
         ⋮
       </button>
-      <ul
-        class="dropdown-menu dropdown-menu-end position-absolute end-0"
-        aria-labelledby="smallDeviceDropdown"
-      >
+      <ul class="dropdown-menu dropdown-menu-end position-absolute end-0" aria-labelledby="smallDeviceDropdown">
         <li>
           <a class="dropdown-item" href="/newLable">Create New Label</a>
         </li>
@@ -215,3 +163,174 @@
     </div>
   </div>
 </nav>
+<script>
+  $(document).ready(function () {
+
+    fetchNotifications();
+  });
+  // Define the function to get CSRF token
+  function getCSRFToken() {
+    let token = null;
+    const cookies = document.cookie.split(";");
+    cookies.forEach(function (cookie) {
+      if (cookie.trim().startsWith("csrftoken=")) {
+        token = cookie.split("=")[1];
+      }
+    });
+    return token;
+  }
+
+  function addNotification(message) {
+    const csrfToken = getCSRFToken();
+    const userId = window.userId;
+    const notificationData = {
+      message: message,
+      is_read: false,
+      user: userId,
+    };
+
+    $.ajax({
+      url: "/api/notifications/",
+      type: "POST",
+      headers: {
+        "X-CSRFToken": csrfToken,
+        "Content-Type": "application/json",
+      },
+      data: JSON.stringify(notificationData),
+      success: function () {
+        console.log("Notification saved in the backend.");
+        fetchNotifications();
+      },
+      error: function (xhr, status, error) {
+        console.error("Failed to save notification in the backend.", error);
+        console.error("Response Text: ", xhr.responseText);
+      },
+    });
+  }
+
+  function fetchNotifications() {
+  $.ajax({
+    url: "/api/notifications/",
+    type: "GET",
+    success: function (response) {
+      const container = document.getElementById("notificationItemsContainer");
+      const noNotificationsMessage = document.getElementById("noNotificationsMessage");
+      const notificationBadge = document.getElementById("notificationBadge");
+
+      if (container) {
+        container.innerHTML = "";
+
+        if (response.length === 0) {
+          noNotificationsMessage.textContent = "You have 0 unread messages.";
+          notificationBadge.style.display = "none"; 
+        } else {
+          let unreadCount = 0;
+          let username = ""; 
+          response.forEach(notification => {
+            const item = document.createElement("div");
+            item.className = "notification-item border p-2 mb-2";
+
+            username = notification.username;
+
+            const timestamp = formatTime(notification.created_at);
+
+            item.innerHTML = `
+              <p class="mb-0 text-muted">${timestamp} by ${username}</p>
+              <h6 class="mb-1">${notification.message}</h6>
+              <p class="mb-0 text-muted">by ${username}</p>
+            `;
+
+            if (notification.is_read) {
+              item.style.opacity = 0.5; 
+            } else {
+              unreadCount++; 
+            }
+
+            container.appendChild(item);
+          });
+         
+          noNotificationsMessage.textContent = `Hello, ${username}! You have ${unreadCount} unread message(s).`;
+
+          if (unreadCount > 0) {
+            notificationBadge.textContent = unreadCount;
+            notificationBadge.style.display = "block"; 
+          } else {
+            notificationBadge.style.display = "none"; 
+          }
+        }
+      }
+    },
+    error: function () {
+      console.error("Failed to fetch notifications.");
+    },
+  });
+}
+
+  function formatTime(timestamp) {
+    const notificationDate = new Date(timestamp);
+    const now = new Date();
+    const diff = Math.floor((now - notificationDate) / 1000); // Time difference in seconds
+
+    if (diff < 60) return `${diff} seconds ago`;
+    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+
+    // Format for older dates
+    return notificationDate.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  function markAllAsRead() {
+    const csrfToken = getCSRFToken();
+    $.ajax({
+      url: "/api/notifications/mark_as_read/",
+      type: "PATCH",
+      headers: {
+        "X-CSRFToken": csrfToken,
+        "Content-Type": "application/json",
+      },
+      success: function () {
+        console.log("All notifications marked as read.");
+
+        $.ajax({
+          url: "/api/notifications/delete_notifications/",
+          type: "DELETE",
+          headers: {
+            "X-CSRFToken": csrfToken,
+          },
+          success: function () {
+
+            fetchNotifications();
+            document.getElementById("noNotificationsMessage").textContent = "You have 0 unread messages.";
+            console.log("All notifications deleted.");
+            fetchNotifications();
+          },
+          error: function () {
+            console.error("Failed to delete notifications.");
+          }
+        });
+      },
+      error: function () {
+        console.error("Failed to mark notifications as read.");
+      },
+    });
+  }
+
+  function toggleNotifications() {
+    const nMenu = document.getElementById("nMenu");
+    if (nMenu) {
+      nMenu.style.display = nMenu.style.display === "none" ? "block" : "none";
+    }
+  }
+
+  window.toggleNotifications = toggleNotifications;
+
+</script>
+
+<script>
+  window.userId = "{{ user.id }}"; 
+</script>

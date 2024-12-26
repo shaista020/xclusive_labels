@@ -462,6 +462,7 @@
           data: JSON.stringify(storeData),
           success: function () {
             alert("Store updated successfully!");
+            addNotification("Your Store info has been updated successfully!"); 
             fetchStores();
             $("#submitStore").removeClass("editMode").text("Add Store");
             window.location.href = "/stores/";
@@ -485,6 +486,7 @@
           success: function () {
           
             $("#successMessage").fadeIn().delay(3000).fadeOut();
+            addNotification("Your Store has been created successfully!"); 
   
             window.location.href = "/stores/";
   
@@ -518,18 +520,16 @@
       $("#url").val(response.url);
       $("#description").val(response.description);
 
-      // Fix for dropdown value
-      const storeType = response.store_type?.trim(); // Ensure correct key and trim whitespace
+      const storeType = response.store_type?.trim(); 
       $("#store_type").val(storeType);
 
-      // Debugging dropdown value
+      
       if ($("#store_type").val() !== storeType) {
         console.warn(
           `Dropdown value mismatch. Received: "${storeType}", Expected: one of ${$('#store_type option').map(function() { return $(this).val(); }).get()}`
         );
       }
 
-      // Update button for editing
       $("#submitStore")
         .text("Save Changes")
         .addClass("editMode")
@@ -544,7 +544,6 @@
 });
 
 
-    // Delete store
     $(document).on("click", ".delete-btn", function () {
       const storeId = $(this).data("id");
   
@@ -557,7 +556,9 @@
           },
           success: function () {
             alert("Store deleted successfully!");
-            fetchStores(); // Refresh the store list after deletion
+            addNotification("Your Store has been Deleted successfully!"); 
+            window.location.reload(),
+            fetchStores(); 
           },
           error: function () {
             alert("Failed to delete store.");

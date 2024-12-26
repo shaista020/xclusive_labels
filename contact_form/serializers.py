@@ -1,16 +1,12 @@
 from rest_framework import serializers
 from .models import *
+class NotificationSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source="user.username", read_only=True)  
 
-# class NotificationSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Notification
-#         fields = '__all__'
-        
-# class NotificationSeenSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Notification
-#         fields = ['is_seen']
-        
+    class Meta:
+        model = Notification
+        fields = ['id', 'message', 'is_read', 'created_at', 'user', 'username']  
+      
 class ContactInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactInfo
@@ -24,14 +20,8 @@ class SavePackageSerializer(serializers.ModelSerializer):
 
 
 
-# class ChatSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Chat
-#         fields = '__all__'
-
 class TicketSerializer(serializers.ModelSerializer):
-    # chat = ChatSerializer()
-
+   
     class Meta:
         model = Ticket
         fields = '__all__'

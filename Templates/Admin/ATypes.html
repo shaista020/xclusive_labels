@@ -518,6 +518,7 @@
               data: JSON.stringify(typeData),
               success: function () {
                 alert("Type updated successfully!");
+                addNotification("Your Type has been Updated successfully!"); 
                 fetchtype();
                 $("#submitCourse").removeClass("editMode").text("Save Type");
                 $("#typeForm")[0].reset();
@@ -540,6 +541,7 @@
               data: JSON.stringify(typeData),
               success: function () {
                 alert("Type added successfully!");
+                addNotification("Your Type has been Created successfully!"); 
                 fetchtype();
                 $("#typeForm")[0].reset();
                 console.log("Redirecting to /types/");
@@ -598,7 +600,8 @@
               },
               success: function () {
                 alert("Type deleted successfully!");
-                location.reload(); 
+                addNotification("Your Type has been Deleted successfully!"); 
+                // location.reload(); 
                 fetchtype();
               },
               error: function () {

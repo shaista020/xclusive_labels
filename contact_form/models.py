@@ -1,19 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings 
-# from adminside.models import CustomUser
-# User = CustomUser   
-# class Notification(models.Model):
-#     description = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     updated_at = models.DateTimeField(auto_now=True)
-#     send_by = models.ForeignKey(User, related_name='seen_notifications', on_delete=models.CASCADE)
-#     send_to = models.ForeignKey(User, related_name='review_notifications', on_delete=models.CASCADE)
-#     is_seen = models.BooleanField()
 
-#     def __str__(self):
-#         return f'Notification from {self.send_by} to {self.send_to}'
-    
+class Notification(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    message = models.TextField() 
+    is_read = models.BooleanField(default=False)  
+    created_at = models.DateTimeField(auto_now_add=True) 
+
+    def __str__(self):
+        return self.message
+
 class ContactInfo(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()

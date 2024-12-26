@@ -154,15 +154,20 @@
             </div>
           
             
-            <div class="card tmaindiv vMDiv" style="text-align: center">
-              <form action="/submit_view_tickets_user/" method="POST">
+            <div class="card tmaindiv vMDiv" style="text-align: left">
+              <form action="/submit_view_tickets_user/" method="POST" id="ticketForm">
                 {% csrf_token %}
                 <input type="text" class="form-control" name="id" value="{{tickets.id}}" hidden>  
-                <input type="text" class="form-control" name="title" value="{{tickets.title}}">  
-                <input type="date" class="form-control mt-3" name="date" value="{{tickets.created_at|date:'Y-m-d' }}">
+                <label for="title">Title</label>
+                <input type="text" class="form-control" name="title" value="{{ tickets.title }}" readonly>
+              
+                <!-- Date Field -->
+                <label for="date">Date</label>
+                <input type="date" class="form-control " name="date" value="{{ tickets.created_at|date:'Y-m-d' }}" readonly>
+                <label for="message">Message</label>
                 <textarea
                   id="messageText"
-                  class="form-control mt-4"
+                  class="form-control "
                   placeholder="Write your message here"
                   rows="5"
                   name="message"
@@ -174,6 +179,38 @@
             </form>
             </div>
           </div>
+<script>
+  function submitTicketForm() {
+    var formData = new FormData(document.getElementById('ticketForm')); // Assuming your form has the id 'ticketForm'
 
+    $.ajax({
+        url: '/submit_view_tickets_user/', // URL of the view handling the form submission
+        method: 'POST',
+        data: formData,
+        processData: false,  // Prevents jQuery from converting data to a query string
+        contentType: false,  // Tells jQuery to not set a content type
+        success: function(response) {
+            if (response.status === 'success') {
+                // Trigger the notification after a successful submission
+                addNotification(response.message);
+                // Optionally, redirect or reload the page
+                window.location.href = '/supports/';
+            } else {
+                addNotification('An error occurred: ' + response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            addNotification('An unexpected error occurred. Please try again.');
+        }
+    });
+}
+
+// Assuming you have an event listener to call submitTicketForm when the form is submitted
+document.getElementById('ticketForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent the form from submitting the normal way
+    submitTicketForm();
+});
+
+</script>
         </body>
 </html>

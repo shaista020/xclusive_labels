@@ -570,6 +570,7 @@
               data: JSON.stringify(addressData),
               success: function () {
                 console.log("Address updated successfully!");
+                addNotification("Your Ship From Address has been updated successfully!"); 
                 alert("Address updated successfully!");
                 fetchAddresses();
                 $("#submitCourse").removeClass("editMode").text("Save Address");
@@ -595,6 +596,7 @@
               success: function () {
                 console.log("Address added successfully!");
                 alert("Address added successfully!");
+                addNotification("Your Ship From Address has been created successfully!"); 
                 fetchAddresses();
                 $("#addressForm")[0].reset();
                 console.log("Redirecting to /address/");
@@ -660,6 +662,8 @@
               },
               success: function () {
                 alert("Address deleted successfully!");
+                addNotification("Your Ship From Address has been deleted successfully!"); 
+                // window.location.reload(),
                 fetchAddresses();
               },
               error: function () {

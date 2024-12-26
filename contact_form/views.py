@@ -17,6 +17,9 @@ from django.utils.timezone import now
 import pytz
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404, render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 
 
@@ -357,42 +360,55 @@ class ReferralView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class Notificationview(APIView):
+class NotificationViewSet(viewsets.ModelViewSet):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
 
-    def get(self, request, pk=None):
-        if pk is not None:
-            try:
-                notification = Notification.objects.get(pk=pk)
-                serializer = NotificationSerializer(notification)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            except Notification.DoesNotExist:
-                return Response({"error": "Notification not found"}, status=status.HTTP_404_NOT_FOUND)
+    def get_queryset(self):
+        """
+        Override get_queryset to filter notifications for the logged-in user,
+        or show all notifications if the user is an admin.
+        """
+        if self.request.user.is_staff:  # Check if the user is an admin (staff)
+            return self.queryset  # Admin can see all notifications
         else:
-            notifications = Notification.objects.all()
-            serializer = NotificationSerializer(notifications, many=True)
-            return Response(serializer.data)
+            return self.queryset.filter(user=self.request.user)  # Non-admin sees only their own notifications
 
-    def post(self, request):
-        serializer = NotificationSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def get_notifications(self, request):
+        """Get notifications with the username included."""
+        notifications = self.get_queryset()
+        unread_count = notifications.filter(is_read=False).count()
+        # Serialize the notifications data
+        serialized_notifications = NotificationSerializer(notifications, many=True)
+        return Response({
+            'username': request.user.username,  # Pass the logged-in user's username
+            'unread_count': unread_count,
+            'notifications': serialized_notifications.data
+        })
 
-    def patch(self, request, pk=None):
-        if pk is None:
-            return Response({"error": "pk is required"}, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=False, methods=['patch'], permission_classes=[IsAuthenticated])
+    def mark_as_read(self, request):
+        """Mark all unread notifications as read."""
+        unread_notifications = self.queryset.filter(user=request.user, is_read=False)
+        
+        if unread_notifications.exists():
+            unread_notifications.update(is_read=True)
+            return Response({"status": "All notifications marked as read."})
+        else:
+            return Response({"status": "No unread notifications to mark."}, status=400)
 
-        try:
-            notification = Notification.objects.get(pk=pk)
-        except Notification.DoesNotExist:
-            return Response({"error": "Notification not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = NotificationSeenSerializer(notification, data={'is_seen': True}, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @action(detail=False, methods=['delete'], permission_classes=[IsAuthenticated])
+    def delete_notifications(self, request):
+        """Delete all read notifications."""
+        deleted_notifications = self.queryset.filter(user=request.user, is_read=True)
+        
+        if deleted_notifications.exists():
+            deleted_notifications.delete()
+            return Response({"status": "All read notifications deleted."})
+        else:
+            return Response({"status": "No read notifications to delete."}, status=400)
 
 
 class newLabelView(APIView):
@@ -507,7 +523,7 @@ def addFund(request):
 
 @login_required(login_url="/auth/signin/")
 def address(request):
-    address = Address.objects.all()
+    address = Address.objects.filter(user=request.user)
     return render(request,'User/fromAddresses.html', {'address':address})
 
 @login_required(login_url="/auth/signin/")
@@ -520,7 +536,7 @@ def referral(request):
 
 @login_required(login_url="/auth/signin/")
 def package(request):
-    packages = Package.objects.all()
+    packages = Package.objects.filter(user=request.user)
     return render(request,'User/savedPackages.html', {'packages':packages})
 
 @login_required(login_url="/auth/signin/")
@@ -568,18 +584,13 @@ def update_profile(request):
 
 @login_required(login_url="/auth/signin/")
 def store(request):
-    store = Store.objects.all()
+    store = Store.objects.filter(user=request.user)
     return render(request,'User/stores.html', {'store':store})
 
 @login_required(login_url="/auth/signin/")
 def supports(request):
-    support = Ticket.objects.all()
+    support = Ticket.objects.filter(user=request.user)
     return render(request,'User/support.html', {'support': support})
-from django.shortcuts import get_object_or_404, render
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import get_object_or_404
 
 @csrf_exempt
 def close_ticket(request, ticket_id):
@@ -601,6 +612,10 @@ def view_tickets_user(request, id):
     return render(request,'User/view_tickets.html',{"tickets":tickets})
 
 
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
+from .models import Ticket
+
 def submit_view_tickets_user(request):
     if request.method == 'POST':
         id = request.POST['id']
@@ -608,16 +623,17 @@ def submit_view_tickets_user(request):
         date = request.POST['date']
         message = request.POST['message']
         try:
-            ticket= Ticket.objects.get(id=id)
+            ticket = Ticket.objects.get(id=id)
             ticket.title = title
             ticket.created_at = date
             ticket.message = message
             ticket.save()
-            return redirect('/supports/')
 
-        except:
-            msg = 'error'
-            return render(request,'User/support.html',{"msg":msg})
+            # Return a success response with a message
+            return JsonResponse({"status": "success", "message": "Your message has been sent successfully!"})
+
+        except Ticket.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Ticket not found."}, status=400)
 
 @login_required(login_url="/auth/signin/")
 def newLable(request):
