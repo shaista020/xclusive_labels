@@ -7,23 +7,68 @@ from django.core.exceptions import ValidationError
 # Create your views here.
 User = get_user_model()
 # Create your views here.
+# def user_login(request):
+#     if request.method == 'POST':
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         user = authenticate(request, username = username , password = password)
+#         print(user)
+#         if user is not None:
+#             login(request, user)
+#             is_superuser = user.is_superuser
+#             if is_superuser is True:
+#                 return redirect('/dashboard/')
+#             else:
+#                 return redirect("/user_dashboard/")
+#         else:
+#             error = "Invalid Credentials"
+#             return render(request, "signin.html", {"error": error})
+#     return render(request, "signin.html")
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, logout, login
+from django.contrib.auth import get_user_model
+import requests
+
+User = get_user_model()
+
+# Create your views here.
 def user_login(request):
+    error = None
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(request, username = username , password = password)
-        print(user)
+        remember = request.POST.get('remember')  # Get the 'remember me' checkbox value
+        recaptcha_response = request.POST.get('g-recaptcha-response')  # Get reCAPTCHA response
+
+        # Verify reCAPTCHA
+        recaptcha_secret_key = "6LcoN6YqAAAAAM_XWygWm2_qBKrPbEzdFoeT0gly"
+        recaptcha_url = "https://www.google.com/recaptcha/api/siteverify"
+        recaptcha_data = {'secret': recaptcha_secret_key, 'response': recaptcha_response}
+        recaptcha_verify = requests.post(recaptcha_url, data=recaptcha_data)
+        recaptcha_result = recaptcha_verify.json()
+
+        if not recaptcha_result.get('success', False):
+            error = "Invalid reCAPTCHA. Please try again."
+            return render(request, "signin.html", {"error": error})
+
+        user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            is_superuser = user.is_superuser
-            if is_superuser is True:
+
+            # Set session expiry based on 'remember me'
+            if remember:
+                request.session.set_expiry(1209600)  # 2 weeks
+            else:
+                request.session.set_expiry(0)  # Browser close
+
+            if user.is_superuser:
                 return redirect('/dashboard/')
             else:
-                return redirect("/user_dashboard/")
+                return redirect('/user_dashboard/')
         else:
             error = "Invalid Credentials"
-            return render(request, "signin.html", {"error": error})
-    return render(request, "signin.html")
+
+    return render(request, "signin.html", {"error": error})
 
 
 def signup(request):

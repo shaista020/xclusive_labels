@@ -219,41 +219,49 @@
           <p>Hey there, please sign in to continue</p>
           <!-- <form id="signin-form"> -->
             <form action="/auth/signin/" method="POST">
-            {% csrf_token %}
-            <label for="Name">Name</label>
-            <input
-              type="name"
-              id="name"
-              name="username"
-              class="form-control"
-              placeholder="username"
-              required
-            />
+              {% csrf_token %}
+              <label for="Name">Name</label>
+              <input
+                  type="text"
+                  id="name"
+                  name="username"
+                  class="form-control"
+                  placeholder="Username"
+                  required
+              />
           
-            <label for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              class="form-control"
-              required
-            />
+              <label for="password">Password</label>
+              <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="form-control"
+                  required
+              />
           
-            <div class="remember-me">
-              <div style="display: flex; flex-direction: row">
-                <input type="checkbox" id="remember" name="remember" />
-                <label style="margin-left: 10px" for="remember">
-                  Remember Me
-                </label>
+              <div class="remember-me">
+                  <div style="display: flex; flex-direction: row">
+                      <input type="checkbox" id="remember" name="remember" />
+                      <label style="margin-left: 10px" for="remember">
+                          Remember Me
+                      </label>
+                  </div>
+              </div>
+          
+              <div class="g-recaptcha" 
+                  data-sitekey="6LcoN6YqAAAAAPA7Hcx9H2eRk1Z-HYalCtl6HpnE">
               </div>
               <br />
-              <div style="display: flex; flex-direction: row">
-                <input type="checkbox" />
-                <label style="margin-left: 10px">I'm not a robot</label>
-              </div>
-            </div>
-            <button type="submit">Sign In</button>
+              <br />
+              <br />
+              <br />
+          
+              <button type="submit" class="btn btn-primary">Sign In</button>
           </form>
+          
+          <!-- Include Google reCAPTCHA JS -->
+          <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+          
           
           <div id="response-message" style="margin-top: 20px; color: red;"></div>
           
