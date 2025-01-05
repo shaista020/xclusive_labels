@@ -38,18 +38,18 @@ def user_login(request):
         username = request.POST['username']
         password = request.POST['password']
         remember = request.POST.get('remember')  # Get the 'remember me' checkbox value
-        recaptcha_response = request.POST.get('g-recaptcha-response')  # Get reCAPTCHA response
+        # recaptcha_response = request.POST.get('g-recaptcha-response')  # Get reCAPTCHA response
 
-        # Verify reCAPTCHA
-        recaptcha_secret_key = "6LcoN6YqAAAAAM_XWygWm2_qBKrPbEzdFoeT0gly"
-        recaptcha_url = "https://www.google.com/recaptcha/api/siteverify"
-        recaptcha_data = {'secret': recaptcha_secret_key, 'response': recaptcha_response}
-        recaptcha_verify = requests.post(recaptcha_url, data=recaptcha_data)
-        recaptcha_result = recaptcha_verify.json()
+        # # Verify reCAPTCHA
+        # recaptcha_secret_key = "6LcoN6YqAAAAAM_XWygWm2_qBKrPbEzdFoeT0gly"
+        # recaptcha_url = "https://www.google.com/recaptcha/api/siteverify"
+        # recaptcha_data = {'secret': recaptcha_secret_key, 'response': recaptcha_response}
+        # recaptcha_verify = requests.post(recaptcha_url, data=recaptcha_data)
+        # recaptcha_result = recaptcha_verify.json()
 
-        if not recaptcha_result.get('success', False):
-            error = "Invalid reCAPTCHA. Please try again."
-            return render(request, "signin.html", {"error": error})
+        # if not recaptcha_result.get('success', False):
+        #     error = "Invalid reCAPTCHA. Please try again."
+        #     return render(request, "signin.html", {"error": error})
 
         user = authenticate(request, username=username, password=password)
         if user is not None:
