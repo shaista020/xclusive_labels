@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin-Tickets</title>
     {% load static %}
-    <link rel="icon" type="image/x-icon" href="images/images/logo1.png" />
+    <link rel="icon" type="image/x-icon" href="{% static 'images/images/logo1.png' %}" />
 
     <link rel="stylesheet" href="../../static/index.css" />
     <link
@@ -15,10 +15,8 @@
       crossorigin="anonymous"
     />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <link
-      href="bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <link href="{% static 'bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css' %}" rel="stylesheet" />
+   
     <style>
       .table {
         border-radius: 10px;
@@ -160,11 +158,11 @@
 
   <!-- Title Field -->
   <label for="title">Title</label>
-  <input type="text" class="form-control" name="title" value="{{ tickets.title }}">
+  <input type="text" class="form-control" name="title" value="{{ tickets.title }}" readonly>
 
   <!-- Date Field -->
   <label for="date">Date</label>
-  <input type="date" class="form-control " name="date" value="{{ tickets.created_at|date:'Y-m-d' }}">
+  <input type="date" class="form-control " name="date" value="{{ tickets.created_at|date:'Y-m-d' }}" readonly>
 
   <!-- Message Field -->
   <label for="messageText">Message</label>

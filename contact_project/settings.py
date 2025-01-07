@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-jte%pwlw%nt(b2uag++nh3mf529d^3!s)-!yb3bfe2vspszst4'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['143.244.177.2']
+# ALLOWED_HOSTS = ['143.244.177.2']
 
 
 # Application definition
@@ -65,7 +65,7 @@ ROOT_URLCONF = 'contact_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR /"Templates"],
+        'DIRS': [BASE_DIR / 'templates'], 
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,6 +128,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATICFILES_DIRS = [BASE_DIR / 'static']
 
 
 

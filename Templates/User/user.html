@@ -4,7 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User Dashboard-Volusion</title>
-    <link rel="icon" type="image/x-icon" href="images/images/logo1.png" />
+    {% load static %}
+    <link rel="icon" type="image/x-icon" href="{% static 'images/images/logo1.png' %}" />
+
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <script
       type="text/javascript"
@@ -12,7 +14,7 @@
     ></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    {% load static %}
+   
     <link rel="stylesheet" href="{% static 'index.css' %}" />
     
     <link
@@ -21,10 +23,7 @@
       integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
       crossorigin="anonymous"
     />
-    <link
-      href="bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <link href="{% static 'bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css' %}" rel="stylesheet" />
     <script>
       google.charts.load("current", { packages: ["corechart", "line"] });
       google.charts.setOnLoadCallback(drawBackgroundColor);
