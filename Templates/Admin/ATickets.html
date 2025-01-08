@@ -22,6 +22,9 @@
     <link href="{% static 'bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css' %}" rel="stylesheet" />
    
     <style>
+       #cMenu {
+  display: none; 
+}
       .table {
         border-radius: 10px;
         overflow: hidden;
@@ -237,7 +240,8 @@
                       <td>{{ ticket.created_at|date:'d-m-Y' }}</td>
                       <td class="d-flex gap-1">
                         <a href="/view_tickets/{{ ticket.id }}" class="form-control btn btn-light">
-                          <img src="{% static 'images/view-message.svg' %}" alt="View" />
+                          <img src="/media/images/view-message.svg" alt="Tickets" />
+
                           View Message
                         </a>
                         <button 
@@ -288,7 +292,7 @@
               <a style="text-decoration: none; color: black" href="/tickets">
                 <div>
                   <div>
-                    <img src="/static/images/Atickets.svg" alt="Tickets" />
+                    <img src="media/images/Atickets.svg" alt="Tickets" />
 
                     <span>Tickets </span>
                   </div>

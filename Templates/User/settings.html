@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Settings-Volusion</title>
     {% load static %}
+    
     <link rel="icon" type="image/x-icon" href="{% static 'images/images/logo1.png' %}" />
-
+  
     <link rel="stylesheet" href="{% static 'index.css' %}" />
-
+  
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -17,9 +18,10 @@
     />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
+  
     <link href="{% static 'bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css' %}" rel="stylesheet" />
-    <style>
+   
+   <style>
       .card {
         display: flex;
         flex-direction: row;
@@ -253,7 +255,7 @@
                 >
                   <img
                     class="tabs-img"
-                    src="{% static '/images/profilee.svg' %}"
+                    src="/media/images/profilee.svg"
                   />
                   <p class="tabs">Profile</p>
                 </button>
@@ -276,7 +278,7 @@
                 >
                   <img
                     class="tabs-img"
-                    src="{% static '/images/notificationss.svg' %}"
+                    src="/media/images/notificationss.svg"
                   />
 
                   <p class="tabs">Notifications</p>
@@ -286,10 +288,7 @@
                   class="form-control btn btn-light"
                   id="aBtn"
                 >
-                  <img
-                    class="tabs-img"
-                    src="{% static '/images/delete-account.svg' %}"
-                  />
+                <img class="tabs-img" src="/media/images/delete-account.svg" alt="del" />
 
                   <p class="tabs">Delete Account</p>
                 </button>
