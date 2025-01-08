@@ -654,3 +654,14 @@ def delete_account(request):
     else:
         messages.error(request, "Invalid request method.")
         return redirect('/settings/')  
+def load_navbar(request):
+    if request.user.is_staff: 
+        return render(request, "navbarAdmin.html")
+    else:
+        return render(request, "navbar.html")
+
+def load_sidebar(request):
+    if request.user.is_staff: 
+        return render(request, "sidebarAdmin.html")
+    else:
+        return render(request, "sidebar.html")

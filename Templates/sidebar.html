@@ -1,208 +1,139 @@
 {% load static %}
-<style>
-  #brand {
-    display: none; /* Default: hidden */
-    position: absolute; /* Ensures it stays at the top */
-    top: 20px;
-    left: 10px;
-    margin-right: 50px;
-    border: none;
-    cursor: pointer;
-    background: white !important;
-    border-radius: 5px;
-    z-index: 1000; /* Keeps it above other elements */
-  }
-
-  @media (max-width: 1500px) {
-    #brand {
-      display: none; /* Show hamburger on smaller screens */
-    }
-  }
-</style>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const brand = document.getElementById("brand");
-    const mynav = document.getElementById("snavbarTogglerDemo03");
-
-    if (brand) {
-      brand.addEventListener("click", function () {
-        if (mynav) mynav.style.display = "block";
-      });
-    }
-
-    document.addEventListener("click", function (event) {
-      if (
-        mynav &&
-        mynav.style.display === "block" &&
-        !mynav.contains(event.target) &&
-        event.target !== brand
-      ) {
-        mynav.style.display = "none";
-      }
-    });
-  });
-</script>
-<div style="position: relative">
-  <button id="brand">☰</button>
-  <div class="sidebar" id="snavbarTogglerDemo03">
-    <div class="flex flex-col">
-      <div class="logoDiv">
-        <img class="logo" src="{% static 'images/images/logo1.png' %} " />
-      </div>
-
-      <div
-        dir="ltr"
-        class="relative scroll"
-        style="
-          position: relative;
-          --radix-scroll-area-corner-width: 0px;
-          --radix-scroll-area-corner-height: 0px;
-        "
-      >
-        <div class="user">
-          <div style="min-width: 90%; display: table">
-            <a style="text-decoration: none" href="/user_dashboard">
-              <div class="Udash" style="margin-top: 10px; gap: 5px">
-                <img src="{% static 'images/dashboard.svg' %} " />
-                <div class="dashI">
-                  <span class="dashT">Dashboard</span>
-                </div>
+<div class="sidebar" id="snavbarTogglerDemo03">
+  <div class="flex flex-col">
+    <div class="logoDiv">
+      <img class="logo" src="{% static 'images/images/logo1.png' %} " />
+    </div>
+    <button id="closeNav" style="
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        border: none;
+        cursor: pointer;
+        background: white !important;
+        border-radius: 5px;
+      ">
+      &times;
+    </button>
+    <div dir="ltr" class="relative scroll" style="
+        position: relative;
+        --radix-scroll-area-corner-width: 0px;
+        --radix-scroll-area-corner-height: 0px;
+      ">
+      <div class="user">
+        <div style="min-width: 90%; display: table">
+          <a style="text-decoration: none" href="/user_dashboard">
+            <div class="Udash" style="margin-top: 10px; gap: 5px">
+              <img src="{% static 'images/dashboard.svg' %} " />
+              <div class="dashI">
+                <span class="dashT">Dashboard</span>
               </div>
-            </a>
-            <a style="text-decoration: none" href="/orders">
-              <div class="Udash">
-                <div class="dashI" style="gap: 5px">
-                  <img
-                    src="{% static 'images/orders.svg' %} "
-                    alt="orders Icon"
-                  />
-                  <span class="dashT">Orders </span>
-                </div>
-              </div> </a
-            ><a style="text-decoration: none" href="/address">
-              <div class="Udash">
-                <div class="dashI" style="gap: 5px">
-                  <img src="{% static 'images/from-address.svg' %} " />
-                  <span class="dashT"
-                    >From Addresses
-                    <!-- text-base font-normal text-primary-foreground -->
-                  </span>
-                </div>
-              </div> </a
-            ><a style="text-decoration: none" href="/packages">
-              <div class="Udash">
-                <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false -->
-                <div class="dashI" style="gap: 5px">
-                  <!-- flex items-center flex-1 gap-2 -->
-                  <img src="{% static 'images/saved-packages.svg' %} " />
-                  <span class="dashT"
-                    >Saved Packages
-                    <!-- text-base font-normal text-primary-foreground -->
-                  </span>
-                </div>
-              </div> </a
-            ><a style="text-decoration: none" href="/payments">
-              <div class="Udash">
-                <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false -->
-                <div class="dashI" style="gap: 5px">
-                  <!-- flex items-center flex-1 gap-2 -->
-                  <img
-                    src="{% static 'images/payments.svg' %} "
-                    alt="payments Icon"
-                  />
-                  <span class="dashT"
-                    >Payments
-                    <!-- text-base font-normal text-primary-foreground -->
-                  </span>
-                </div>
-              </div> </a
-            ><a style="text-decoration: none" href="/supports">
-              <div class="Udash">
-                <!-- inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80" -->
-
-                <div class="dashI" style="gap: 5px">
-                  <!-- flex items-center flex-1 gap-2 -->
-                  <img
-                    src="{% static 'images/support.svg' %} "
-                    alt="support Icon"
-                  />
-                  <span class="dashT">
-                    <!-- text-base font-normal text-primary-foreground -->
-                    Support</span
-                  >
-                </div>
-              </div> </a
-            >
-            <!-- <a style="text-decoration: none" href="/referrals">
-              <div class="Udash">
-               
-                <div class="dashI" style="gap: 5px">
-                 
-                  <img
-                    src="{% static 'images/referrals.svg' %} "
-                    alt="referrals Icon"
-                  />
-                  <span class="dashT"
-                    >Referrals
-                   
-                  </span>
-                </div>
-              </div> </a
-            > -->
-            <a style="text-decoration: none" href="/stores">
-              <div class="Udash">
-                <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false" -->
-
-                <div class="dashI" style="gap: 5px">
-                  <!-- flex items-center flex-1 gap-2 -->
-                  <img
-                    src="{% static 'images/stores.svg' %} "
-                    alt="stores Icon"
-                  />
-                  <span class="dashT"
-                    >Stores
-                    <!-- text-base font-normal text-primary-foreground -->
-                  </span>
-                </div>
+            </div>
+          </a>
+          <a style="text-decoration: none" href="/orders">
+            <div class="Udash">
+              <div class="dashI" style="gap: 5px">
+                <img src="{% static 'images/orders.svg' %} " alt="orders Icon" />
+                <span class="dashT">Orders </span>
               </div>
-            </a>
-            <a style="text-decoration: none" href="/settings">
-              <div class="Udash">
-                <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false" -->
-
-                <div class="dashI" style="gap: 5px; margin-bottom: 10px">
-                  <!-- flex items-center flex-1 gap-2 -->
-                  <img
-                    src="{% static 'images/settings.svg' %} "
-                    alt="settings Icon"
-                  />
-                  <span class="dashT"
-                    >Settings
-                    <!-- text-base font-normal text-primary-foreground -->
-                  </span>
-                </div>
-                <div class="dashN">
-                  <!-- flex items-center gap-2 -->
-                </div>
+            </div>
+          </a><a style="text-decoration: none" href="/address">
+            <div class="Udash">
+              <div class="dashI" style="gap: 5px">
+                <img src="{% static 'images/from-address.svg' %} " />
+                <span class="dashT">From Addresses
+                  <!-- text-base font-normal text-primary-foreground -->
+                </span>
               </div>
-            </a>
-          </div>
+            </div>
+          </a><a style="text-decoration: none" href="/packages">
+            <div class="Udash">
+              <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false -->
+              <div class="dashI" style="gap: 5px">
+                <!-- flex items-center flex-1 gap-2 -->
+                <img src="{% static 'images/saved-packages.svg' %} " />
+                <span class="dashT">Saved Packages
+                  <!-- text-base font-normal text-primary-foreground -->
+                </span>
+              </div>
+            </div>
+          </a><a style="text-decoration: none" href="/payments">
+            <div class="Udash">
+              <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false -->
+              <div class="dashI" style="gap: 5px">
+                <!-- flex items-center flex-1 gap-2 -->
+                <img src="{% static 'images/payments.svg' %} " alt="payments Icon" />
+                <span class="dashT">Payments
+                  <!-- text-base font-normal text-primary-foreground -->
+                </span>
+              </div>
+            </div>
+          </a><a style="text-decoration: none" href="/supports">
+            <div class="Udash">
+              <!-- inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80" -->
+
+              <div class="dashI" style="gap: 5px">
+                <!-- flex items-center flex-1 gap-2 -->
+                <img src="{% static 'images/support.svg' %} " alt="support Icon" />
+                <span class="dashT">
+                  <!-- text-base font-normal text-primary-foreground -->
+                  Support</span>
+              </div>
+            </div>
+          </a><a style="text-decoration: none" href="/referrals">
+            <div class="Udash">
+              <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false" -->
+
+              <div class="dashI" style="gap: 5px">
+                <!-- flex items-center flex-1 gap-2 -->
+                <img src="{% static 'images/referrals.svg' %} " alt="referrals Icon" />
+                <span class="dashT">Referrals
+                  <!-- text-base font-normal text-primary-foreground -->
+                </span>
+              </div>
+            </div>
+          </a><a style="text-decoration: none" href="/stores">
+            <div class="Udash">
+              <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false" -->
+
+              <div class="dashI" style="gap: 5px">
+                <!-- flex items-center flex-1 gap-2 -->
+                <img src="{% static 'images/stores.svg' %} " alt="stores Icon" />
+                <span class="dashT">Stores
+                  <!-- text-base font-normal text-primary-foreground -->
+                </span>
+              </div>
+            </div>
+          </a>
+          <a style="text-decoration: none" href="/settings">
+            <div class="Udash">
+              <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false" -->
+
+              <div class="dashI" style="gap: 5px; margin-bottom: 10px">
+                <!-- flex items-center flex-1 gap-2 -->
+                <img src="{% static 'images/settings.svg' %} " alt="settings Icon" />
+                <span class="dashT">Settings
+                  <!-- text-base font-normal text-primary-foreground -->
+                </span>
+              </div>
+              <div class="dashN">
+                <!-- flex items-center gap-2 -->
+              </div>
+            </div>
+          </a>
         </div>
       </div>
     </div>
-    <div style="border-top: 1px solid white; padding-bottom: 10px">
-      <div style="padding: 20px; margin-left: 2rem">
-        <h1 style="font-size: medium; color: gray">
-          Need help with
-          <b>Volusion</b>?
-        </h1>
-        <a href="/contact"
-          ><button class="form-control btn btn-light my-2 contact">
-            Contact Us
-          </button></a
-        >
-      </div>
-    </div> 
+  </div>
+  <div style="border-top: 1px solid white; padding-bottom: 10px">
+    <div style="padding: 20px; margin-left: 2rem">
+      <h1 style="font-size: medium; color: gray">
+        Need help with
+        <b>Volusion</b>?
+      </h1>
+      <a href="/contact"><button class="form-control btn btn-light my-2 contact">
+          Contact Us
+        </button></a>
+    </div>
   </div>
 </div>

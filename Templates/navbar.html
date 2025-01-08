@@ -1,123 +1,287 @@
-{% load static %}
-
-<script>
-  document.addEventListener("DOMContentLoaded", function (event2) {
-    document.getElementById("nBtn").addEventListener("click", function () {
-      document.getElementById("nMenu").style.display = "block";
-      event.stopPropagation();
-    });
-  });
-  document.addEventListener("click", function (event2) {
-    if (
-      nMenu.style.display == "block" &&
-      !nMenu.contains(event.target) &&
-      event.target !== nBtn
-    ) {
-      nMenu.style.display = "none";
-    }
-  });
-  document.addEventListener("DOMContentLoaded", function (event1) {
-    document
-      .getElementById("customizeBtn")
-      .addEventListener("click", function () {
-        document.getElementById("customizeMenu").style.display = "block";
-        event.stopPropagation();
-      });
-  });
-  document.addEventListener("click", function (event1) {
-    if (
-      customizeMenu.style.display == "block" &&
-      !customizeMenu.contains(event.target) &&
-      event.target !== customizeBtn
-    ) {
-      customizeMenu.style.display = "none";
-    }
-  });
-
-
-</script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<nav class="navbar navbar-expand-lg navbar-light bg-light p-3">
-  <div class="container-fluid">
-    <!-- Account Info Section -->
-    <div class="d-flex align-items-center me-auto">
-      <div class="account-info d-flex align-items-center">
-        <button type="button" id="customizeBtn" class="btn btn-light d-flex align-items-center" aria-haspopup="true"
-          aria-expanded="false" style="background-color: transparent; border: none">
-          <!-- Avatar Image -->
-          {% if user.get_full_name %}
-          <!-- Avatar Image with Dynamic Initials -->
-          <img
-            src="https://ui-avatars.com/api/?name={{ user.get_full_name|default:user.username|urlencode }}&size=64&background=random"
-            alt="{{ user.get_full_name|default:user.username }}'s Profile Image"
-            class="profile-icon rounded-circle mr-3" style="width: 1.8rem; height: 1.8rem; object-fit: cover" />
-          {% else %}
-          <!-- Fallback Initials -->
-          <div class="rounded-circle d-flex justify-content-center ms-3 align-items-center bg-secondary text-white"
-            style="width: 35px; height: 35px; margin-right: 10px">
-            {{ user.first_name|default:user.username|slice:":1"|upper }}{{ user.last_name|default:""|slice:":1"|upper }}
-          </div>
-          {% endif %}
-
-          <!-- Display User Name and Email -->
-          <div class="text-start me-2">
-            <h6 class="mb-0">{{ user.get_full_name|default:user.username }}</h6>
-            <small>{{ user.email }}</small>
-          </div>
-
-          <!-- Profile Image -->
-
-          <img src="{% static 'images/john-doe.svg' %}" alt="Profile" class="rounded-circle"
-            style="width: 35px; height: 35px" />
-        </button>
-
-        <!-- Customize Menu (Dropdown) -->
-        <div id="customizeMenu" class="customize-menu card position-absolute mt-2" style="display: none; z-index: 1">
-          <div class="card-body">
-            <h6 class="card-title">My Account</h6>
-            <hr />
-            <a href="/set" class="d-flex align-items-center text-dark text-decoration-none mb-2">
-              <img src="{% static 'images/profile.svg' %}" class="me-2" alt="Profile" />
-              Profile
-            </a>
-            <hr />
-            <a class="d-flex align-items-center text-dark text-decoration-none" href="{% url 'logout' %}">
-              <img src="{% static 'images/logout.svg' %}" class="me-2" alt="Logout" />
-              Logout
-            </a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  {% comment %} <nav class="navbar navbar-expand-lg navbar-light bg-light  p-3">
+    <div class="container-fluid">
+      <!-- Toggle button for small screens -->
+  
+  
+      <!-- Account Info Section -->
+      <div class="d-flex align-items-center me-auto">
+        <div class="account-info d-flex align-items-center">
+          <button
+            type="button"
+            id="customizeBtn"
+            class="btn btn-light d-flex align-items-center"
+            aria-haspopup="true"
+            aria-expanded="false"
+            style="background-color: transparent; border: none"
+          >
+            <div
+              class="rounded-circle d-flex justify-content-center ms-3 align-items-center bg-secondary text-white"
+              style="width: 35px; height: 35px; margin-right: 10px"
+            >
+              jd
+            </div>
+            <div class="text-start me-2">
+              <h6 class="mb-0">John Doe</h6>
+              <small>pwz2k@hotmail.com</small>
+            </div>
+            <img
+              src="/media/media/images/john-doe.svg"
+              alt="Profile"
+              class="rounded-circle"
+              style="width: 35px; height: 35px"
+            />
+          </button>
+  
+          <!-- Customize Menu (Dropdown) -->
+          <div
+            id="customizeMenu"
+            class="customize-menu card position-absolute mt-2"
+            style="display: none; z-index: 1"
+          >
+            <div class="card-body">
+              <h6 class="card-title">My Account</h6>
+              <hr />
+              <a
+                href="/userFeatures/settings"
+                class="d-flex align-items-center text-dark text-decoration-none mb-2"
+              >
+                <img src="/media/media/images/profile.svg" class="me-2" alt="Profile" />
+                Profile
+              </a>
+              <!-- <a
+                href="/userFeatures/settings"
+                class="d-flex align-items-center text-dark text-decoration-none mb-2"
+              >
+                <img src="/media/media/images/coupons.svg" class="me-2" alt="Coupons" />
+                Coupons
+              </a> -->
+              <!-- <a
+                href="/userFeatures/settings"
+                class="d-flex align-items-center text-dark text-decoration-none mb-2"
+              >
+                <img
+                  src="/media/media/images/notifications.svg"
+                  class="me-2"
+                  alt="Notifications"
+                />
+                Notifications
+              </a> -->
+              <hr />
+              <a
+                class="d-flex align-items-center text-dark text-decoration-none"
+                href="#"
+              >
+                <img src="/media/media/images/logout.svg" class="me-2" alt="Logout" /> Logout
+              </a>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Collapsible Section for Menu Items -->
-    <div class="collapse navbar-collapse" id="navbarContent">
-      <ul class="navbar-nav gap-2 ms-auto">
-        <!-- Balance Section -->
-        <li class="nav-item mb-2 mb-lg-0">
-          <div class="balance p-2 border rounded bg-light">
-            Balance: $1,059.00
+  
+      <!-- Collapsible Section for Menu Items -->
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav gap-2 ms-auto">
+          <!-- Balance Section -->
+          <li class="nav-item mb-2 mb-lg-0">
+            <div class="balance p-2 border rounded bg-light">
+              Balance: $1,059.00
+            </div>
+          </li>
+  
+          <!-- Action Buttons (Create Label & Add Funds) -->
+          <li class="nav-item d-flex align-items-center">
+            <a href="/newLable" class="btn btn-outline-primary me-2">
+              <img
+                src="/media/media/images/create-label.svg"
+                class="me-1"
+                alt="Create Label"
+              />
+              Create New Label
+            </a>
+            <a href="/addfund" class="btn btn-outline-success">
+              <img src="/media/media/images/add-funds.svg" class="me-1" alt="Add Funds" /> Add
+              Funds
+            </a>
+          </li>
+        </ul>
+      </div>
+  
+      <!-- Notifications Section -->
+      <div class="nav-item position-relative">
+        <button
+          type="button"
+          id="nBtn"
+          class="btn btn-light"
+          aria-haspopup="true"
+          aria-expanded="false"
+          style="display: flex; align-items: center"
+        >
+          <img src="/media/media/images/menu.svg" alt="Notifications" />
+        </button>
+  
+        <!-- Notifications Dropdown -->
+        <div
+          id="nMenu"
+          class="customize-menu card position-absolute mt-2"
+          style="display: none; right: 0; z-index: 1"
+        >
+          <div class="card-body">
+            <h6>Notifications</h6>
+            <p>You have 0 unread messages.</p>
+            <div class="notification-item border p-2 mb-2">
+              <h6 class="mb-1">New Label Created</h6>
+              <p class="mb-0 text-muted">6 hours ago</p>
+              <p>Your label has been created successfully</p>
+            </div>
+            <!-- Repeat the above div for more notifications -->
+            <button class="btn btn-dark w-100 mt-2">Mark all as read</button>
           </div>
-        </li>
-
-        <!-- Action Buttons (Create Label & Add Funds) -->
-        <li class="nav-item d-flex align-items-center">
-          <a href="/newLable" class="btn btn-outline-primary me-2">
-            <img src="{% static 'images/create-label.svg' %}" class="me-1" alt="Create Label" />
-            Create New Label
-          </a>
-          <a href="/addfund" class="btn btn-outline-success">
-            <img src="{% static 'images/add-funds.svg' %}" class="me-1" alt="Add Funds" />
-            Add Funds
-          </a>
-        </li>
-      </ul>
+        </div>
+      </div>
+  
+      <!-- Dropdown for small devices -->
+      <div class="d-lg-none">
+        <button
+          class="btn btn-secondary"
+          type="button"
+          id="smallDeviceDropdown"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          style="
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 24px;
+            color: #000;
+          "
+        >
+          ⋮
+        </button>
+        <ul
+          class="dropdown-menu position-absolute end-0"
+          aria-labelledby="smallDeviceDropdown"
+        >
+          <li>
+            <a class="dropdown-item" href="/newLable">Create New Label</a>
+          </li>
+          <li><a class="dropdown-item" href="/addfund">Add Funds</a></li>
+          <li><a class="dropdown-item" href="#">Balance: $1,059.00</a></li>
+        </ul>
+      </div>
     </div>
-
-    <!-- Notifications Section -->
+  </nav> {% endcomment %}
+  
+  {% load static %}
+  <nav class="navbar navbar-expand-lg navbar-light bg-light p-3">
+    <div class="container-fluid">
+      <!-- Toggle button for small screens -->
+      <button
+        class="navbar-toggler"
+        id="sidebarToggleBtn"
+        type="button"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+  
+      <!-- Account Info Section -->
+      <div class="d-flex align-items-center me-auto">
+        <div class="account-info d-flex align-items-center">
+          <button type="button" id="customizeBtn" class="btn btn-light d-flex align-items-center" aria-haspopup="true"
+            aria-expanded="false" style="background-color: transparent; border: none">
+            <!-- Avatar Image -->
+            {% if user.get_full_name %}
+            <!-- Avatar Image with Dynamic Initials -->
+            <img
+              src="https://ui-avatars.com/api/?name={{ user.get_full_name|default:user.username|urlencode }}&size=64&background=random"
+              alt="{{ user.get_full_name|default:user.username }}'s Profile Image"
+              class="profile-icon rounded-circle mr-3" style="width: 1.8rem; height: 1.8rem; object-fit: cover" />
+            {% else %}
+            <!-- Fallback Initials -->
+            <div class="rounded-circle d-flex justify-content-center ms-3 align-items-center bg-secondary text-white"
+              style="width: 35px; height: 35px; margin-right: 10px">
+              {{ user.first_name|default:user.username|slice:":1"|upper }}{{ user.last_name|default:""|slice:":1"|upper }}
+            </div>
+            {% endif %}
+  
+            <!-- Display User Name and Email -->
+            <div class="text-start me-2">
+              <h6 class="mb-0">{{ user.get_full_name|default:user.username }}</h6>
+              <small>{{ user.email }}</small>
+            </div>
+  
+            <!-- Profile Image -->
+  
+            <img src="{% static 'images/john-doe.svg' %}" alt="Profile" class="rounded-circle"
+              style="width: 35px; height: 35px" />
+          </button>
+  
+          <!-- Customize Menu (Dropdown) -->
+          <div id="customizeMenu" class="customize-menu card position-absolute mt-2" style="display: none; z-index: 1">
+            <div class="card-body">
+              <h6 class="card-title">My Account</h6>
+              <hr />
+              <a href="/set" class="d-flex align-items-center text-dark text-decoration-none mb-2">
+                <img src="{% static 'images/profile.svg' %}" class="me-2" alt="Profile" />
+                Profile
+              </a>
+              <hr />
+              <a class="d-flex align-items-center text-dark text-decoration-none" href="{% url 'logout' %}">
+                <img src="{% static 'images/logout.svg' %}" class="me-2" alt="Logout" />
+                Logout
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Collapsible Section for Menu Items -->
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav gap-2 ms-auto">
+          <!-- Balance Section -->
+          <li class="nav-item mb-2 mb-lg-0">
+            <div class="balance p-2 border rounded bg-light">
+              Balance: $1,059.00
+            </div>
+          </li>
+  
+          <!-- Action Buttons (Create Label & Add Funds) -->
+          <li class="nav-item d-flex align-items-center">
+            <a
+              href="/newLable"
+              class="btn btn-outline-primary me-2"
+            >
+              <img
+                src="{% static 'images/create-label.svg' %}"
+                class="me-1"
+                alt="Create Label"
+              />
+              Create New Label
+            </a>
+            <a
+              href="/addfund"
+              class="btn btn-outline-success"
+            >
+              <img src="{% static 'images/add-funds.svg' %}" class="me-1" alt="Add Funds" /> Add
+              Funds
+            </a>
+          </li>
+        </ul>
+      </div>
+  
+      <!-- Notifications Section -->
+       <!-- Notifications Section -->
     <div class="nav-item position-relative">
       <button type="button" id="nBtn" class="btn btn-light" aria-haspopup="true" aria-expanded="false"
-        style="display: flex; align-items: center" onclick="toggleNotifications()">
+        style="display: flex; align-items: center"  data-toggle="dropdown">
         <img src="{% static 'images/menu.svg' %}" alt="Notifications" />
         <span id="notificationBadge"
           class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
@@ -128,7 +292,7 @@
 
       <!-- Notifications Dropdown -->
       <div id="nMenu" class="customize-menu card position-absolute mt-2"
-        style="display: none; right: 0; z-index: 1; max-height: 400px; overflow-y: auto;">
+        style="display: none; right: 0; z-index: 1500; max-height: 400px; overflow-y: auto;">
         <div class="card-body">
           <h6>Notifications</h6>
           <p id="noNotificationsMessage">You have 0 unread messages.</p>
@@ -140,197 +304,207 @@
       </div>
     </div>
 
-
-    <!-- Dropdown for small devices -->
-    <div class="d-lg-none position-relative">
-      <button class="btn btn-secondary" type="button" id="smallDeviceDropdown" data-bs-toggle="dropdown"
-        aria-expanded="false" style="
-          background: none;
-          border: none;
-          padding: 0;
-          font-size: 24px;
-          color: #000;
-        ">
-        ⋮
-      </button>
-      <ul class="dropdown-menu dropdown-menu-end position-absolute end-0" aria-labelledby="smallDeviceDropdown">
-        <li>
-          <a class="dropdown-item" href="/newLable">Create New Label</a>
-        </li>
-        <li><a class="dropdown-item" href="/addfund">Add Funds</a></li>
-        <li><a class="dropdown-item" href="#">Balance: $1,059.00</a></li>
-      </ul>
+      <!-- Dropdown for small devices -->
+      <div class="d-lg-none">
+        <button
+          class="btn btn-secondary"
+          type="button"
+          id="smallDeviceDropdown"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          style="
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 24px;
+            color: #000;
+          "
+        >
+          ⋮
+        </button>
+        <ul
+          class="dropdown-menu position-absolute end-0"
+          aria-labelledby="smallDeviceDropdown"
+        >
+          <li>
+            <a class="dropdown-item" href="/newLable">Create New Label</a>
+          </li>
+          <li><a class="dropdown-item" href="/addfund">Add Funds</a></li>
+          <li><a class="dropdown-item" href="#">Balance: $1,059.00</a></li>
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
-<script>
-  $(document).ready(function () {
-
-    fetchNotifications();
-  });
-  // Define the function to get CSRF token
-  function getCSRFToken() {
-    let token = null;
-    const cookies = document.cookie.split(";");
-    cookies.forEach(function (cookie) {
-      if (cookie.trim().startsWith("csrftoken=")) {
-        token = cookie.split("=")[1];
-      }
+  </nav>
+  <script>
+    $(document).ready(function () {
+  
+      fetchNotifications();
     });
-    return token;
-  }
-
-  function addNotification(message) {
-    const csrfToken = getCSRFToken();
-    const userId = window.userId;
-    const notificationData = {
-      message: message,
-      is_read: false,
-      user: userId,
-    };
-
+    // Define the function to get CSRF token
+    function getCSRFToken() {
+      let token = null;
+      const cookies = document.cookie.split(";");
+      cookies.forEach(function (cookie) {
+        if (cookie.trim().startsWith("csrftoken=")) {
+          token = cookie.split("=")[1];
+        }
+      });
+      return token;
+    }
+  
+    function addNotification(message) {
+      const csrfToken = getCSRFToken();
+      const userId = window.userId;
+      const notificationData = {
+        message: message,
+        is_read: false,
+        user: userId,
+      };
+  
+      $.ajax({
+        url: "/api/notifications/",
+        type: "POST",
+        headers: {
+          "X-CSRFToken": csrfToken,
+          "Content-Type": "application/json",
+        },
+        data: JSON.stringify(notificationData),
+        success: function () {
+          console.log("Notification saved in the backend.");
+          fetchNotifications();
+        },
+        error: function (xhr, status, error) {
+          console.error("Failed to save notification in the backend.", error);
+          console.error("Response Text: ", xhr.responseText);
+        },
+      });
+    }
+  
+    function fetchNotifications() {
     $.ajax({
       url: "/api/notifications/",
-      type: "POST",
-      headers: {
-        "X-CSRFToken": csrfToken,
-        "Content-Type": "application/json",
-      },
-      data: JSON.stringify(notificationData),
-      success: function () {
-        console.log("Notification saved in the backend.");
-        fetchNotifications();
-      },
-      error: function (xhr, status, error) {
-        console.error("Failed to save notification in the backend.", error);
-        console.error("Response Text: ", xhr.responseText);
-      },
-    });
-  }
-
-  function fetchNotifications() {
-  $.ajax({
-    url: "/api/notifications/",
-    type: "GET",
-    success: function (response) {
-      const container = document.getElementById("notificationItemsContainer");
-      const noNotificationsMessage = document.getElementById("noNotificationsMessage");
-      const notificationBadge = document.getElementById("notificationBadge");
-
-      if (container) {
-        container.innerHTML = "";
-
-        if (response.length === 0) {
-          noNotificationsMessage.textContent = "You have 0 unread messages.";
-          notificationBadge.style.display = "none"; 
-        } else {
-          let unreadCount = 0;
-          let username = ""; 
-          response.forEach(notification => {
-            const item = document.createElement("div");
-            item.className = "notification-item border p-2 mb-2";
-
-            username = notification.username;
-
-            const timestamp = formatTime(notification.created_at);
-
-            item.innerHTML = `
-              <p class="mb-0 text-muted">${timestamp} by ${username}</p>
-              <h6 class="mb-1">${notification.message}</h6>
-              <p class="mb-0 text-muted">by ${username}</p>
-            `;
-
-            if (notification.is_read) {
-              item.style.opacity = 0.5; 
-            } else {
-              unreadCount++; 
-            }
-
-            container.appendChild(item);
-          });
-         
-          noNotificationsMessage.textContent = `Hello, ${username}! You have ${unreadCount} unread message(s).`;
-
-          if (unreadCount > 0) {
-            notificationBadge.textContent = unreadCount;
-            notificationBadge.style.display = "block"; 
-          } else {
+      type: "GET",
+      success: function (response) {
+        const container = document.getElementById("notificationItemsContainer");
+        const noNotificationsMessage = document.getElementById("noNotificationsMessage");
+        const notificationBadge = document.getElementById("notificationBadge");
+  
+        if (container) {
+          container.innerHTML = "";
+  
+          if (response.length === 0) {
+            noNotificationsMessage.textContent = "You have 0 unread messages.";
             notificationBadge.style.display = "none"; 
+          } else {
+            let unreadCount = 0;
+            let username = ""; 
+            response.forEach(notification => {
+              const item = document.createElement("div");
+              item.className = "notification-item border p-2 mb-2";
+  
+              username = notification.username;
+  
+              const timestamp = formatTime(notification.created_at);
+  
+              item.innerHTML = `
+                <p class="mb-0 text-muted">${timestamp} by ${username}</p>
+                <h6 class="mb-1">${notification.message}</h6>
+                <p class="mb-0 text-muted">by ${username}</p>
+              `;
+  
+              if (notification.is_read) {
+                item.style.opacity = 0.5; 
+              } else {
+                unreadCount++; 
+              }
+  
+              container.appendChild(item);
+            });
+           
+            noNotificationsMessage.textContent = `Hello, ${username}! You have ${unreadCount} unread message(s).`;
+  
+            if (unreadCount > 0) {
+              notificationBadge.textContent = unreadCount;
+              notificationBadge.style.display = "block"; 
+            } else {
+              notificationBadge.style.display = "none"; 
+            }
           }
         }
-      }
-    },
-    error: function () {
-      console.error("Failed to fetch notifications.");
-    },
-  });
-}
-
-  function formatTime(timestamp) {
-    const notificationDate = new Date(timestamp);
-    const now = new Date();
-    const diff = Math.floor((now - notificationDate) / 1000); // Time difference in seconds
-
-    if (diff < 60) return `${diff} seconds ago`;
-    if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
-
-    // Format for older dates
-    return notificationDate.toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
-
-  function markAllAsRead() {
-    const csrfToken = getCSRFToken();
-    $.ajax({
-      url: "/api/notifications/mark_as_read/",
-      type: "PATCH",
-      headers: {
-        "X-CSRFToken": csrfToken,
-        "Content-Type": "application/json",
-      },
-      success: function () {
-        console.log("All notifications marked as read.");
-
-        $.ajax({
-          url: "/api/notifications/delete_notifications/",
-          type: "DELETE",
-          headers: {
-            "X-CSRFToken": csrfToken,
-          },
-          success: function () {
-
-            fetchNotifications();
-            document.getElementById("noNotificationsMessage").textContent = "You have 0 unread messages.";
-            console.log("All notifications deleted.");
-            fetchNotifications();
-          },
-          error: function () {
-            console.error("Failed to delete notifications.");
-          }
-        });
       },
       error: function () {
-        console.error("Failed to mark notifications as read.");
+        console.error("Failed to fetch notifications.");
       },
     });
   }
-
-  function toggleNotifications() {
-    const nMenu = document.getElementById("nMenu");
-    if (nMenu) {
-      nMenu.style.display = nMenu.style.display === "none" ? "block" : "none";
+  
+    function formatTime(timestamp) {
+      const notificationDate = new Date(timestamp);
+      const now = new Date();
+      const diff = Math.floor((now - notificationDate) / 1000); // Time difference in seconds
+  
+      if (diff < 60) return `${diff} seconds ago`;
+      if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+  
+      // Format for older dates
+      return notificationDate.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     }
-  }
-
-  window.toggleNotifications = toggleNotifications;
-
-</script>
-
-<script>
-  window.userId = "{{ user.id }}"; 
-</script>
+  
+    function markAllAsRead() {
+      const csrfToken = getCSRFToken();
+      $.ajax({
+        url: "/api/notifications/mark_as_read/",
+        type: "PATCH",
+        headers: {
+          "X-CSRFToken": csrfToken,
+          "Content-Type": "application/json",
+        },
+        success: function () {
+          console.log("All notifications marked as read.");
+  
+          $.ajax({
+            url: "/api/notifications/delete_notifications/",
+            type: "DELETE",
+            headers: {
+              "X-CSRFToken": csrfToken,
+            },
+            success: function () {
+  
+              fetchNotifications();
+              document.getElementById("noNotificationsMessage").textContent = "You have 0 unread messages.";
+              console.log("All notifications deleted.");
+              fetchNotifications();
+            },
+            error: function () {
+              console.error("Failed to delete notifications.");
+            }
+          });
+        },
+        error: function () {
+          console.error("Failed to mark notifications as read.");
+        },
+      });
+    }
+  
+    function toggleNotifications() {
+      const nMenu = document.getElementById("nMenu");
+      if (nMenu) {
+        nMenu.style.display = nMenu.style.display === "none" ? "block" : "none";
+      }
+    }
+  
+    window.toggleNotifications = toggleNotifications;
+  
+  </script>
+  
+  <script>
+    window.userId = "{{ user.id }}"; 
+  </script>
+</body>
+</html>
