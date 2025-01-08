@@ -2,7 +2,7 @@
 <div class="sidebar" id="snavbarTogglerDemo03">
   <div class="flex flex-col">
     <div class="logoDiv">
-      <img class="logo" src="{% static 'images/images/logo1.png' %} " />
+      <img class="logo" src="{{ '/media/images/images/logo1.png' }}" />
     </div>
     <button id="closeNav" style="
         position: absolute;
@@ -24,7 +24,7 @@
         <div style="min-width: 90%; display: table">
           <a style="text-decoration: none" href="/user_dashboard">
             <div class="Udash" style="margin-top: 10px; gap: 5px">
-              <img src="{% static 'images/dashboard.svg' %} " />
+              <img src="{{ '/media/images/dashboard.svg' }}"/>
               <div class="dashI">
                 <span class="dashT">Dashboard</span>
               </div>
@@ -33,14 +33,14 @@
           <a style="text-decoration: none" href="/orders">
             <div class="Udash">
               <div class="dashI" style="gap: 5px">
-                <img src="{% static 'images/orders.svg' %} " alt="orders Icon" />
+                <img src="{{ '/media/images/orders.svg' }}" alt="orders Icon" />
                 <span class="dashT">Orders </span>
               </div>
             </div>
           </a><a style="text-decoration: none" href="/address">
             <div class="Udash">
               <div class="dashI" style="gap: 5px">
-                <img src="{% static 'images/from-address.svg' %} " />
+                <img src="{{ '/media/images/from-address.svg' }}" />
                 <span class="dashT">From Addresses
                   <!-- text-base font-normal text-primary-foreground -->
                 </span>
@@ -51,7 +51,7 @@
               <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false -->
               <div class="dashI" style="gap: 5px">
                 <!-- flex items-center flex-1 gap-2 -->
-                <img src="{% static 'images/saved-packages.svg' %} " />
+                <img src="{{'/media/images/saved-packages.svg'}} " />
                 <span class="dashT">Saved Packages
                   <!-- text-base font-normal text-primary-foreground -->
                 </span>
@@ -62,7 +62,7 @@
               <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false -->
               <div class="dashI" style="gap: 5px">
                 <!-- flex items-center flex-1 gap-2 -->
-                <img src="{% static 'images/payments.svg' %} " alt="payments Icon" />
+                <img src="{{'/media/images/payments.svg' }} " alt="payments Icon" />
                 <span class="dashT">Payments
                   <!-- text-base font-normal text-primary-foreground -->
                 </span>
@@ -74,7 +74,7 @@
 
               <div class="dashI" style="gap: 5px">
                 <!-- flex items-center flex-1 gap-2 -->
-                <img src="{% static 'images/support.svg' %} " alt="support Icon" />
+                <img src="{{'/media/images/support.svg' }} " alt="support Icon" />
                 <span class="dashT">
                   <!-- text-base font-normal text-primary-foreground -->
                   Support</span>
@@ -86,7 +86,7 @@
 
               <div class="dashI" style="gap: 5px">
                 <!-- flex items-center flex-1 gap-2 -->
-                <img src="{% static 'images/referrals.svg' %} " alt="referrals Icon" />
+                <img src="{{'/media/images/referrals.svg' }}" alt="referrals Icon" />
                 <span class="dashT">Referrals
                   <!-- text-base font-normal text-primary-foreground -->
                 </span>
@@ -98,7 +98,7 @@
 
               <div class="dashI" style="gap: 5px">
                 <!-- flex items-center flex-1 gap-2 -->
-                <img src="{% static 'images/stores.svg' %} " alt="stores Icon" />
+                <img src="{{'/media/images/stores.svg'}}" alt="stores Icon" />
                 <span class="dashT">Stores
                   <!-- text-base font-normal text-primary-foreground -->
                 </span>
@@ -111,7 +111,7 @@
 
               <div class="dashI" style="gap: 5px; margin-bottom: 10px">
                 <!-- flex items-center flex-1 gap-2 -->
-                <img src="{% static 'images/settings.svg' %} " alt="settings Icon" />
+                <img src="{{ '/media/images/settings.svg' }}" alt="settings Icon" />
                 <span class="dashT">Settings
                   <!-- text-base font-normal text-primary-foreground -->
                 </span>

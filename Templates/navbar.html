@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,7 +34,7 @@
               <small>pwz2k@hotmail.com</small>
             </div>
             <img
-              src="/media/media/images/john-doe.svg"
+              src="{{'/media/images/john-doe.svg'}}"
               alt="Profile"
               class="rounded-circle"
               style="width: 35px; height: 35px"
@@ -53,7 +54,7 @@
                 href="/userFeatures/settings"
                 class="d-flex align-items-center text-dark text-decoration-none mb-2"
               >
-                <img src="/media/media/images/profile.svg" class="me-2" alt="Profile" />
+                <img src="{{'/media/images/profile.svg'}}" class="me-2" alt="Profile" />
                 Profile
               </a>
               <!-- <a
@@ -79,7 +80,7 @@
                 class="d-flex align-items-center text-dark text-decoration-none"
                 href="#"
               >
-                <img src="/media/media/images/logout.svg" class="me-2" alt="Logout" /> Logout
+                <img src="/media/images/logout.svg" class="me-2" alt="Logout" /> Logout
               </a>
             </div>
           </div>
