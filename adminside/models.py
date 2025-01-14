@@ -164,6 +164,8 @@ class CustomUser(AbstractUser):
     current_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_spent = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     date = models.DateTimeField(auto_now_add=True)
+    otp_secret = models.CharField(max_length=16, blank=True, null=True)
+    is_2fa_enabled = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 

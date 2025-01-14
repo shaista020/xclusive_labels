@@ -193,7 +193,7 @@
     <div class="container">
       <div class="left-panel">
         <a href="/details.html">
-          <img style="width: 50%" src="{% static 'media/images/logo.png' %}" alt="Logo" />
+          <img style="width: 50%" src="{{'/media/images/logo.png'}}" alt="Logo" />
         </a>
         <div class="content">
           <h2>Fast, Efficient and Productive</h2>
@@ -270,23 +270,24 @@
     };
 
     $.ajax({
-      url: '/api/signup/', 
-      method: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify(formData),
-      headers: {
-        'X-CSRFToken': csrfToken 
-      },
-      success: function (response) {
-        alert('Signup successful! Redirecting to the sign-in page...');
-        console.log(response); 
-        window.location.href = '/signin/'; 
-      },
-      error: function (xhr, status, error) {
-        alert('Signup failed. Please check your input and try again.');
-        console.error(xhr.responseText);
-      }
-    });
+  url: '/api/signup/',
+  method: 'POST',
+  contentType: 'application/json',
+  data: JSON.stringify(formData),
+  headers: {
+    'X-CSRFToken': csrfToken
+  },
+  success: function (response) {
+    alert('Signup successful! Check your email for confirmation.');
+    console.log(response);
+    window.location.href = '/signin/';
+  },
+  error: function (xhr, status, error) {
+    alert('Signup failed. Please check your input and try again.');
+    console.error(xhr.responseText);
+  }
+});
+
   });
 
   $.ajaxSetup({
