@@ -331,20 +331,17 @@ class DeleteAccountView(APIView):
     def delete(self, request):
         user = request.user
         user.delete()
+def referrals_view(request):
+    referrals = User.objects.filter(referred_by=request.user)  
+    referral_link = request.build_absolute_uri(f'/auth/signup/?referral_code={request.user.referral_code}')
 
+    context = {
+        "referrals": referrals,
+        "referral_link": referral_link,
+    }
 
-class ReferralView(APIView):
-    def get(self, request):
-        referrals = Referral.objects.all()
-        serializer = ReferralSerializer(referrals, many=True)
-        return Response(serializer.data)
+    return render(request, "User/Referrals.html", context)
 
-    def post(self, request):
-        serializer = ReferralSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
@@ -597,10 +594,6 @@ def view_tickets_user(request, id):
     tickets= Ticket.objects.get(id=id)
     return render(request,'User/view_tickets.html',{"tickets":tickets})
 
-
-from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from .models import Ticket
 
 def submit_view_tickets_user(request):
     if request.method == 'POST':

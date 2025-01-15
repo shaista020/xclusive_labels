@@ -200,7 +200,7 @@
               <div class="p-3 bg-light rounded shadow-sm mb-4">
                 <div class="d-flex align-items-center mb-2">
                   <img
-                    src="{% static 'images/referral-bonus.svg' %}"
+                  src="{{'/media/images/referral-bonus.svg'}}"
                     alt="Referral Bonus"
                     class="me-2"
                     style="width: 24px; height: 24px"
@@ -212,10 +212,10 @@
                     You will get 10% from every referral you made.
                   </p>
                   <div class="col-12 col-md-3 text-md-end">
-                    <button class="btn btn-dark w-100 w-md-auto">
-                      Copy Your Referral Link
-                    </button>
-                  </div>
+                    <a href="{{ referral_link }}" class="btn btn-dark w-100 w-md-auto">
+                        Copy Your Referral Link
+                    </a>
+                </div>
                 </div>
               </div>
 
@@ -274,86 +274,41 @@
 
             <div class="card mt-5">
               <div class="table-responsive">
-                <table class="table table-hover">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Available for Withdraw</th>
-                      <th>Joined At</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tb"></tbody>
-                </table>
+                  <table class="table table-hover">
+                      <thead>
+                          <tr>
+                              <th>Name</th>
+                              <th>Email</th>
+                              <!-- <th>Referred By</th> -->
+                              <th>Available for Withdraw</th>
+                              <th>Joined At</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for referral in referrals %}
+                              <tr>
+                                  <td>{{ referral.username }}</td>
+                                  <td>{{ referral.email }}</td>
+                                  
+                                  <td>{{ referral.available_for_withdraw }}</td>
+                                  <td>{{ referral.joined_at }}</td>
+                              </tr>
+                          {% empty %}
+                              <tr>
+                                
+                                  <td colspan="5" class="text-center">No referrals available.</td>
+                              </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
               </div>
-
-              {% comment %}
-              <div id="no-data-image" class="text-center">
-                <img
-                  src="{% static 'images/no-results.svg' %}"
-                  class="img-fluid"
-                  style="height: 200px"
-                  alt="No results"
-                />
-                <p>No referrals available at the moment.</p>
-              </div>
-              {% endcomment %}
-
-              <!-- Pagination -->
-              <nav aria-label="Page navigation" class="my-4">
-                <ul class="pagination justify-content-end">
-                  <li class="page-item">
-                    <a class="page-link prev text-white" href="#" tabindex="-1"
-                      >Previous</a
-                    >
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="#">1</a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="#">2</a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="#">3</a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link bg-black text-white" href="#">Next</a>
-                  </li>
-                </ul>
-              </nav>
-            </div>
+          </div>
+          
           </div>
         </main>
       </div>
     </div>
     <script src="../../static/index.js"></script>
-    <script>
-      $(document).ready(function () {
-        $.ajax({
-          url: "http://127.0.0.1:8000/api/referrals/",
-          method: "GET",
-          success: function (response) {
-            console.log(response);
-            let tbody = $("#tb");
-            tbody.empty();
-            response.forEach(function (referrals) {
-              let row = `<tr>
-                      <td>${referrals.name}</td>
-                      <td>${referrals.email}</td>
-                      <td>${referrals.available_for_withdraw}</td>
-                      <td>${referrals.joined_at}</td>
-                      
-                    </tr>`;
-
-              tbody.append(row);
-            });
-          },
-          error: function (error) {
-            console.log("Error:", error);
-            alert("Failed to retrieve data from the server.");
-          },
-        });
-      });
-    </script>
+    
   </body>
 </html>
