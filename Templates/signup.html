@@ -210,36 +210,62 @@
             <h2>Sign Up</h2>
             <p>Hey there, please sign Up to continue</p>
             <form action="/auth/signup/" method="POST">
-                {% csrf_token %}
-                <div>
-                <label for="text">Name</label>
-                <input type="text" id="text" name="username" class="form-control" required />
-                {% if error_username %}
-                    <small style="color: red;">{{ error_username }}</small>
-                {% endif %}
+              <div id="msg" class="text-center" style="border-radius: 5px;">
+                  {% if error %}
+                      <div class="alert alert-danger" style="margin-bottom: 15px;">
+                          {{ error }}
+                      </div>
+                  {% endif %}
+              </div>
+          
+              {% csrf_token %}
+              <div>
+                  <label for="text">Name</label>
+                  <input
+                      type="text"
+                      id="text"
+                      name="username"
+                      class="form-control"
+                      value="{{ request.POST.username }}"
+                      required
+                  />
               </div>
               <div>
-                <label for="email">Email address</label>
-                <input type="email" id="email" name="email" class="form-control" placeholder="example@hotmail.com" required />
-                {% if error_email %}
-                    <small style="color: red;">{{ error_email }}</small>
-                {% endif %}
+                  <label for="email">Email address</label>
+                  <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      class="form-control"
+                      placeholder="example@hotmail.com"
+                      value="{{ request.POST.email }}"
+                      required
+                  />
               </div>
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" required />
-            
-                <div class="remember-me">
-                    <div style="display: flex; flex-direction: row">
-                        <input class="checkbox" type="checkbox" id="remember" name="remember" />
-                        <label style="margin-left: 10px" for="remember">Remember Me</label>
-                    </div>
-                    <br />
-                </div>
-                {% if referral_code %}
-        <input type="hidden" name="referral_code" value="{{ referral_code }}">
-        {% endif %}
-                <button type="submit">Sign Up</button>
-            </form>
+              <div>
+                  <label for="password">Password</label>
+                  <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      class="form-control"
+                      required
+                  />
+              </div>
+              <div class="remember-me">
+                  <div style="display: flex; flex-direction: row;">
+                      <input class="checkbox" type="checkbox" id="remember" name="remember" />
+                      <label style="margin-left: 10px" for="remember">Remember Me</label>
+                  </div>
+                  <br />
+              </div>
+              {% if referral_code %}
+                  <input type="hidden" name="referral_code" value="{{ referral_code }}">
+              {% endif %}
+              <button type="submit">Sign Up</button>
+          </form>
+          
+          
             <p class="signup-link">
                 Already have an account? <a href="/auth/signin/">Sign In</a>
             </p>

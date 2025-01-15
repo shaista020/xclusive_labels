@@ -212,9 +212,10 @@
                     You will get 10% from every referral you made.
                   </p>
                   <div class="col-12 col-md-3 text-md-end">
-                    <a href="{{ referral_link }}" class="btn btn-dark w-100 w-md-auto">
+                    <button id="copyButton" class="btn btn-dark w-100 w-md-auto">
                         Copy Your Referral Link
-                    </a>
+                    </button>
+                    
                 </div>
                 </div>
               </div>
@@ -309,6 +310,24 @@
       </div>
     </div>
     <script src="../../static/index.js"></script>
-    
+    <script>
+      document.getElementById("copyButton").addEventListener("click", function() {
+          // Copy the referral link to the clipboard
+          const referralLink = "{{ referral_link }}"; // Your referral link variable
+          navigator.clipboard.writeText(referralLink).then(function() {
+              // Show success message after copying
+              // const successMessage = document.getElementById("successMessage");
+              successMessage.style.display = "block";
+  
+              // Hide success message after 3 seconds
+              setTimeout(function() {
+                  successMessage.style.display = "none";
+              }, 3000);
+          }).catch(function(err) {
+              console.error("Error copying text: ", err);
+          });
+      });
+  </script>
+
   </body>
 </html>

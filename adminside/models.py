@@ -188,15 +188,17 @@ class CustomUser(AbstractUser):
         return "Yes" if self.is_active else "No"
 
     def generate_referral_code(self):
-       
-        return get_random_string(length=10)
+        """Generate a unique referral code for the user."""
+        while True:
+            code = get_random_string(length=10) 
+            if not CustomUser.objects.filter(referral_code=code).exists():  
+                return code
     
     def save(self, *args, **kwargs):
+       
         if not self.referral_code:
-            self.referral_code = self.generate_referral_code()  
+            self.referral_code = self.generate_referral_code()
         super(CustomUser, self).save(*args, **kwargs)
-
-from django.conf import settings
 
 class AdminUser(models.Model):
     email_address = models.EmailField(unique=True)

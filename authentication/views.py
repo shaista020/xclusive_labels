@@ -8,7 +8,7 @@ from django.contrib import messages
 
 User = get_user_model()
 
-# User Login View
+
 def user_login(request):
     error = None
     if request.method == 'POST':
@@ -19,10 +19,11 @@ def user_login(request):
         if user is not None:
             login(request, user)
 
+            # Set up 2FA if enabled
             if user.is_2fa_enabled and not user.otp_secret:
                 user.otp_secret = pyotp.random_base32()  
                 user.save()
-            
+
             if user.is_2fa_enabled:
                 totp = pyotp.TOTP(user.otp_secret)
                 otp = totp.now()
@@ -38,16 +39,17 @@ def user_login(request):
                 request.session['is_2fa_verified'] = False  
                 return redirect('/auth/verify-2fa/')  
             if remember:
-                request.session.set_expiry(1209600)  
+                request.session.set_expiry(1209600)  # 2 weeks
             else:
                 request.session.set_expiry(0)  
+
+            # Redirect based on user type
             if user.is_superuser:
                 return redirect('/dashboard/')
             else:
                 return redirect('/user_dashboard/')
-
         else:
-            error = "Invalid Credentials"
+            error = "Invalid username or password."
 
     return render(request, "signin.html", {"error": error})
 
@@ -58,40 +60,59 @@ def user_logout(request):
 
 def signup(request):
     referral_code = request.GET.get('referral_code')
-    print(f"Referral Code from URL: {referral_code}")
+   
+    if referral_code == "None":
+        referral_code = None
+
+    error_messages = []
 
     if request.method == 'POST':
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
 
+        # Validation
         if User.objects.filter(username=username).exists():
-            return render(request, "signup.html", {"error_username": "Username already exists"})
+            error_messages.append("Username already exists.")
 
         if User.objects.filter(email=email).exists():
-            return render(request, "signup.html", {"error_email": "Email already exists"})
+            error_messages.append("Email already exists.")
+
+        if error_messages:
+            return render(
+                request,
+                "signup.html",
+                {
+                    "error": " ".join(error_messages),
+                    "referral_code": referral_code,
+                },
+            )
 
         user = User.objects.create_user(username=username, email=email, password=password)
         print(f"Created user: {user.username}")
 
+        user.generate_referral_code()
+        user.save()
+        print(f"Generated referral code for user: {user.referral_code}")
+
         if referral_code:
             referrer = User.objects.filter(referral_code=referral_code).first()
             if referrer:
-                user.referred_by = referrer  
-                user.save() 
+              
+                user.referred_by = referrer
+                user.save()  
                 referrer.referral_bonus += 100
                 referrer.available_for_withdraw += 100
-                referrer.save()
+                referrer.save() 
                 print(f"User {user.username} referred by {referrer.username}")
-
-                print(f"User {user.username} referred by {user.referred_by.username}")
             else:
-                print(f"No referrer found for code: {referral_code}")
-
-        user.generate_referral_code() 
-        print(f"Generated referral code for user: {user.referral_code}")
-        user.save()
-        print(f"User {user.username} saved with referral code.")
+                print(f"No valid referrer found for referral code: {referral_code}")
+        else:
+           
+            if request.user.is_authenticated:
+                user.referred_by = request.user
+                user.save()
+                print(f"User {user.username} referred by {request.user.username}")
 
         send_mail(
             'Welcome to Our Website!',
@@ -103,7 +124,9 @@ def signup(request):
 
         return redirect('/auth/signin/')
 
-    return render(request, "signup.html", {"referral_code": referral_code})
+    referral_link = request.build_absolute_uri(f"/auth/signup/?referral_code={request.user.referral_code}") if request.user.is_authenticated else None
+
+    return render(request, "signup.html", {"referral_code": referral_code, "referral_link": referral_link})
 
 
 def verify_2fa(request):
