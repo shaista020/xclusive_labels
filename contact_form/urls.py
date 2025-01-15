@@ -9,7 +9,7 @@ router.register('notifications', views.NotificationViewSet, basename='notificati
 urlpatterns = [
     path('api/contact/', ContactInfoView.as_view(), name='contact_api'),
     path('api/packages/', PackageView.as_view(), name='package_api'),
-    path('api/chats/', ChatView.as_view(), name='chat_api'),
+   #  path('api/chats/', ChatView.as_view(), name='chat_api'),
     path('api/tickets/',TicketView.as_view(), name='ticket_api'),
     path('api/tickets/<int:ticket_id>/', TicketView.as_view(), name='ticket-detail'), 
     path('api/order/',OrderView.as_view() , name='order_api'),
@@ -29,9 +29,11 @@ urlpatterns = [
    path('api/profile/', ProfileView.as_view(), name='profile_api'),
    path('api/coupons/', CouponView.as_view(), name='coupons_api'),
    path('api/delete-account/', DeleteAccountView.as_view(), name='delete_account_api'),
-   path('api/referrals/', ReferralView.as_view(), name='referral-list'),
+   # path('api/referrals/', ReferralView.as_view(), name='referral-list'),
    # path('api/notifications/', Notificationview.as_view(), name='notification-api'),
    # path('api/notifications/<int:pk>/', Notificationview.as_view(), name='notification-details'),
+   path("referrals/", views.referrals_view, name="referrals"),
+  
    path('api/', include(router.urls)),
    path('user_dashboard/', views.dashboard,name='dashboard'),
    path('orders/', views.order,name='orders'),

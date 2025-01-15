@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OTP Verification</title>
+    {% load static %}
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background:  rgba(8, 8, 8, 0.1);
+        margin: 0;
+        color: #f8f8f8;
+      }
+      .form-container {
+        background: #333333;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        width: 100%;
+      }
+      .form-title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #3ad2a1;
+        text-align: center;
+      }
+      .btn-custom {
+        background-color: #3ad2a1;
+        color: white;
+        border: none;
+        transition: all 0.3s ease;
+      }
+      .btn-custom:hover {
+        background-color: #2fa58c;
+      }
+      .btn-resend {
+        background-color: #444444;
+        color: #bbb;
+        border: none;
+        margin-top: 10px;
+        transition: all 0.3s ease;
+      }
+      .btn-resend:hover {
+        background-color: #666666;
+        color: #ffffff;
+      }
+      .error-text {
+        color: red;
+        text-align: center;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="form-container">
+      <form method="POST">
+        {% csrf_token %}
+        <div class="form-title">Verify OTP</div>
+        <div class="mb-3">
+          <label for="otp" class="form-label">Enter OTP</label>
+          <input
+            type="text"
+            class="form-control"
+            id="otp"
+            name="otp"
+            placeholder="6-digit OTP"
+            maxlength="6"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-custom w-100">Verify</button>
+        {% if error %}
+        <p class="error-text">{{ error }}</p>
+        {% endif %}
+      </form>
+      <form method="POST" action="/auth/resend-otp/">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-resend w-100">Resend OTP</button>
+      </form>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYkGxQQ2tJ6MDNdJb59ycd44zpO1Gh9Uw53dhxQz8AX5xAM/n91alBggP"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
