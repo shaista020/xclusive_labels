@@ -218,6 +218,18 @@
                 >
                   Customize Columns
                 </button>
+                <div class="button-container">
+                  <button 
+                      class="btn btn-primary btn-lg d-flex align-items-center gap-2"
+                      onclick="location.href='/create_order/'" 
+                      aria-label="Create a new order"
+                  >
+                      <i class="fas fa-plus"></i> 
+                      Create Order
+                  </button>
+              </div>
+                </div>
+                
               </div>
             </div>
             <br />
@@ -414,7 +426,21 @@
                       <th>Created At</th>
                     </tr>
                   </thead>
-                  <tbody id="tb"></tbody>
+                  <tbody id="tb">
+                    {% for order in orders %}
+                    <tr>
+                      <td>{{ order.batch_number }}</td>
+                      <td>{{ order.tracking_number }}</td>
+                      <td>{{ order.name }}</td>
+                      <td>{{ order.type }}</td>
+                      <td>{{ order.weight }}</td>
+                      <td>{{ order.cost }}</td>
+                      <td>{{ order.status }}</td>
+                      <td>{{ order.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+
+                  </tbody>
                 </table>
               </div>
 

@@ -498,7 +498,39 @@ def dashboard(request):
 
 @login_required(login_url="/auth/signin/")
 def order(request):
-    return render(request, 'User/order.html')
+    order = Order.objects.all()
+    return render(request, 'User/order.html',{"orders": order})
+
+def create_order(request):
+    packages = Order.objects.all()
+    new_label= NewLabel.objects.all()
+    if request.method == "POST":
+        batch_no = request.POST.get('batch_number')
+        tracking_no = request.POST.get('tracking_number')
+        name = request.POST.get('name')
+        order_type = request.POST.get('type')
+        weight = request.POST.get('weight')
+        cost = request.POST.get('cost')
+        # Ensure the user is logged in and can be assigned as the creator
+        if request.user.is_authenticated:
+            user = request.user
+            print(user)
+            new_order = Order(
+                    new_label= new_label,
+                    batch_number=batch_no,
+                    tracking_number=tracking_no,
+                    name=name,
+                    type=order_type,
+                    weight=weight,
+                    cost=cost,
+                    created_by=user
+                )
+            new_order.save()
+
+                # Redirect to the same page to display updated list
+            return redirect('/orders')
+    # Render the page with existing packages for a GET request
+    return render(request, "User/create_order.html", {'new_label': new_label})
 
 @login_required(login_url="/auth/signin/")
 def addFund(request):
@@ -521,6 +553,34 @@ def referral(request):
 def package(request):
     packages = Package.objects.filter(user=request.user)
     return render(request,'User/savedPackages.html', {'packages':packages})
+
+def create_package(request):
+    if request.method == "POST":
+
+        name = request.POST['name']
+        weight = request.POST.get('weight')
+        length = request.POST.get('length')
+        width = request.POST.get('width')
+        height = request.POST.get('height')
+        # Ensure the user is logged in and can be assigned as the creator
+        if request.user.is_authenticated:
+            user = request.user
+
+            new_package = Package(
+                    user=user,
+                    name=name,
+                    weight=weight,
+                    length =  length,
+                    width =width,   
+                    height =height,   
+                )
+            new_package.save()
+
+                # Redirect to the same page to display updated list
+            return redirect('/packages')
+    # Render the page with existing packages for a GET request
+    return render(request, "User/savedPackages.html")
+
 
 @login_required(login_url="/auth/signin/")
 def setting(request):
@@ -616,7 +676,8 @@ def submit_view_tickets_user(request):
 
 @login_required(login_url="/auth/signin/")
 def newLable(request):
-    return render(request,'User/newLable.html')
+    package= Package.objects.all()
+    return render(request,'User/newLable.html',{"packages":package})
 
 @login_required(login_url="/auth/signin/")
 def contact(request):
