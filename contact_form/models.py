@@ -1,9 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import User
 from django.conf import settings 
+from django.contrib.auth import get_user_model
+User = settings.AUTH_USER_MODEL
 
 class Notification(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField() 
     is_read = models.BooleanField(default=False)  
     created_at = models.DateTimeField(auto_now_add=True) 
@@ -70,6 +71,7 @@ class Ticket(models.Model):
 #         ('none', 'None'),
 #     ]
     
+    
 #     batch_number = models.CharField(max_length=255)
 #     tracking_number = models.CharField(max_length=255)
 #     name = models.CharField(max_length=255)
@@ -81,7 +83,7 @@ class Ticket(models.Model):
 #         choices=STATUS_CHOICES,
 #         default='Select'
 #     )
-    
+#     created_by = models.ForeignKey(User, related_name="created_order", on_delete=models.CASCADE, null=True)
 #     created_at = models.DateTimeField(auto_now_add=True)
 
 #     def __str__(self):
@@ -233,7 +235,7 @@ class NewLabel(models.Model):
     zip_code = models.CharField(max_length=10)
     state = models.CharField(max_length=50)
     phone = models.CharField(max_length=20)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
  
 
     def __str__(self):
@@ -251,10 +253,7 @@ class Order(models.Model):
         ('cancelled', 'Cancelled'),
         ('none', 'None'),
     ]
-
-    # Link Order to NewLabel (ForeignKey)
     new_label = models.ForeignKey(NewLabel, on_delete=models.CASCADE)
-
     tracking_number = models.CharField(max_length=255)
     batch_number = models.CharField(max_length=255)
     name = models.CharField(max_length=255)
@@ -267,9 +266,13 @@ class Order(models.Model):
         default='Select'
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, related_name="created_order", on_delete=models.CASCADE, null=True)
+
+    
 
     def __str__(self):
         return self.tracking_number
+    
 class Transaction(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     balance = models.DecimalField(max_digits=10, decimal_places=2)

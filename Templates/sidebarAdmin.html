@@ -1,19 +1,18 @@
 {% load static %}
 <style>
   .scrollable-container {
-    max-height: 80vh; /* Adjust as needed */
+    max-height: 80vh;
+    /* Adjust as needed */
     overflow-y: auto;
   }
 </style>
-<div class="sidebar" id="snavbarTogglerDemo03"  class="relative scroll scrollable-container">
+<div class="sidebar" id="snavbarTogglerDemo03" class="relative scroll scrollable-container">
   <div class="flex flex-col">
     <div class="logoDiv">
 
       <img class="logo" src="{{'/media/images/images/logo1.png'}}" />
     </div>
-    <button
-      id="closeNav"
-      style="
+    <button id="closeNav" style="
         position: absolute;
         top: 10px;
         right: 10px;
@@ -21,84 +20,85 @@
         cursor: pointer;
         background: white !important;
         border-radius: 5px;
-      "
-    >
+      ">
       &times;
     </button>
-    <div
-      dir="ltr"
-      class="relative scroll"
-      style="
+    <div dir="ltr" class="relative scroll" style="
         position: relative;
         --radix-scroll-area-corner-width: 0px;
         --radix-scroll-area-corner-height: 0px;
         overflow-y: auto;
-      "
-    >
+      ">
       <div class="user">
         <div style="min-width: 90%; display: table">
-          <a style="text-decoration: none" href="/dashboard"
-            ><div class="Udash" style="margin-top: 10px; gap: 5px">
+          <a style="text-decoration: none" href="/dashboard">
+            <div class="Udash" style="margin-top: 10px; gap: 5px">
               <img src="{{'/media/images/dashboard.svg' }} " />
               <div class="dashI">
                 <span class="dashT">Dashboard</span>
               </div>
-            </div></a
-          >
-          <a style="text-decoration: none" href="/batch"
-            ><div class="Udash">
+            </div>
+          </a>
+          <a style="text-decoration: none" href="/batch">
+            <div class="Udash">
               <div class="dashI" style="gap: 5px">
                 {% comment %} <img src="/images/batches.svg" /> {% endcomment %}
                 <img src="{{'/media/images/batches.svg' }}" />
                 <span class="dashT">Batches </span>
               </div>
-            </div></a
-          ><a style="text-decoration: none" href="/types"
-            ><div class="Udash">
+            </div>
+          </a><a style="text-decoration: none" href="/types">
+            <div class="Udash">
               <div class="dashI" style="gap: 5px">
 
                 <img src="{{'/media/images/Atypes.svg' }}" />
 
-                <span class="dashT"
-                  >Types
+                <span class="dashT">Types
                   <!-- text-base font-normal text-primary-foreground -->
                 </span>
               </div>
-            </div></a
-          ><a
-            style="text-decoration: none"
-            href="/weights"
-            ><div class="Udash">
+            </div>
+          </a>
+          <a style="text-decoration: none" href="/weights">
+            <div class="Udash">
               <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false -->
               <div class="dashI" style="gap: 5px">
                 <!-- flex items-center flex-1 gap-2 -->
                 <img src="{{'/media/images/Aweights.svg'}} " />
 
-                <span class="dashT"
-                  >Weights
+                <span class="dashT">Weights
                   <!-- text-base font-normal text-primary-foreground -->
                 </span>
               </div>
-            </div></a
-          ><a
-            style="text-decoration: none"
-            href="/pay"
-            ><div class="Udash">
+            </div>
+          </a>
+          <a style="text-decoration: none" href="/orders">
+            <div class="Udash">
+              <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false -->
+              <div class="dashI" style="gap: 5px">
+                <!-- flex items-center flex-1 gap-2 -->
+                <img src="{{'/media/images/Aweights.svg'}} " />
+
+                <span class="dashT">Orders
+                  <!-- text-base font-normal text-primary-foreground -->
+                </span>
+              </div>
+            </div>
+          </a>
+          <a style="text-decoration: none" href="/pay">
+            <div class="Udash">
               <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false -->
               <div class="dashI" style="gap: 5px">
                 <!-- flex items-center flex-1 gap-2 -->
 
                 <img src="{{'/media/images/Apayments.svg'}} " />
-                <span class="dashT"
-                  >Payments
+                <span class="dashT">Payments
                   <!-- text-base font-normal text-primary-foreground -->
                 </span>
               </div>
-            </div></a
-          ><a
-            style="text-decoration: none"
-            href="/tickets"
-            ><div class="Udash">
+            </div>
+          </a><a style="text-decoration: none" href="/tickets">
+            <div class="Udash">
               <!-- inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80" -->
 
               <div class="dashI" style="gap: 5px">
@@ -107,77 +107,70 @@
                 <img src="{{'/media/images/Atickets.svg' }} " />
                 <span class="dashT">
                   <!-- text-base font-normal text-primary-foreground -->
-                  Tickets</span
-                >
+                  Tickets</span>
               </div>
-            </div></a
-          ><a style="text-decoration: none" href="/users"
-            ><div class="Udash">
+            </div>
+          </a><a style="text-decoration: none" href="/users">
+            <div class="Udash">
               <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false" -->
 
               <div class="dashI" style="gap: 5px">
                 <!-- flex items-center flex-1 gap-2 -->
                 {% comment %} <img src="/images/Ausers.svg" /> {% endcomment %}
                 <img src="{{'/media/images/Ausers.svg'}}" />
-                <span class="dashT"
-                  >Users
+                <span class="dashT">Users
                   <!-- text-base font-normal text-primary-foreground -->
                 </span>
               </div>
-            </div></a
-          ><a style="text-decoration: none" href="/crons"
-            ><div class="Udash">
+            </div>
+          </a><a style="text-decoration: none" href="/crons">
+            <div class="Udash">
               <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false" -->
 
               <div class="dashI" style="gap: 5px">
                 <!-- flex items-center flex-1 gap-2 -->
 
                 <img src="{{'/media/images/Acrons.svg'}}" />
-                <span class="dashT"
-                  >Crons
+                <span class="dashT">Crons
                   <!-- text-base font-normal text-primary-foreground -->
                 </span>
               </div>
-            </div></a
-          >
-          <a style="text-decoration: none" href="/refunds"
-            ><div class="Udash">
+            </div>
+          </a>
+          <a style="text-decoration: none" href="/refunds">
+            <div class="Udash">
               <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false" -->
 
               <div class="dashI" style="gap: 5px; margin-bottom: 10px">
                 <!-- flex items-center flex-1 gap-2 -->
 
                 <img src="{{'/media/images/Arefunds.svg'}} " />
-                <span class="dashT"
-                  >Refunds
+                <span class="dashT">Refunds
                   <!-- text-base font-normal text-primary-foreground -->
                 </span>
               </div>
               <div class="dashN">
                 <!-- flex items-center gap-2 -->
               </div>
-            </div></a
-          >
-          <a
-            style="text-decoration: none"
-            href="/set"
-            ><div class="Udash">
+            </div>
+          </a>
+          <a style="text-decoration: none" href="/set">
+            <div class="Udash">
               <!-- flex items-center justify-between p-4 cursor-pointer transition ease-in-out delay-100 hover:bg-primary-foreground/5 false" -->
 
               <div class="dashI" style="gap: 5px; margin-bottom: 10px">
                 <!-- flex items-center flex-1 gap-2 -->
 
                 <img src="{{'/media/images/Asettings.svg'}} " />
-                <span class="dashT"
-                  >Settings
+                <span class="dashT">Settings
                   <!-- text-base font-normal text-primary-foreground -->
                 </span>
               </div>
               <div class="dashN">
                 <!-- flex items-center gap-2 -->
               </div>
-            </div></a
-          >
+            </div>
+          </a>
         </div>
       </div>
     </div>
@@ -188,11 +181,9 @@
         Need help with
         <b>Volusion</b>?
       </h1>
-      <a href="/contact"
-        ><button class="form-control btn btn-light my-2 contact">
+      <a href="/contact"><button class="form-control btn btn-light my-2 contact">
           Contact Us
-        </button></a
-      >
+        </button></a>
     </div>
   </div>
 </div>

@@ -216,6 +216,11 @@
                 <label for="package">Package</label>
                 <select id="package" class="form-select">
                   <option selected>Choose a Package</option>
+                  {% for package in packages %}
+                  <option value="{{package.id}}">{{package.name}}</option>
+
+                {% endfor %}
+
                 </select>
               </div>
             </div>
