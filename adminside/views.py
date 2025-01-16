@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import *
 from contact_form.models import Ticket
-
+from django.http import JsonResponse
 from .serializers import *
 from rest_framework import status
 from django.contrib.auth import authenticate
@@ -483,9 +483,6 @@ def user(request):
     users = CustomUser.objects.all()
     
     return render(request, 'Admin/AUsers.html', {'users': users})
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from .models import CustomUser
 
 @login_required(login_url="/auth/signin/")
 def get_user_details(request):
@@ -496,7 +493,7 @@ def get_user_details(request):
             user_data = {
                 "full_name": user.username,  
                 "email": user.email,
-                "verified_status": "Yes" if user.verified_status else "No",
+                "verified_status": user.verified_status,  # No extra check needed here
                 "current_balance": user.current_balance,
                 "total_spent": user.total_spent,
                 "date_joined": user.date_joined.strftime("%Y-%m-%d"),
@@ -525,4 +522,3 @@ def home(request):
 @login_required(login_url="/auth/signin/")
 def signin(request):
     return render(request,'signin.html')
-

@@ -184,11 +184,9 @@ class CustomUser(AbstractUser):
         return self.username
 
     @property
-    def verified_status(self):
-        return "Yes" if self.is_active else "No"
-
+    def verified_status(self):       
+        return "Yes" if self.is_active and self.is_2fa_enabled else "No"
     def generate_referral_code(self):
-        """Generate a unique referral code for the user."""
         while True:
             code = get_random_string(length=10) 
             if not CustomUser.objects.filter(referral_code=code).exists():  
