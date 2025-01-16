@@ -7,6 +7,10 @@ from django.db import models
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils import timezone
+import random
+import string
+from django.db import models
+from django.utils.crypto import get_random_string
 
 from contact_form.models import NewLabel, Package, Address 
 
@@ -152,6 +156,7 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
 
         return self.create_user(username, email, password, **extra_fields)
+
 class CustomUser(AbstractUser):
     full_name = models.CharField(max_length=100, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
@@ -164,7 +169,15 @@ class CustomUser(AbstractUser):
     current_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_spent = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     date = models.DateTimeField(auto_now_add=True)
-
+    otp_secret = models.CharField(max_length=16, blank=True, null=True)
+    is_2fa_enabled = models.BooleanField(default=False)
+    available_for_withdraw = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    joined_at = models.DateTimeField(auto_now_add=True)
+    referral_bonus = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    
+    referral_code = models.CharField(max_length=50, unique=True, blank=True, null=True)
+    referred_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='referrals')
+    
     objects = CustomUserManager()
 
     def __str__(self):
@@ -172,10 +185,20 @@ class CustomUser(AbstractUser):
 
     @property
     def verified_status(self):
-        # Set the `verified` status based on `is_active`
         return "Yes" if self.is_active else "No"
 
-from django.conf import settings
+    def generate_referral_code(self):
+        """Generate a unique referral code for the user."""
+        while True:
+            code = get_random_string(length=10) 
+            if not CustomUser.objects.filter(referral_code=code).exists():  
+                return code
+    
+    def save(self, *args, **kwargs):
+       
+        if not self.referral_code:
+            self.referral_code = self.generate_referral_code()
+        super(CustomUser, self).save(*args, **kwargs)
 
 class AdminUser(models.Model):
     email_address = models.EmailField(unique=True)

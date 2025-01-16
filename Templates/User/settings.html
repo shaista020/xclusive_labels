@@ -304,8 +304,8 @@
                   {% csrf_token %}
                   <div class="row my-2">
                     <div class="col-sm-6">
-                      <label for="text">First Name</label>
-                      <input type="text" id="text1" name="first_name" class="form-control" value="{{ user.username }}" required />
+                      <label for="text">Name</label>
+                      <input readonly type="text" id="text1" name="first_name" class="form-control" value="{{ user.username }}" required />
                     </div>
 
                     <!-- <div class="col-sm-6">
@@ -323,7 +323,7 @@
                   <div class="row my-2"> -->
                     <div class="col-sm-6">
                       <label for="email">Email address</label>
-                      <input
+                      <input readonly
                         type="email"
                         id="email"
                         name="email"
@@ -360,11 +360,12 @@
 
                     <div class="col-sm-6">
                       <label>2FA Authentication</label>
-                      <select id="two_fa_enabled" name="is_active" class="form-control">
-                        <option value="False" {% if not user.is_active %} selected {% endif %}>Disabled</option>
-                        <option value="True" {% if user.is_active %} selected {% endif %}>Enabled</option>
+                      <select id="two_fa_enabled" name="is_2fa_enabled" class="form-control">
+                        <option value="False" {% if not user.is_2fa_enabled %} selected {% endif %}>Disabled</option>
+                        <option value="True" {% if user.is_2fa_enabled %} selected {% endif %}>Enabled</option>
                       </select>
                     </div>
+                    
                   </div>
 
                   <button

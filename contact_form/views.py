@@ -20,6 +20,7 @@ from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import get_user_model
 
 
 
@@ -149,21 +150,6 @@ class TicketView(APIView):
             return Response({"message": "Ticket closed successfully", "status": "Closed"}, status=status.HTTP_200_OK)
         except Ticket.DoesNotExist:
             return Response({"error": "Ticket not found"}, status=status.HTTP_404_NOT_FOUND)
-
-class ChatView(APIView):
-
-    def get(self,request):
-        chats = Chat.objects.all()
-        serializer = ChatSerializer(chats, many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-
-
-    def post(self,request):
-        serializer = ChatSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class OrderView(APIView):
@@ -345,20 +331,17 @@ class DeleteAccountView(APIView):
     def delete(self, request):
         user = request.user
         user.delete()
+def referrals_view(request):
+    referrals = User.objects.filter(referred_by=request.user)  
+    referral_link = request.build_absolute_uri(f'/auth/signup/?referral_code={request.user.referral_code}')
 
+    context = {
+        "referrals": referrals,
+        "referral_link": referral_link,
+    }
 
-class ReferralView(APIView):
-    def get(self, request):
-        referrals = Referral.objects.all()
-        serializer = ReferralSerializer(referrals, many=True)
-        return Response(serializer.data)
+    return render(request, "User/Referrals.html", context)
 
-    def post(self, request):
-        serializer = ReferralSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
@@ -543,15 +526,17 @@ def package(request):
 def setting(request):
     return render(request,'User/settings.html')
 
+
+User = get_user_model()
+
 def update_profile(request):
     user = request.user 
     if request.method == 'POST':
-      
+    
         first_name = request.POST.get('first_name', user.first_name)
         email = request.POST.get('email', user.email)
         timezone_str = request.POST.get('timezone', 'UTC')  
-        is_active = request.POST.get('is_active') == 'True'
-
+        is_2fa_enabled = request.POST.get('is_2fa_enabled') == 'True'  
         if not first_name:
             messages.error(request, "First Name is required.")
             return redirect('/settings/')
@@ -559,26 +544,24 @@ def update_profile(request):
         user.first_name = first_name
         user.email = email
         user.timezone = timezone_str
-        user.is_active = is_active
-
+        user.is_2fa_enabled = is_2fa_enabled  
         try:
-            user.save() 
+            user.save()  
             messages.success(request, "Profile updated successfully.")
         except Exception as e:
             messages.error(request, f"An error occurred: {e}")
 
-        return redirect('/settings/') 
+        return redirect('/settings/')  
     else:
-      
+        
         try:
             if user.timezone:
-                user_timezone = pytz.timezone(user.timezone)
-                current_time = now().astimezone(user_timezone)
+                user_timezone = pytz.timezone(user.timezone)  
+                current_time = now().astimezone(user_timezone)  
             else:
-                current_time = now()
+                current_time = now()  
         except pytz.UnknownTimeZoneError:
-            current_time = now()
-
+            current_time = now()  
         return render(request, 'profile.html', {'user': user, 'current_time': current_time})
 
 
@@ -611,10 +594,6 @@ def view_tickets_user(request, id):
     tickets= Ticket.objects.get(id=id)
     return render(request,'User/view_tickets.html',{"tickets":tickets})
 
-
-from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from .models import Ticket
 
 def submit_view_tickets_user(request):
     if request.method == 'POST':
