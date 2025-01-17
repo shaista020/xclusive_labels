@@ -18,25 +18,6 @@ from django.conf import settings
 
 
 
-class Signup(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=100)
-    rememberme= models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.name
-    
-class Signin(models.Model):
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=100)
-    rememberme= models.BooleanField(default=False)
-    recaptcha=models.BooleanField(default=False)
-    
-
-    def __str__(self):
-        return self.email
-
 class Batch(models.Model):
     batch_id = models.CharField(max_length=100)
     ship_from_name = models.CharField(max_length=100)

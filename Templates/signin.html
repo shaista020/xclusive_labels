@@ -9,6 +9,8 @@
      <!-- <img src="{{'/media/images/images/logo1.png'}}" alt= "Image"> -->
 
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
     <!-- <link rel="stylesheet" href="styles.css" /> -->
     <link
@@ -154,14 +156,7 @@
           justify-content: space-between;
         }
 
-        /* .remember-me input {
-          position: relative;
-          left: -1000px;
-        }
-        .remember-me label {
-          position: absolute;
-          left: auto;
-        } */
+       
       }
       @media (max-width: 450px) {
         .left-panel {
@@ -194,6 +189,26 @@
           left: auto;
         } */
       }
+      .password-container {
+    position: relative;
+}
+.password-container {
+    position: relative;
+    width: 100%;
+}
+
+.eye-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.eye-icon i {
+    font-size: 18px;
+}
+
     </style>
   </head>
   <body>
@@ -233,18 +248,26 @@
                   id="name"
                   name="username"
                   class="form-control"
-                  placeholder="Username"
+                  placeholder="Enter Your Username"
                   required
               />
           
               <label for="password">Password</label>
-              <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  class="form-control"
-                  required
-              />
+              <div class="password-container">
+                  <input
+                      type="password"
+                      id="password"
+                      name="password"
+                      class="form-control"
+                      placeholder="Enter Your Password"
+                      required
+                  />
+                  <span class="eye-icon" id="togglePassword">
+                      <i class="fa fa-eye"></i> <!-- Eye icon -->
+                  </span>
+              </div>
+              
+              
           
               <div class="remember-me">
                   <div style="display: flex; flex-direction: row">
@@ -253,7 +276,7 @@
                   </div>
               </div>
           
-              <button type="submit" class="btn btn-primary">Sign In</button>
+              <button type="submit" class="btn btn-secondary">Sign In</button>
           </form>
           
           
@@ -270,6 +293,23 @@
       </div>
     </div>
 
+<script>
+ $(document).ready(function () {
+    $("#togglePassword").click(function () {
+        var passwordField = $("#password");
+        var type = passwordField.attr("type") === "password" ? "text" : "password";
+        passwordField.attr("type", type);
 
+        var icon = $(this).find("i");
+        if (icon.hasClass("fa-eye")) {
+            icon.removeClass("fa-eye").addClass("fa-eye-slash");
+        } else {
+            icon.removeClass("fa-eye-slash").addClass("fa-eye");
+        }
+    });
+});
+
+
+</script>
   </body>
 </html>
