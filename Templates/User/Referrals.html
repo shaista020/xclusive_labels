@@ -336,14 +336,29 @@
     </div>
     <script src="../../static/index.js"></script>
     <script>
-    function copyReferralLink() {
-    const referralLink = document.getElementById('referralLink').innerText;
+   function copyReferralLink() {
+    const referralElement = document.getElementById('referralLink');
+
+    if (!referralElement) {
+        console.error('Element with ID "referralLink" not found.');
+        return;
+    }
+
+    const referralLink = referralElement.innerText;
+
+    if (!navigator.clipboard || !navigator.clipboard.writeText) {
+        console.error('Clipboard API is not supported.');
+        alert('Your browser does not support the Clipboard API. Please copy manually.');
+        return;
+    }
+
     navigator.clipboard.writeText(referralLink).then(() => {
-        // alert('Referral link copied to clipboard!');
+        alert('Referral link copied to clipboard!');
     }).catch(err => {
         console.error('Failed to copy text: ', err);
     });
 }
+
 
  </script>
 
