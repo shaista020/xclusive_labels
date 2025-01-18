@@ -513,7 +513,7 @@
 
         function fetchAddresses() {
           $.ajax({
-            url: "http://127.0.0.1:8000/api/addresses/",
+            url: "/api/addresses/",
             method: "GET",
             success: function (response) {
               let tbody = $("#tb");
@@ -565,7 +565,7 @@
           if (isEdit) {
             // Handle edit (PUT request)
             $.ajax({
-              url: `http://127.0.0.1:8000/api/addresses/${AdressesId}/`,
+              url: `/api/addresses/${AdressesId}/`,
               type: "PUT",
               headers: {
                 "X-CSRFToken": csrfToken,
@@ -590,7 +590,7 @@
           } else {
             // Handle add (POST request)
             $.ajax({
-              url: "http://127.0.0.1:8000/api/addresses/",
+              url: "/api/addresses/",
               type: "POST",
               headers: {
                 "X-CSRFToken": csrfToken,
@@ -619,7 +619,7 @@
           const AdressesId = $(this).data("id");
 
           $.ajax({
-            url: `http://127.0.0.1:8000/api/addresses/${AdressesId}/`,
+            url: `/api/addresses/${AdressesId}/`,
             type: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -659,7 +659,7 @@
 
           if (confirm("Are you sure you want to delete this address?")) {
             $.ajax({
-              url: `http://127.0.0.1:8000/api/addresses/${AdressesId}/`,
+              url: `/api/addresses/${AdressesId}/`,
               type: "DELETE",
               headers: {
                 "X-CSRFToken": csrfToken,

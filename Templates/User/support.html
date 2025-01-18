@@ -475,7 +475,7 @@ function viewmessage(ticketId) {
     console.log("Ticket ID:", ticketId);
 
     $.ajax({
-        url: `http://127.0.0.1:8000/api/tickets/${ticketId}/`,
+        url: `/api/tickets/${ticketId}/`,
         type: 'GET',
         success: function (data) {
             console.log("Fetched data:", data);
@@ -499,7 +499,7 @@ function viewmessage(ticketId) {
 
   $(document).ready(function () {
         $.ajax({
-          url: "http://127.0.0.1:8000/api/tickets/",
+          url: "/api/tickets/",
           method: "GET",
           success: function (response) {
             console.log(response);
@@ -564,7 +564,7 @@ function viewmessage(ticketId) {
     console.log(courseData, "Submitted data:");
 
     $.ajax({
-        url: "http://127.0.0.1:8000/api/tickets/",
+        url: "/api/tickets/",
         type: "POST",
         headers: {
             "Content-Type": "application/json",

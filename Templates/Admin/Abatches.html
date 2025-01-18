@@ -460,7 +460,7 @@
     
           if (confirm("Are you sure you want to delete this batch?")) {
             $.ajax({
-              url: `http://127.0.0.1:8000/api/batch/${batchesId}/`,
+              url: `/api/batch/${batchesId}/`,
               type: "DELETE",
               headers: {
                 "X-CSRFToken": csrfToken,
