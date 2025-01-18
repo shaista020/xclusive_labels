@@ -121,6 +121,7 @@ def signup(request):
             [email],
             fail_silently=False,
         )
+        print(send_mail,"hiiiiiiiiii")
 
         return redirect('/auth/signin/')
 
