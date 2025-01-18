@@ -7,7 +7,8 @@
     {% load static %}
  
     <link rel="icon" type="image/x-icon" href="{% static 'media/images/images/logo1.png' %}" />
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 
   <link rel="stylesheet" href="../../static/index.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -187,6 +188,23 @@
           justify-content: space-between;
         }
       }
+      .password-container {
+    position: relative;
+    width: 100%;
+}
+
+.eye-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.eye-icon i {
+    font-size: 18px;
+}
+
     </style>
   </head>
   <body>
@@ -227,6 +245,7 @@
                       name="username"
                       class="form-control"
                       value="{{ request.POST.username }}"
+                      placeholder="Enter Your Username"
                       required
                   />
               </div>
@@ -237,21 +256,26 @@
                       id="email"
                       name="email"
                       class="form-control"
-                      placeholder="example@hotmail.com"
+                      placeholder="example@gmail.com"
                       value="{{ request.POST.email }}"
                       required
                   />
               </div>
-              <div>
-                  <label for="password">Password</label>
+              <label for="password">Password</label>
+              <div class="password-container">
                   <input
                       type="password"
                       id="password"
                       name="password"
                       class="form-control"
+                      placeholder="Enter Your Password"
                       required
                   />
+                  <span class="eye-icon" id="togglePassword">
+                      <i class="fa fa-eye"></i> 
+                  </span>
               </div>
+              
               <div class="remember-me">
                   <div style="display: flex; flex-direction: row;">
                       <input class="checkbox" type="checkbox" id="remember" name="remember" />
@@ -324,7 +348,22 @@
   });
 });
 
-    </script>
-    
+  $(document).ready(function () {
+     $("#togglePassword").click(function () {
+         var passwordField = $("#password");
+         var type = passwordField.attr("type") === "password" ? "text" : "password";
+         passwordField.attr("type", type);
+ 
+         var icon = $(this).find("i");
+         if (icon.hasClass("fa-eye")) {
+             icon.removeClass("fa-eye").addClass("fa-eye-slash");
+         } else {
+             icon.removeClass("fa-eye-slash").addClass("fa-eye");
+         }
+     });
+ });
+ 
+ 
+ </script>
   </body>
 </html>

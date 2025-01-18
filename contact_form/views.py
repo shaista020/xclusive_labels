@@ -496,41 +496,56 @@ class TransactionViewSet(viewsets.ModelViewSet):
 def dashboard(request):
     return render(request, 'User/user.html')
 
-@login_required(login_url="/auth/signin/")
-def order(request):
-    order = Order.objects.all()
-    return render(request, 'User/order.html',{"orders": order})
 
+@login_required(login_url="/auth/signin/")
+def orders(request):
+    # Filter orders based on the logged-in user
+    user_orders = Order.objects.filter(created_by=request.user)
+    return render(request, 'User/order.html', {"orders": user_orders})
+
+@login_required(login_url="/auth/signin/")
+def view_receipt(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'User/receipt.html', {"order": order})
+import uuid  
 def create_order(request):
     packages = Order.objects.all()
-    new_label= NewLabel.objects.all()
+    new_labels = NewLabel.objects.all()
+    
     if request.method == "POST":
         batch_no = request.POST.get('batch_number')
-        tracking_no = request.POST.get('tracking_number')
         name = request.POST.get('name')
         order_type = request.POST.get('type')
         weight = request.POST.get('weight')
         cost = request.POST.get('cost')
-        # Ensure the user is logged in and can be assigned as the creator
+        new_label_id = request.POST.get('new_label_id')
+
         if request.user.is_authenticated:
             user = request.user
-            print(user)
+
+            # Fetch the NewLabel instance
+            new_label_instance = get_object_or_404(NewLabel, id=new_label_id)
+
+            # Automatically generate tracking number
+            tracking_no = str(uuid.uuid4()).replace("-", "").upper()[:12]  # Generate unique 12-character tracking number
+
+            # Create the Order
             new_order = Order(
-                    new_label= new_label,
-                    batch_number=batch_no,
-                    tracking_number=tracking_no,
-                    name=name,
-                    type=order_type,
-                    weight=weight,
-                    cost=cost,
-                    created_by=user
-                )
+                new_label=new_label_instance,
+                tracking_number=tracking_no,  # Automatically assigned
+                batch_number=batch_no,
+                name=name,
+                type=order_type,
+                weight=weight,
+                cost=cost,
+                created_by=user
+            )
             new_order.save()
 
-                # Redirect to the same page to display updated list
+            # Redirect to the orders list
             return redirect('/orders')
-    # Render the page with existing packages for a GET request
-    return render(request, "User/create_order.html", {'new_label': new_label})
+    
+    return render(request, "User/create_order.html", {'new_label': new_labels})
 
 @login_required(login_url="/auth/signin/")
 def addFund(request):
@@ -705,3 +720,10 @@ def load_sidebar(request):
         return render(request, "sidebarAdmin.html")
     else:
         return render(request, "sidebar.html")
+def orders_admin(request):
+    order = Order.objects.all()
+    return render(request, 'Admin/order.html',{"orderss": order})
+@login_required(login_url="/auth/signin/")
+def view_receipt_admin(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return render(request, 'Admin/receipt.html', {"order": order})

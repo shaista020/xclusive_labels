@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import *
 from contact_form.models import Ticket
-
+from django.http import JsonResponse
 from .serializers import *
 from rest_framework import status
 from django.contrib.auth import authenticate
@@ -17,58 +17,6 @@ from .serializers import AdminUserSerializer
 from django.contrib.auth.decorators import login_required
 from datetime import date
 
-class signupView(APIView):
-    
-    def get(self, request):
-        signup = AdminUser.objects.all()
-        serializer = AdminUserSerializer(signup, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-       
-        serializer = AdminUserSerializer(data=request.data)
-
-        if serializer.is_valid():
-         
-            user = serializer.save()
-
-            user.is_superuser = False
-            user.is_staff = False
-
-            user.save()
-
-            return Response({"message": "Signup successful!", "redirect_url": "/signin/"}, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class signinView(APIView):
-    def post(self, request, *args, **kwargs):
-        email = request.data.get('email')
-        password = request.data.get('password')
-
-        try:
-           
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            user = None
-
-        if user:
-            authenticated_user = authenticate(username=user.username, password=password)
-        else:
-            authenticated_user = None
-
-        print(authenticated_user)
-
-        if authenticated_user:
-            if authenticated_user.is_superuser:
-                return Response({"redirect_url": "/1/"}, status=status.HTTP_200_OK)
-            else:
-                return Response({"redirect_url": "/user_dashboard/"}, status=status.HTTP_200_OK)
-        else:
-            return Response(
-                {"error": "Invalid email or password"}, 
-                status=status.HTTP_401_UNAUTHORIZED
-            )
 
 class BatchView(APIView):
     def get(self, request, pk=None):
@@ -269,22 +217,6 @@ class label_api_config_view(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class Ticketview(APIView):
-
-    def get(self, request):
-       ticket= Ticket.objects.all()
-       serializer = TicketSerializer(ticket, many=True)
-       return Response(serializer.data)
-
-
-    def post(self, request):
-        serializer = TicketSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class Userview(APIView):
    
     def get(self, request, pk=None):
@@ -355,45 +287,7 @@ class Weightview(APIView):
         weight_instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-class Notificationview(APIView):
-
-    def get(self, request, pk=None):
-        if pk is not None:
-
-            try:
-                notification = Notification.objects.get(pk=pk)
-                serializer = NotificationSerializer(notification)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            except Notification.DoesNotExist:
-                return Response({"error": "Notification not found"}, status=status.HTTP_404_NOT_FOUND)
-        else:
-
-            notifications = Notification.objects.all()
-            serializer = NotificationSerializer(notifications, many=True)
-            return Response(serializer.data)
-
-    def post(self, request):
-        serializer = NotificationSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def patch(self, request, pk=None):
-        if pk is None:
-            return Response({"error": "pk is required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            notification = Notification.objects.get(pk=pk)
-        except Notification.DoesNotExist:
-            return Response({"error": "Notification not found"}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = NotificationSeenSerializer(notification, data={'is_seen': True}, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+ 
 
 
 class LabelView(APIView):
@@ -483,9 +377,6 @@ def user(request):
     users = CustomUser.objects.all()
     
     return render(request, 'Admin/AUsers.html', {'users': users})
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from .models import CustomUser
 
 @login_required(login_url="/auth/signin/")
 def get_user_details(request):
@@ -496,7 +387,7 @@ def get_user_details(request):
             user_data = {
                 "full_name": user.username,  
                 "email": user.email,
-                "verified_status": "Yes" if user.verified_status else "No",
+                "verified_status": user.verified_status,  # No extra check needed here
                 "current_balance": user.current_balance,
                 "total_spent": user.total_spent,
                 "date_joined": user.date_joined.strftime("%Y-%m-%d"),
@@ -525,4 +416,3 @@ def home(request):
 @login_required(login_url="/auth/signin/")
 def signin(request):
     return render(request,'signin.html')
-

@@ -17,94 +17,270 @@
     />
 
     <style>
-      /* General Page Styling */
+      #cMenu {
+        display: none;
+      }
+  
       body {
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
         background-color: #f8f9fa;
       }
-
-      /* Sidebar Styling */
-      #sidebar {
-        background-color: #343a40; /* Dark background */
-        color: white;
-        height: 100vh; /* Full height */
-        position: fixed; /* Fixed position */
-        overflow-y: auto; /* Scroll for overflow */
-        width: 16.666%; /* 2/12 grid width */
-        padding: 15px;
+  
+      .table {
+        border-radius: 10px;
+        overflow: hidden;
       }
-
-      /* Sidebar Links */
-      #sidebar a {
+  
+      .table th,
+      .table td {
+        vertical-align: middle;
+        padding: 15px;
+        text-align: left;
+      }
+  
+      .table thead {
+        background-color: #343a40;
         color: white;
-        text-decoration: none;
+      }
+  
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 10px;
+        top: 30px;
+        background-color: #f9f9f9;
+        min-width: 120px;
+        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+      }
+  
+      .dropdown:hover .dropdown-content {
         display: block;
-        padding: 10px;
-        border-radius: 5px;
-        transition: background-color 0.3s;
       }
-
-      #sidebar a:hover {
-        background-color: #495057;
+  
+      .dropdown-btn {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 20px;
       }
-
-      /* Header Styling */
-      #header {
-        background-color: #ffffff;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        padding: 15px;
+  
+      .card {
+        border: none;
         margin-bottom: 20px;
       }
-
-      /* Main Content */
-      .main-content {
-        margin-left: 16.666%; /* Offset for the sidebar */
-        padding: 20px;
+  
+      .hidden {
+        display: none;
       }
-
-      /* Responsive Adjustments */
-      @media (max-width: 768px) {
-        #sidebar {
-          position: relative;
-          height: auto;
-          width: 100%;
+  
+      /* Pagination Styles */
+      .pagination {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 20px;
+      }
+  
+      .pagination .page-item.active .page-link {
+        background-color: #67e6be;
+        border-color: #67e6be;
+      }
+  
+      .pagination .page-link {
+        background-color: white;
+        color: black;
+        padding: 10px 15px;
+        margin: 0 5px;
+      }
+  
+      .pagination .page-link:hover {
+        background-color: #e9ecef;
+        color: black;
+      }
+  
+      .prev {
+        background-color: #6c757d !important;
+        opacity: 30%;
+      }
+  
+      .hidden {
+        display: none;
+      }
+  
+      .heading {
+        @media (max-width: 758px) {
+          margin: 10px !important;
         }
-
-        .main-content {
-          margin-left: 0;
+      }
+  
+      .dropdown {
+        position: relative;
+        display: inline-block;
+      }
+  
+      .dropdown-content a {
+        color: black;
+        padding: 8px 12px;
+        text-decoration: none;
+        display: block;
+      }
+  
+      .dropdown-content a:hover {
+        background-color: #f1f1f1;
+      }
+  
+      .ship {
+        margin: 2rem;
+      }
+  
+      .ship:hover {
+        background-color: white;
+        font-size: large;
+      }
+  
+      label {
+        text-align: left;
+        margin-bottom: 10px;
+      }
+  
+      input {
+        margin-bottom: 10px;
+      }
+  
+      @media (max-width:560px) {
+        .tableDiv {
+          height: 300px;
         }
+      }
+      label {
+    text-align: left;
+    display: block; /* Ensure the label takes up the full width */
+  }
+      input.form-control {
+        display: block;
+        width: 100%;
+        padding: .75rem .75rem;
       }
     </style>
+    <script>
+      document.addEventListener("DOMContentLoaded", function (event3) {
+        const cBtn = document.getElementById("cBtn");
+        var cMenu = document.getElementById("cMenu");
+  
+        cBtn.addEventListener("click", function (event3) {
+          cMenu = document.getElementById("cMenu");
+          cMenu.style.display = "block";
+          event.stopPropagation();
+        });
+  
+        document.querySelectorAll(".toggle-col").forEach(function (checkbox) {
+          console.log("gfjgh");
+          checkbox.addEventListener("change", function () {
+            const colClass = this.getAttribute("data-col");
+            const isVisible = this.checked;
+            console.log("eee");
+  
+            document
+              .querySelectorAll(
+                "th:nth-child(" + colClass + "), td:nth-child(" + colClass + ")"
+              )
+              .forEach(function (cell) {
+                cell.style.display = isVisible ? "" : "none";
+              });
+          });
+        });
+        document.addEventListener("click", function (event3) {
+          if (
+            cMenu.style.display == "block" &&
+            !cMenu.contains(event.target) &&
+            event.target !== cBtn
+          ) {
+            cMenu.style.display = "none";
+          }
+        });
+      });
+  
+      document.addEventListener("DOMContentLoaded", function (event5) {
+        document
+          .getElementById("packageBtn")
+          .addEventListener("click", function () {
+            document.getElementById("createPackage").style.display = "block";
+            document.getElementById("packageDiv").style.display = "none";
+  
+            event.stopPropagation();
+          });
+      });
+    </script>
   </head>
   <body>
-    <div class="container-fluid">
-      <div class="row">
+    
+      <div class="row bigDiv">
         <!-- Sidebar -->
-        <aside id="sidebar">
-          {% include 'sidebar.html' %}
-        </aside>
-
+        <div class="sidebar nav col-5 col-sm-4 col-md-3 col-xl-3 col-xxl-2 col-lg-3">
+          <div id="sidebar"> {% include 'sidebar.html' %}</div>
+        </div>
         <!-- Main Content -->
-        <div class="main-content col">
-          <!-- Header -->
-          <header id="header">
-            {% include 'navbar.html' %}
-          </header>
+        <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9 col-xxl-10">
+          <div class="row">
+            <div id="header" class="p-0"> {% include 'navbar.html' %}</div>
+          </div>
 
           <!-- Page Content -->
-          <main>
-            <div class="card p-4">
-              <h1>Create a New Order</h1>
+          <main style="margin: 1rem;">
+            <div id="createPackage" >
+              <div style="margin-left:2rem ;">
+    
+                <h2>New order</h2>
+                <div style="display: flex">
+                  <div>
+                    <div>
+                      <a style="text-decoration: none ;color: black;" href="/orders">
+                        <div>
+                          <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                              stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                              class="lucide lucide-boxes">
+                              <path
+                                d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z">
+                              </path>
+                              <path d="m7 16.5-4.74-2.85"></path>
+                              <path d="m7 16.5 5-3"></path>
+                              <path d="M7 16.5v5.17"></path>
+                              <path
+                                d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z">
+                              </path>
+                              <path d="m17 16.5-5-3"></path>
+                              <path d="m17 16.5 4.74-2.85"></path>
+                              <path d="M17 16.5v5.17"></path>
+                              <path
+                                d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z">
+                              </path>
+                              <path d="M12 8 7.26 5.15"></path>
+                              <path d="m12 8 4.74-2.85"></path>
+                              <path d="M12 13.5V8"></path>
+                            </svg>
+                            <span> Order List
+                              <!-- text-base font-normal text-primary-foreground -->
+                            </span>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                  <p style=" margin-left: 10px;">></p>
+                  <a href="#" style="text-decoration: none; color: black; margin-left: 10px;">
+                    Create Order </a>
+                </div>
+              </div>
               {% if error %}
               <div class="alert alert-danger" role="alert">
                 {{ error }}
               </div>
               {% endif %}
 
-              <form method="POST">
+              <form method="POST" class="text-start">
                 {% csrf_token %}
+                <div class="card ship ">
                 <div class="mb-3">
                   <label for="new_label" class="form-label">New Label:</label>
                   <select name="new_label_id" id="new_label" class="form-control" required>
@@ -128,16 +304,8 @@
                     required
                   />
                 </div>
-                <div class="mb-3">
-                  <label for="tracking_number" class="form-label">Tracking Number:</label>
-                  <input
-                    type="text"
-                    name="tracking_number"
-                    id="tracking_number"
-                    class="form-control"
-                    required
-                  />
-                </div>
+                <input type="hidden" name="tracking_number" id="tracking_number" />
+
                 <div class="mb-3">
                   <label for="type" class="form-label">Type:</label>
                   <input type="text" name="type" id="type" class="form-control" required />
@@ -150,7 +318,11 @@
                   <label for="cost" class="form-label">Cost:</label>
                   <input type="number" name="cost" id="cost" class="form-control" required />
                 </div>
-                <button type="submit" class="btn btn-primary">Create Order</button>
+                <button class="form-control btn btn-dark" 
+              style="width: fit-content; padding: 15px 30px; margin-top: 20px;"> Save Oder</button>
+         
+             
+              </div>
               </form>
             </div>
 
@@ -158,7 +330,7 @@
           </main>
         </div>
       </div>
-    </div>
+    
 
     <!-- Bootstrap and jQuery Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>

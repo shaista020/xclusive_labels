@@ -2,25 +2,7 @@ from rest_framework import serializers
 from .models import *
 from contact_form.serializers import LabelSerializer
 
-class signupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Signup
-        fields = '__all__'
-
-class signinSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Signin
-        fields = '__all__'
-        
-class NotificationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Notification
-        fields = '__all__'
-        
-class NotificationSeenSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Notification
-        fields = ['is_seen']
+    
 
 class BatchSerializer(serializers.ModelSerializer):
     class Meta:
@@ -64,12 +46,6 @@ class LabelAPIConfigSerializer(serializers.ModelSerializer):
     class Meta:
         model = LabelAPIConfig
         fields = '__all__'
-
-
-# class TicketSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Ticket
-#         fields = '__all__'
 
 class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:

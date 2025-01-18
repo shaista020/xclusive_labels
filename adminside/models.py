@@ -18,25 +18,6 @@ from django.conf import settings
 
 
 
-class Signup(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=100)
-    rememberme= models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.name
-    
-class Signin(models.Model):
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=100)
-    rememberme= models.BooleanField(default=False)
-    recaptcha=models.BooleanField(default=False)
-    
-
-    def __str__(self):
-        return self.email
-
 class Batch(models.Model):
     batch_id = models.CharField(max_length=100)
     ship_from_name = models.CharField(max_length=100)
@@ -184,11 +165,9 @@ class CustomUser(AbstractUser):
         return self.username
 
     @property
-    def verified_status(self):
-        return "Yes" if self.is_active else "No"
-
+    def verified_status(self):       
+        return "Yes" if self.is_active and self.is_2fa_enabled else "No"
     def generate_referral_code(self):
-        """Generate a unique referral code for the user."""
         while True:
             code = get_random_string(length=10) 
             if not CustomUser.objects.filter(referral_code=code).exists():  
