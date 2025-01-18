@@ -376,7 +376,7 @@
   
       // Fetch and populate Packages
       $.ajax({
-        url: 'http://127.0.0.1:8000/api/packages/',
+        url: '/api/packages/',
         method: 'GET',
         success: function (data) {
           const packageSelect = $('#package');
@@ -395,7 +395,7 @@
   
       // Fetch and populate Ship From Addresses
       $.ajax({
-    url: 'http://127.0.0.1:8000/api/addresses/',
+    url: '/api/addresses/',
     method: 'GET',
     success: function (data) {
         const shipFromSelect = $('#ship-from');
@@ -430,7 +430,7 @@
     console.log(labelData);  // Log the data to verify it's correct before sending
 
     $.ajax({
-        url: 'http://127.0.0.1:8000/api/newlabels/',
+        url: '/api/newlabels/',
         method: 'POST',
         headers: {
             'X-CSRFToken': csrfToken  // Include CSRF token in the request header

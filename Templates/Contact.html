@@ -261,7 +261,7 @@ button:hover {
           var formData = $(this).serialize();
 
           $.ajax({
-            url: 'http://127.0.0.1:8000/api/contact/', // Django URL for the backend API
+            url: '/api/contact/', // Django URL for the backend API
             method: 'POST',
             data: formData,
             beforeSend: function (xhr) {
