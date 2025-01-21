@@ -4,74 +4,105 @@
     {% load static %}
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Recipt</title>
+    <title>Receipt</title>
     <link rel="icon" type="image/x-icon" href="{% static 'images/logo1.png' %}" />
     <link rel="stylesheet" href="{% static 'index.css' %}" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.4/dist/purify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <!-- Bootstrap CSS from CDN -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-      crossorigin="anonymous"
-    />
-<style> </style>
-</head>
-<body>
-  <!-- <div class="container py-5"> -->
-    <div class="row ">
-        <!-- Sidebar -->
-        <div class="sidebar nav col-5 col-sm-4 col-md-3 col-xl-3 col-xxl-2 col-lg-3">
-          <div id="sidebar"> {% include 'sidebar.html' %}</div>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  </head>
+  <body>
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="sidebar nav col-5 col-sm-4 col-md-3 col-xl-3 col-xxl-2 col-lg-3">
+        <div id="sidebar"> {% include 'sidebarAdmin.html' %}</div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9 col-xxl-10">
+        <div class="row">
+          <div id="header" class="p-0"> {% include 'navbarAdmin.html' %}</div>
         </div>
-        <!-- Main Content -->
-        <div class="col-sm-12 col-md-12 col-lg-9 col-xl-9 col-xxl-10">
-          <div class="row">
-            <div id="header" class="p-0"> {% include 'navbar.html' %}</div>
-          </div>
 
-          <!-- Page Content -->
-          <main style="margin: 1rem;">
-    <div class="card mx-auto" style="max-width: 600px;">
-      <div class="card-header text-center bg-dark text-white">
-        <h2>Order Receipt</h2>
-        <p class="mb-0">Order ID: {{ order.id }}</p>
-        <small>Date: {{ order.created_at|date:"Y-m-d H:i:s" }}</small>
-      </div>
-      <div class="card-body">
-        <h4 class="card-title">Order Details</h4>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">
-            <strong>Batch Number:</strong> {{ order.batch_number }}
-          </li>
-          <li class="list-group-item">
-            <strong>Tracking Number:</strong> {{ order.tracking_number }}
-          </li>
-          <li class="list-group-item">
-            <strong>Name:</strong> {{ order.name }}
-          </li>
-          <li class="list-group-item">
-            <strong>Type:</strong> {{ order.type }}
-          </li>
-          <li class="list-group-item">
-            <strong>Weight:</strong> {{ order.weight }} kg
-          </li>
-          <li class="list-group-item">
-            <strong>Cost:</strong> ${{ order.cost }}
-          </li>
-          <li class="list-group-item">
-            <strong>Status:</strong> {{ order.get_status_display }}
-          </li>
-        </ul>
-      </div>
-      <div class="card-footer text-center bg-light">
-        <p class="mb-0">Thank you for your business!</p>
-      </div>
-      <div class="text-center mt-4">
-        <a href="{% url 'orders' %}" class="btn btn-secondary">Back to Orders</a>
+        <!-- Page Content -->
+        <main style="margin: 1rem;">
+          <div class="card mx-auto" style="max-width: 600px;">
+            <div class="card-header text-center bg-dark text-white">
+              <h2>Order Receipt</h2>
+              <p class="mb-0">Order ID: {{ order.id }}</p>
+              <small>Date: {{ order.created_at|date:"Y-m-d H:i:s" }}</small>
+            </div>
+            <div class="card-body" id="receipt-content">
+              <h4 class="card-title">Order Details</h4>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                  <strong>Batch Number:</strong> {{ order.batch_number }}
+                </li>
+                <li class="list-group-item">
+                  <strong>Tracking Number:</strong> {{ order.tracking_number }}
+                </li>
+                <li class="list-group-item">
+                  <strong>Name:</strong> {{ order.name }}
+                </li>
+                <li class="list-group-item">
+                  <strong>Type:</strong> {{ order.type }}
+                </li>
+                <li class="list-group-item">
+                  <strong>Weight:</strong> {{ order.weight }} kg
+                </li>
+                <li class="list-group-item">
+                  <strong>Cost:</strong> ${{ order.cost }}
+                </li>
+                <li class="list-group-item">
+                  <strong>Status:</strong> {{ order.get_status_display }}
+                </li>
+              </ul>
+            </div>
+            <div class="card-footer text-center bg-light">
+              <p class="mb-0">Thank you for your business!</p>
+            </div>
+            <div class="text-center mt-4">
+              <a href="{% url 'orders_admin' %}" class="btn btn-secondary">Back to Orders</a>
+            </div>
+            <!-- PDF Download Button -->
+            <div class="text-center mt-4">
+              <button id="download-pdf" class="btn btn-primary">Download PDF</button>
+            </div>
+          </div>
+        </main>
       </div>
     </div>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+
+    <!-- jsPDF Script -->
+    <script>
+      document.getElementById("download-pdf").addEventListener("click", function () {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+
+        // Directly fetching HTML content for the PDF
+        const receiptContent = document.getElementById("receipt-content");
+        
+        // Setting the text of the receipt into the PDF
+        pdf.text("Order Receipt", 20, 20);
+        pdf.text("Order ID: {{ order.id }}", 20, 30);
+        pdf.text("Date: {{ order.created_at|date:'Y-m-d H:i:s' }}", 20, 40);
+        
+        // Order details as text
+        pdf.text("Batch Number: {{ order.batch_number }}", 20, 50);
+        pdf.text("Tracking Number: {{ order.tracking_number }}", 20, 60);
+        pdf.text("Name: {{ order.name }}", 20, 70);
+        pdf.text("Type: {{ order.type }}", 20, 80);
+        pdf.text("Weight: {{ order.weight }} kg", 20, 90);
+        pdf.text("Cost: ${{ order.cost }}", 20, 100);
+        pdf.text("Status: {{ order.get_status_display }}", 20, 110);
+        
+        // Save the generated PDF with a dynamic filename
+        pdf.save("receipt_{{ order.id }}.pdf");
+      });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>

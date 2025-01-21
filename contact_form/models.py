@@ -20,21 +20,38 @@ class ContactInfo(models.Model):
     def __str__(self):
         return self.name
     
-
+from django.db import models
+from django.conf import settings
 
 class Package(models.Model):
-  
-    name = models.CharField(max_length=255)  
-    weight = models.DecimalField(max_digits=10, decimal_places=2)  
-    length = models.DecimalField(max_digits=5, decimal_places=2)  
-    width = models.DecimalField(max_digits=5, decimal_places=2)   
-    height = models.DecimalField(max_digits=5, decimal_places=2)  
+    name = models.CharField(max_length=255)
+    weight = models.DecimalField(max_digits=10, decimal_places=2)
+    length = models.DecimalField(max_digits=5, decimal_places=2)
+    width = models.DecimalField(max_digits=5, decimal_places=2)
+    height = models.DecimalField(max_digits=5, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
- 
+    discount = models.DecimalField(max_digits=5, decimal_places=2, default=20.00)  # Default discount 20%
+    total_cost = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
+
+    def calculate_original_price(self):
+        # Example: calculating price as weight * dimensions (volume)
+        return self.weight * self.length * self.width * self.height
+
+    def calculate_cost(self):
+        # Example cost calculation based on dimensions (volume * weight as a base price)
+        base_cost = self.length * self.width * self.height * self.weight
+        discount_multiplier = (100 - self.discount) / 100
+        return base_cost * discount_multiplier
+
+    def save(self, *args, **kwargs):
+        # Calculate and update total cost before saving
+        self.total_cost = self.calculate_cost()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
+
 
 
 

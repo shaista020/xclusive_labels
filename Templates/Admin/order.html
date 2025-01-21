@@ -7,27 +7,26 @@
     <title>Order-Volusion</title>
     {% load static %}
     <link rel="icon" type="image/x-icon" href="{% static 'images/images/logo1.png' %}" />
-
+    
     <!-- Load custom CSS (ensure this path is correct) -->
     <link rel="stylesheet" href="../../static/index.css" />
-
+    
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
-
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
-    <!-- jQuery (important: always load jQuery before DataTables JS) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/colreorder/1.3.0/css/colReorder.dataTables.min.css">
+    
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    
     <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
-    <!-- Bootstrap 5 JS (optional, depending on your needs) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Bootstrap 5 additional CSS (if needed, you can remove if redundant) -->
-    <link href="{% static 'bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css' %}" rel="stylesheet" />
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    
+    <!-- colReorder JS -->
+    <script src="https://cdn.datatables.net/colreorder/1.3.0/js/dataTables.colReorder.min.js"></script>
+    
+    <!-- Bootstrap 5 JS -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script> -->
     
     <style>
       body {
@@ -390,37 +389,37 @@
               <div class="table-responsive">
                 <table class="table table-striped table-hover" id="user">
                   <thead>
-                    <tr>
-                      <th>Batch#</th>
-                      <th>Tracking Number</th>
-                      <th>Name</th>
-                      <th>Type</th>
-                      <th>Weight</th>
-                      <th>Cost</th>
-                      <th>Status</th>
-                      <th>Created At</th>
-                      <th>Actions</th>
-                    </tr>
+                      <tr>
+                          <th>Batch#</th>
+                          <th>Tracking Number</th>
+                          <th>Name</th>
+                          <th>Type</th>
+                          <th>Weight</th>
+                          <th>Cost</th>
+                          <th>Status</th>
+                          <th>Created At</th>
+                          <th>Actions</th>
+                      </tr>
                   </thead>
                   <tbody>
-                    {% for order in orderss %}
-                    <tr>
-                      <td>{{ order.batch_number }}</td>
-                      <td>{{ order.tracking_number }}</td>
-                      <td>{{ order.name }}</td>
-                      <td>{{ order.type }}</td>
-                      <td>{{ order.weight }}</td>
-                      <td>${{ order.cost }}</td>
-                      <td>{{ order.get_status_display }}</td>
-                      <td>{{ order.created_at|date:"Y-m-d" }}</td>
-                      <td>
-                        <a href="{% url 'view_receipt_admin' order.id %}" class="btn btn-primary btn-sm">View Receipt</a>
-                      </td>
-                      
-                    </tr>
-                    {% endfor %}
+                      {% for order in orderss %}
+                      <tr>
+                          <td>{{ order.batch_number }}</td>
+                          <td>{{ order.tracking_number }}</td>
+                          <td>{{ order.name }}</td>
+                          <td>{{ order.type }}</td>
+                          <td>{{ order.weight }}</td>
+                          <td>${{ order.cost }}</td>
+                          <td>{{ order.get_status_display }}</td>
+                          <td>{{ order.created_at|date:"Y-m-d" }}</td>
+                          <td>
+                              <a href="{% url 'view_receipt_admin' order.id %}" class="btn btn-primary btn-sm">View Receipt</a>
+                          </td>
+                      </tr>
+                      {% endfor %}
                   </tbody>
-                </table>
+              </table>
+              
                 
               </div>
 
@@ -430,18 +429,19 @@
         </main>
       </div>
     </div>
+    
     <script>
-     
       $(document).ready(function () {
-  $('#user').DataTable({
-      "paging": true,
-      "ordering": true,
-      "searching": true,
-      "info": true,
-      "responsive": true,
-  });
-});
-    </script>
+          console.log($.fn.dataTable.ColReorder ? "colReorder loaded" : "colReorder not loaded");
+  
+          $('#user').DataTable({
+              colReorder: true, // Enable column reordering
+              paging: true, // Enable pagination
+              searching: true, // Enable search functionality
+              ordering: true, // Enable column sorting
+          });
+      });
+  </script>
 
     <script src="{% static 'index.js' %}"></script>
   </body>

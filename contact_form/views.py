@@ -566,35 +566,51 @@ def referral(request):
 
 @login_required(login_url="/auth/signin/")
 def package(request):
-    packages = Package.objects.filter(user=request.user)
+    packages = Package.objects.all()
+    for package in packages:
+        package.original_price = package.weight * package.length * package.width * package.height
+    
+    print("user-pkjs:" ,packages)
     return render(request,'User/savedPackages.html', {'packages':packages})
 
+
+@login_required 
 def create_package(request):
     if request.method == "POST":
+        try:
+           
+            name = request.POST.get('name', '').strip()
+            weight = float(request.POST.get('weight', 0))
+            length = float(request.POST.get('length', 0))
+            width = float(request.POST.get('width', 0))
+            height = float(request.POST.get('height', 0))
 
-        name = request.POST['name']
-        weight = request.POST.get('weight')
-        length = request.POST.get('length')
-        width = request.POST.get('width')
-        height = request.POST.get('height')
-        # Ensure the user is logged in and can be assigned as the creator
-        if request.user.is_authenticated:
-            user = request.user
+            if weight <= 0 or length <= 0 or width <= 0 or height <= 0:
+                raise ValueError("All dimensions and weight must be positive numbers.")
 
             new_package = Package(
-                    user=user,
-                    name=name,
-                    weight=weight,
-                    length =  length,
-                    width =width,   
-                    height =height,   
-                )
+                user=request.user,
+                name=name,
+                weight=weight,
+                length=length,
+                width=width,
+                height=height,
+            )
             new_package.save()
 
-                # Redirect to the same page to display updated list
-            return redirect('/packages')
-    # Render the page with existing packages for a GET request
-    return render(request, "User/savedPackages.html")
+            return redirect('/packages_admin')
+
+        except ValueError as e:
+           
+            return render(request, "User/savedPackages.html", {
+                "error": str(e),
+                "packages": Package.objects.filter(user=request.user),  
+            })
+
+    packages = Package.objects.filter(user=request.user)  
+    return render(request, "User/savedPackages.html", {
+        "packages": packages,
+    })
 
 
 @login_required(login_url="/auth/signin/")
@@ -683,7 +699,6 @@ def submit_view_tickets_user(request):
             ticket.message = message
             ticket.save()
 
-            # Return a success response with a message
             return JsonResponse({"status": "success", "message": "Your message has been sent successfully!"})
 
         except Ticket.DoesNotExist:
