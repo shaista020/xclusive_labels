@@ -172,7 +172,67 @@
       padding: .75rem .75rem;
     }
     
+   
+            .cards {
+    /* Remove margin to ensure no gap between cards */
+    margin: 0;
+    max-width: 290px;  /* Adjust the max-width for smaller cards */
+    padding: 0;
+}
 
+
+
+              .card-header {
+                  background-color: #f8f9fa;
+                  padding: 1rem 1.5rem;
+                  position: relative;
+              }
+          
+              .original-price {
+                  font-size: 0.9rem;
+                  position: absolute;
+                  top: 0;
+                  right: 0;
+                  padding: 0.5rem;
+              }
+          
+              .card-title {
+                  font-size: 1.2rem;
+                  text-align: center;
+              }
+          
+              .card-body {
+                  padding: 1.5rem;
+                  font-size: 1rem;
+              }
+          
+              .card-footer {
+                  background-color: #fff;
+                  padding: 1rem;
+              }
+          
+              .select {
+                  /* background-color: #000000; */
+                  border: none;
+                  font-size: 1.1rem;
+                  font-weight: bold;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+              }
+          
+              
+          
+              .border-custom {
+                  border: 2px solid black;  /* You can change the color and thickness */
+                  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);  /* Optional: add shadow for depth */
+              }
+              .cards{
+                /* width: 100%; */
+                  max-width: 290px; /* Adjust the max-width for smaller cards */
+                  margin: 0 ; /* Center the card horizontally */
+             
+              }
+         
   </style>
   <script>
     document.addEventListener("DOMContentLoaded", function (event3) {
@@ -309,98 +369,15 @@
               </div>
           </div>
           
-          <!-- Custom CSS -->
-          <style>
-            .cards {
-    /* Remove margin to ensure no gap between cards */
-    margin: 0;
-    max-width: 290px;  /* Adjust the max-width for smaller cards */
-    padding: 0;
-}
-
-
-
-              .card-header {
-                  background-color: #f8f9fa;
-                  padding: 1rem 1.5rem;
-                  position: relative;
-              }
-          
-              .original-price {
-                  font-size: 0.9rem;
-                  position: absolute;
-                  top: 0;
-                  right: 0;
-                  padding: 0.5rem;
-              }
-          
-              .card-title {
-                  font-size: 1.2rem;
-                  text-align: center;
-              }
-          
-              .card-body {
-                  padding: 1.5rem;
-                  font-size: 1rem;
-              }
-          
-              .card-footer {
-                  background-color: #fff;
-                  padding: 1rem;
-              }
-          
-              .select {
-                  /* background-color: #000000; */
-                  border: none;
-                  font-size: 1.1rem;
-                  font-weight: bold;
-                  text-transform: uppercase;
-                  letter-spacing: 1px;
-              }
-          
-              
-          
-              .border-custom {
-                  border: 2px solid black;  /* You can change the color and thickness */
-                  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);  /* Optional: add shadow for depth */
-              }
-              .cards{
-                /* width: 100%; */
-                  max-width: 290px; /* Adjust the max-width for smaller cards */
-                  margin: 0 ; /* Center the card horizontally */
-             
-              }
-          </style>
-          
+        
           
          
           
              
             
 
-            <!-- Pagination -->
-            <!-- <nav aria-label="Page navigation" class="my-4">
-                  <ul class="pagination justify-content-end">
-                    <li class="page-item">
-                      <a class="page-link prev text-white" href="#" tabindex="-1"
-                        >Previous</a
-                      >
-                    </li>
-                    <li class="page-item">
-                      <a class="page-link" href="#">1</a>
-                    </li>
-                    <li class="page-item">
-                      <a class="page-link" href="#">2</a>
-                    </li>
-                    <li class="page-item">
-                      <a class="page-link" href="#">3</a>
-                    </li>
-                    <li class="page-item">
-                      <a class="page-link bg-black text-white" href="#">Next</a>
-                    </li>
-                  </ul>
-                </nav> -->
-          </div>
+           
+              </div>
         </div>
         <div id="createPackage" style="display: none">
           <div style="margin-left:2rem ;">
