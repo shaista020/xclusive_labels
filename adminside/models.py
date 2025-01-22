@@ -146,38 +146,38 @@ class CustomUser(AbstractUser):
     last_login_date = models.DateField(blank=True, null=True)
     is_super_admin = models.BooleanField(default=False)
     verified = models.BooleanField(default=False)
-    timezone = models.CharField(max_length=50, default='UTC') 
+    timezone = models.CharField(max_length=50, default='UTC')
     current_balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_spent = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     date = models.DateTimeField(auto_now_add=True)
     otp_secret = models.CharField(max_length=16, blank=True, null=True)
     is_2fa_enabled = models.BooleanField(default=False)
-    available_for_withdraw = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    available_for_withdraw = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     joined_at = models.DateTimeField(auto_now_add=True)
-    referral_bonus = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    
     referral_code = models.CharField(max_length=50, unique=True, blank=True, null=True)
     referred_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='referrals')
-    
-    objects = CustomUserManager()
 
     def __str__(self):
         return self.username
 
-    @property
-    def verified_status(self):       
-        return "Yes" if self.is_active and self.is_2fa_enabled else "No"
     def generate_referral_code(self):
         while True:
-            code = get_random_string(length=10) 
-            if not CustomUser.objects.filter(referral_code=code).exists():  
+            code = get_random_string(length=10)
+            if not CustomUser.objects.filter(referral_code=code).exists():
                 return code
-    
+
+    @staticmethod
+    def calculate_commission(referrer, amount):
+        commission = amount * 0.10
+        referrer.available_for_withdraw += commission
+        referrer.save()
+        return commission
+
     def save(self, *args, **kwargs):
-       
         if not self.referral_code:
             self.referral_code = self.generate_referral_code()
         super(CustomUser, self).save(*args, **kwargs)
+  
 
 class AdminUser(models.Model):
     email_address = models.EmailField(unique=True)
