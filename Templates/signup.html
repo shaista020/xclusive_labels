@@ -283,12 +283,15 @@
                   </div>
                   <br />
               </div>
-              {% if referral_code %}
-                  <input type="hidden" name="referral_code" value="{{ referral_code }}">
-              {% endif %}
+              <input type="hidden" name="referral_code" value="{{ referral_code }}">
               <button type="submit">Sign Up</button>
           </form>
-          
+          <!-- {% if referral_link %}
+            <div class="mt-4">
+                <h5>Your Referral Link</h5>
+                <p>{{ referral_link }}</p>
+            </div>
+        {% endif %} -->
           
             <p class="signup-link">
                 Already have an account? <a href="/auth/signin/">Sign In</a>

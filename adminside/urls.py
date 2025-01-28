@@ -36,8 +36,12 @@ urlpatterns = [
     path('set/',views.setting,name='settings'),
     path('types/',views.type,name='types'),
     path('users/',views.user,name='users'),
-     path('get-user-details/', views.get_user_details, name='get_user_details'),
+    path('get-user-details/', views.get_user_details, name='get_user_details'),
     path('weights/',views.weight,name='weights'),
     path('new/',views.newlable,name='newlable'),
     path('addFunds/',views.addFunds,name='addFunds'),
+    path('packages_admin/',views.packages_admin,name='packages_admin'),
+    path('update-discount/', views.update_discount, name='update_discount'),
+    path('edit-package/<int:package_id>/', views.edit_package, name='edit_package'),
+    path('update-global-discount/', views.update_global_discount, name='update_global_discount'),
 ]

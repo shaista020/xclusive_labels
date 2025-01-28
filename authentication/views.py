@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 import pyotp
 from django.contrib import messages
+from decimal import Decimal
 
 User = get_user_model()
 
@@ -59,14 +60,17 @@ def user_logout(request):
     return redirect('/auth/signin/')
 
 def signup(request):
-    referral_code = request.GET.get('referral_code')
-   
-    if referral_code == "None":
-        referral_code = None
+    referral_code = request.GET.get('referral_code')  # Get referral code from GET request
+
+    print(f"Referral code received in GET request: {referral_code}")  # Debugging
 
     error_messages = []
 
     if request.method == 'POST':
+        # Referral code from POST request (if any)
+        referral_code = request.POST.get('referral_code', referral_code)
+        print(f"Referral code received in POST request: {referral_code}")  # Debugging
+
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
@@ -88,32 +92,34 @@ def signup(request):
                 },
             )
 
+        # Create user
         user = User.objects.create_user(username=username, email=email, password=password)
         print(f"Created user: {user.username}")
 
+        # Generate referral code
         user.generate_referral_code()
         user.save()
         print(f"Generated referral code for user: {user.referral_code}")
 
         if referral_code:
+            print(f"Handling referral code: {referral_code}")  # Debugging
             referrer = User.objects.filter(referral_code=referral_code).first()
             if referrer:
-              
+                print(f"Referrer: {referrer}")  # Debugging
                 user.referred_by = referrer
-                user.save()  
-                referrer.referral_bonus += 100
-                referrer.available_for_withdraw += 100
-                referrer.save() 
-                print(f"User {user.username} referred by {referrer.username}")
+                user.save()
+
+                # Add 10% commission
+                from decimal import Decimal
+                referrer.available_for_withdraw += Decimal('100.00')  # Use Decimal for compatibility
+                referrer.save()
+                print(f"Updated referrer's available_for_withdraw: {referrer.available_for_withdraw}")
             else:
                 print(f"No valid referrer found for referral code: {referral_code}")
         else:
-           
-            if request.user.is_authenticated:
-                user.referred_by = request.user
-                user.save()
-                print(f"User {user.username} referred by {request.user.username}")
+            print("No referral code provided")
 
+        # Send welcome email
         send_mail(
             'Welcome to Our Website!',
             'Thank you for signing up with us. We are excited to have you on board!',
@@ -121,10 +127,11 @@ def signup(request):
             [email],
             fail_silently=False,
         )
-        print(send_mail,"hiiiiiiiiii")
+        print("Email sent successfully.")
 
         return redirect('/auth/signin/')
 
+    # Build referral link
     referral_link = request.build_absolute_uri(f"/auth/signup/?referral_code={request.user.referral_code}") if request.user.is_authenticated else None
 
     return render(request, "signup.html", {"referral_code": referral_code, "referral_link": referral_link})

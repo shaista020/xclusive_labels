@@ -171,6 +171,129 @@
       width: 100%;
       padding: .75rem .75rem;
     }
+    .cards {
+      /* Remove margin to ensure no gap between cards */
+      margin: 0;
+      max-width: 250px;  /* Adjust the max-width for smaller cards */
+      padding: 0;
+      height: 320px;
+      margin-bottom: -30px;
+    }
+    .card-header {
+        background-color: #f8f9fa;
+        padding: 1rem 1rem;
+        position: relative;
+        }     
+        .original-price {
+            font-size: 0.9rem;
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0.5rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .card-body {
+            padding: 0rem;
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        .card-footer {
+            background-color: #fff;
+            padding: 1rem;
+        }
+
+        .select {
+            /* background-color: #000000; */
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        .select:hover {
+          background-color: #3b3b3b;
+          color: #fff; /* Change color on hover */
+        }
+        .border-custom {
+            border: 1px solid;  /* You can change the color and thickness */
+            box-shadow: 16px 40px 48px rgba(0, 0, 0, 0.7); /* Larger shadow */
+        }
+        
+        /* for values and weights*/
+        .card-details {
+            display: flex;
+            flex-direction: column; /* Arrange rows vertically */
+            gap: 0.2rem; /* Add space between rows */
+          }
+
+          .card-detail {
+            display: flex;
+            justify-content: space-between; /* Align text to left and right */
+            font-size: 1.1rem;
+            padding: 0.2rem 0; /* Optional: Add padding between rows */
+          }
+
+          .card-detail strong {
+            font-weight: bold; /* Ensure labels are bold */
+          }
+
+          .card-detail span {
+            text-align: right; /* Align values to the right */
+          }
+
+          /* Input Group Styling */
+.search-bar {
+  display: flex;
+  align-items: right;
+  max-width: 500px; /* Adjust width as needed */
+  margin-left: 60% ; /* Center align and add spacing */
+  border-radius: 5px;
+  overflow: hidden; /* Ensure no elements overflow */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add subtle shadow */
+  margin-bottom: 50px;
+}
+
+/* Search Input Styling */
+.search-input {
+  flex: 1; /* Make the input take remaining space */
+  border: none;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  outline: none; /* Remove default focus outline */
+  transition: all 0.3s ease; /* Smooth focus effects */
+}
+
+/* Search Button Styling */
+.search-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: none;
+  background-color: #343a40; /* Dark gray */
+  color: #fff; /* White text */
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth hover effects */
+}
+
+.search-button:hover {
+  background-color: #495057; /* Slightly lighter gray on hover */
+  transform: scale(1.05); /* Slightly enlarge button */
+}
+
   </style>
   <script>
     document.addEventListener("DOMContentLoaded", function (event3) {
@@ -241,9 +364,9 @@
           <div class="heading row m-5 mb-0">
             <h2 class="col-sm-6 col-md-6 col-lg-7">Packages</h2>
             <div class="head d-flex justify-content-end gap-2 col-sm-6 col-md-6 col-lg-5 mt-2">
-              <button id="packageBtn" class="form-control btn btn-secondary" style="width: fit-content">
+              <!-- <button id="packageBtn" class="form-control btn btn-secondary" style="width: fit-content">
                 Create Saved Package
-              </button>
+              </button> -->
               <button id="cBtn" class="form-control btn btn-dark" style="width: fit-content">
                 Customize Columns
               </button>
@@ -267,55 +390,72 @@
           </div>
 
           <div class="card mt-5">
-            <div class="table-responsive">
-              <table class="table table-hover" id="user">
-                <thead>
-                  <tr>
-                    <th>Package Name</th>
-                    <th>Weight</th>
-                    <th>Length</th>
-                    <th>Width</th>
-                    <th>Height</th>
-                  </tr>
-                </thead>
-                <tbody>
+            <div class="container mt-2">
+              <div class="input-group search-bar">
+                <input 
+                  type="search" 
+                  name="search" 
+                  class=" search-input" 
+                  value=""  
+                  placeholder="Search packages..."
+                />
+                <button 
+                  class="btn btn-dark search-button" 
+                  type="button">
+                  Search
+                </button>
+              </div>
+              
+              <div class="row">
                   {% for package in packages %}
-                  <tr>
-                    <td>{{ package.name }}</td>
-                    <td>{{ package.weight }}</td>
-                    <td>{{ package.length }}</td>
-                    <td>{{ package.width }}</td>
-                    <td>{{ package.height }}</td>
-                  </tr>
+                      <div class="col-md-3 mb-5">
+                          <div class="cards shadow-sm border-custom rounded-lg overflow-hidden">
+                              <div class="card-header bg-light py-3 position-relative">
+                                  <!-- Package Name -->
+                                  <h5 class="card-title text-dark font-weight-bold mb-0">{{ package.name }}</h5>
+                                  
+                                  <!-- Original Price (Before Discount) -->
+                                  <div class="original-price position-absolute top-0 end-0 p-1">
+                                      <span class="text-muted text-decoration-line-through">
+                                          ${{ package.calculate_original_price|floatformat:2 }} 
+                                      </span>
+                                  </div>
+                                  <!-- Discounted Price -->
+                                  <h5 class="text-dark font-weight-bold position-absolute top-30 end-0 translate-middle-y p-1">
+                                      ${{ package.total_cost|floatformat:2 }}
+                                  </h5>
+                             </div>
+                              <div class="card-body p-3 cards shadow-sm border-custom rounded-lg overflow-hidden">
+                                <div class="card-details">
+                                  <div class="card-detail">
+                                    <strong>Weight:</strong> <span>{{ package.weight }}</span>
+                                  </div>
+                                  <div class="card-detail">
+                                    <strong>Length:</strong> <span>{{ package.length }}</span>
+                                  </div>
+                                  <div class="card-detail">
+                                    <strong>Width:</strong> <span>{{ package.width }}</span>
+                                  </div>
+                                  <div class="card-detail">
+                                    <strong>Height:</strong> <span>{{ package.height }}</span>
+                                  </div>
+                                  <div class="card-detail">
+                                    <strong>Discount:</strong> <span>{{ package.discount }}%</span>
+                                  </div>
+                                </div>
+                                <div class="card-footer text-center p-2">
+                                  <a href="/newLable" class="btn btn-dark btn-block select rounded-pill py-1 px-3">
+                                    <strong>Select</strong>
+                                  </a>
+                                </div>
+                              </div>
+                              
+                          </div>
+                      </div>
                   {% endfor %}
-                </tbody>
-              </table>
-
-            </div>
-
-            <!-- Pagination -->
-            <!-- <nav aria-label="Page navigation" class="my-4">
-                  <ul class="pagination justify-content-end">
-                    <li class="page-item">
-                      <a class="page-link prev text-white" href="#" tabindex="-1"
-                        >Previous</a
-                      >
-                    </li>
-                    <li class="page-item">
-                      <a class="page-link" href="#">1</a>
-                    </li>
-                    <li class="page-item">
-                      <a class="page-link" href="#">2</a>
-                    </li>
-                    <li class="page-item">
-                      <a class="page-link" href="#">3</a>
-                    </li>
-                    <li class="page-item">
-                      <a class="page-link bg-black text-white" href="#">Next</a>
-                    </li>
-                  </ul>
-                </nav> -->
-          </div>
+              </div>
+          </div>             
+       </div>
         </div>
         <div id="createPackage" style="display: none">
           <div style="margin-left:2rem ;">

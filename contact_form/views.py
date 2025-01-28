@@ -72,16 +72,13 @@ class ContactInfoView(APIView):
 
 class PackageView(APIView):
     permission_classes = [IsAuthenticated]  
+    
     def get(self, request):
-        if request.user.is_staff:
-            packages = Package.objects.all()
-        else:
-            packages = Package.objects.filter(user=request.user)       
+        packages = Package.objects.all()  
         serializer = SavePackageSerializer(packages, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-       
         data = request.data
         data['user'] = request.user.id 
         serializer = SavePackageSerializer(data=data)
@@ -331,13 +328,30 @@ class DeleteAccountView(APIView):
     def delete(self, request):
         user = request.user
         user.delete()
+from django.db.models import Sum
+from django.db.models import Sum
+from decimal import Decimal
+
 def referrals_view(request):
-    referrals = User.objects.filter(referred_by=request.user)  
+    # Fetch referrals made by the logged-in user
+    referrals = User.objects.filter(referred_by=request.user)
+
+    # Calculate total commission from referrals and the user's own balance
+    referral_commission = referrals.aggregate(Sum('available_for_withdraw'))['available_for_withdraw__sum'] or Decimal('0.00')
+    user_own_commission = request.user.available_for_withdraw
+
+    # Combine both to get the total commission
+    total_commission = referral_commission + user_own_commission
+
+    # Generate the referral link
     referral_link = request.build_absolute_uri(f'/auth/signup/?referral_code={request.user.referral_code}')
 
     context = {
-        "referrals": referrals,
-        "referral_link": referral_link,
+        'referrals': referrals,
+        'referral_commission': referral_commission,  # Commission from referrals
+        'user_own_commission': user_own_commission,  # The logged-in user's own earnings
+        'total_commission': total_commission,       # Combined total commission
+        'referral_link': referral_link,
     }
 
     return render(request, "User/Referrals.html", context)
@@ -349,31 +363,25 @@ class NotificationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """
-        Override get_queryset to filter notifications for the logged-in user,
-        or show all notifications if the user is an admin.
-        """
-        if self.request.user.is_staff:  # Check if the user is an admin (staff)
-            return self.queryset  # Admin can see all notifications
+       
+        if self.request.user.is_staff:  
+            return self.queryset  
         else:
-            return self.queryset.filter(user=self.request.user)  # Non-admin sees only their own notifications
-
+            return self.queryset.filter(user=self.request.user)  
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def get_notifications(self, request):
-        """Get notifications with the username included."""
+      
         notifications = self.get_queryset()
         unread_count = notifications.filter(is_read=False).count()
-        # Serialize the notifications data
         serialized_notifications = NotificationSerializer(notifications, many=True)
         return Response({
-            'username': request.user.username,  # Pass the logged-in user's username
+            'username': request.user.username,  
             'unread_count': unread_count,
             'notifications': serialized_notifications.data
         })
 
     @action(detail=False, methods=['patch'], permission_classes=[IsAuthenticated])
     def mark_as_read(self, request):
-        """Mark all unread notifications as read."""
         unread_notifications = self.queryset.filter(user=request.user, is_read=False)
         
         if unread_notifications.exists():
@@ -566,35 +574,51 @@ def referral(request):
 
 @login_required(login_url="/auth/signin/")
 def package(request):
-    packages = Package.objects.filter(user=request.user)
+    packages = Package.objects.all()
+    for package in packages:
+        package.original_price = package.weight * package.length * package.width * package.height
+    
+    print("user-pkjs:" ,packages)
     return render(request,'User/savedPackages.html', {'packages':packages})
 
+
+@login_required 
 def create_package(request):
     if request.method == "POST":
+        try:
+           
+            name = request.POST.get('name', '').strip()
+            weight = float(request.POST.get('weight', 0))
+            length = float(request.POST.get('length', 0))
+            width = float(request.POST.get('width', 0))
+            height = float(request.POST.get('height', 0))
 
-        name = request.POST['name']
-        weight = request.POST.get('weight')
-        length = request.POST.get('length')
-        width = request.POST.get('width')
-        height = request.POST.get('height')
-        # Ensure the user is logged in and can be assigned as the creator
-        if request.user.is_authenticated:
-            user = request.user
+            if weight <= 0 or length <= 0 or width <= 0 or height <= 0:
+                raise ValueError("All dimensions and weight must be positive numbers.")
 
             new_package = Package(
-                    user=user,
-                    name=name,
-                    weight=weight,
-                    length =  length,
-                    width =width,   
-                    height =height,   
-                )
+                user=request.user,
+                name=name,
+                weight=weight,
+                length=length,
+                width=width,
+                height=height,
+            )
             new_package.save()
 
-                # Redirect to the same page to display updated list
-            return redirect('/packages')
-    # Render the page with existing packages for a GET request
-    return render(request, "User/savedPackages.html")
+            return redirect('/packages_admin')
+
+        except ValueError as e:
+           
+            return render(request, "User/savedPackages.html", {
+                "error": str(e),
+                "packages": Package.objects.filter(user=request.user),  
+            })
+
+    packages = Package.objects.filter(user=request.user)  
+    return render(request, "User/savedPackages.html", {
+        "packages": packages,
+    })
 
 
 @login_required(login_url="/auth/signin/")
@@ -683,7 +707,6 @@ def submit_view_tickets_user(request):
             ticket.message = message
             ticket.save()
 
-            # Return a success response with a message
             return JsonResponse({"status": "success", "message": "Your message has been sent successfully!"})
 
         except Ticket.DoesNotExist:
