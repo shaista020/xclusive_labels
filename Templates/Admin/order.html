@@ -429,20 +429,30 @@
         </main>
       </div>
     </div>
-    
     <script>
       $(document).ready(function () {
-          console.log($.fn.dataTable.ColReorder ? "colReorder loaded" : "colReorder not loaded");
-  
-          $('#user').DataTable({
-              colReorder: true, // Enable column reordering
-              paging: true, // Enable pagination
-              searching: true, // Enable search functionality
-              ordering: true, // Enable column sorting
-          });
-      });
-  </script>
-
+     var table = $('#user').DataTable({
+         colReorder: true, // Enable column reordering
+         paging: true,
+         searching: true,
+         ordering: true
+     });
+ 
+     // Load saved column order from localStorage
+     var savedOrder = localStorage.getItem('columnOrder');
+     if (savedOrder) {
+         table.colReorder.order(JSON.parse(savedOrder), true);
+     }
+ 
+     // Save column order when changed
+     table.on('column-reorder', function () {
+         var columnOrder = table.colReorder.order();
+         localStorage.setItem('columnOrder', JSON.stringify(columnOrder));
+         console.log("Column order saved:", columnOrder);
+     });
+ });
+ 
+   </script>
     <script src="{% static 'index.js' %}"></script>
   </body>
 </html>
