@@ -38,9 +38,10 @@ urlpatterns = [
    path('orders/', views.orders,name='orders'),
    path('create_order/', views.create_order,name='create_order'),
    path('orders_admin/', views.orders_admin,name='orders_admin'),
+    path('order/<int:order_id>/pdf/', generate_pdf, name='generate_pdf'),
    path('order/<int:order_id>/receipt/', views.view_receipt, name='view_receipt'),
    path('view_receipt_admin/<int:order_id>/', views.view_receipt_admin, name='view_receipt_admin'),
-
+    path('upload-csv/', views.handle_uploaded_file, name='upload_csv'),
    path('address/',views.address,name='address'),
    path('payments/',views.payment,name='payments'),
    path('referrals/',views.referral,name='referrals'),

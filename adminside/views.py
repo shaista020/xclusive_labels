@@ -421,7 +421,6 @@ def packages_admin(request):
     packages = Package.objects.filter(user=request.user)
     return render(request,'Admin/Packages.html', {'packages':packages})
 
-@login_required
 def update_discount(request):
     if request.method == "POST":
         package_id = request.POST.get('package_id')
@@ -432,49 +431,69 @@ def update_discount(request):
 
             package.discount = Decimal(discount)
 
-            # Assuming total_cost = (length * width * height) - discount
-            package.total_cost = (
-                (package.length * package.width * package.height) - 
-                ((package.length * package.width * package.height) * (package.discount / Decimal(100)))
-            )
+            # Convert float values to Decimal before multiplication
+            length = Decimal(str(package.length))
+            width = Decimal(str(package.width))
+            height = Decimal(str(package.height))
+
+            base_price = length * width * height
+            discount_amount = base_price * (package.discount / Decimal(100))
+            package.total_cost = base_price - discount_amount
 
             package.save()
-            return redirect('/packages_admin')  
+            return redirect('/packages_admin')
+
         except ValueError:
-        
-            return redirect('/packages_admin') 
+            return redirect('/packages_admin')
+
     return redirect('/packages_admin')
+
+
+from decimal import Decimal
 
 @login_required
 def edit_package(request, package_id):
     package = get_object_or_404(Package, id=package_id, user=request.user)
 
     if request.method == "POST":
+       
         package.name = request.POST.get('name')
         package.weight = Decimal(request.POST.get('weight'))
         package.length = Decimal(request.POST.get('length'))
         package.width = Decimal(request.POST.get('width'))
         package.height = Decimal(request.POST.get('height'))
         package.discount = Decimal(request.POST.get('discount'))
+        
+        dynamic_pricing_enabled = 'dynamic_pricing_enabled' in request.POST
+        package.dynamic_pricing_enabled = dynamic_pricing_enabled
 
         volume = package.length * package.width * package.height
-        package.total_cost = volume - (volume * package.discount / Decimal(100))
 
+        if package.dynamic_pricing_enabled:
+            package.total_cost = volume - (volume * package.discount / Decimal(100))
+        else:
+            package.total_cost = volume  
         package.save()
-        return redirect('/packages_admin')  
+        return redirect('/packages_admin')
+
     return render(request, 'Admin/edit_package.html', {'package': package})
+
 
 @login_required
 def update_global_discount(request):
     if request.method == "POST":
-        discount = Decimal(request.POST.get('discount'))
+        discount = Decimal(request.POST.get('discount')) 
         packages = Package.objects.filter(user=request.user)
 
         for package in packages:
             package.discount = discount
-            volume = package.length * package.width * package.height
+            
+            volume = Decimal(package.length) * Decimal(package.width) * Decimal(package.height)
+            
             package.total_cost = volume - (volume * discount / Decimal(100))
+            
             package.save()
+        
         return redirect('/packages_admin')
-    
+
     return render(request, 'Admin/packages.html')

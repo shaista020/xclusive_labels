@@ -177,6 +177,9 @@
                         <label for="height" class="form-label">Height:</label>
                         <input type="number" step="0.01" id="height" name="height" value="{{ package.height }}" class="form-control" required>
                     </div>
+                    <label>Enable Dynamic Pricing</label>
+                    <input type="checkbox" name="dynamic_pricing_enabled" value="on" />
+            
                     <div class="mb-3">
                         <label for="discount" class="form-label">Discount (%):</label>
                         <input type="number" step="0.01" id="discount" name="discount" value="{{ package.discount }}" class="form-control" required>
