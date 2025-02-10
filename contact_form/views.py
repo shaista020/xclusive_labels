@@ -598,18 +598,15 @@ def create_package(request):
     if request.method == "POST":
         try:
             name = request.POST.get('name', '').strip()
-            weight = float(request.POST.get('weight', 0))
-            length = float(request.POST.get('length', 0))
-            width = float(request.POST.get('width', 0))
-            height = float(request.POST.get('height', 0))
+            weight = Decimal(request.POST.get('weight', 0))  # Convert to Decimal
+            length = Decimal(request.POST.get('length', 0))  # Convert to Decimal
+            width = Decimal(request.POST.get('width', 0))    # Convert to Decimal
+            height = Decimal(request.POST.get('height', 0))  # Convert to Decimal
             dynamic_pricing_enabled = request.POST.get('dynamic_pricing_enabled', 'off') == 'on'
             shipping_class = request.POST.get('shipping_class', 'Standard')
             
             discount_percentage_obj = ShippingClassDiscount.objects.filter(shipping_class=shipping_class).first()
             discount_percentage = discount_percentage_obj.discount_percentage if discount_percentage_obj else 20
-
-            # print(f"Creating package: {name}, {weight} lbs, {length}x{width}x{height}")
-            # print(f"Dynamic Pricing: {dynamic_pricing_enabled}, Shipping Class: {shipping_class}, Discount: {discount_percentage}%")
 
             new_package = Package(
                 user=request.user, name=name, weight=weight, length=length,
@@ -626,10 +623,6 @@ def create_package(request):
                     print("No exact competitor rate found. Using estimated base pricing.")
 
                 new_package.calculate_discounted_price()
-
-                # print(f"Calculated Prices - Original: {new_package.original_price}, "
-                #       f"Discounted: {new_package.discounted_price}, "
-                #       f"Discount Amount: {new_package.discount_amount}")
 
             new_package.save()
             return redirect('/packages_admin')

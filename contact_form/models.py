@@ -47,6 +47,7 @@ class CompetitorRate(models.Model):
     def __str__(self):
         return f"{self.length}x{self.width}x{self.height} - {self.rate}"
 
+
 class Package(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
@@ -59,62 +60,65 @@ class Package(models.Model):
     dynamic_pricing_enabled = models.BooleanField(default=False)
     discounted_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    original_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)  
+    original_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     shipping_class = models.CharField(max_length=100, default='Standard')
 
-   
     def get_competitor_rate(self):
-    
-     exact_match = CompetitorRate.objects.filter(
-        weight=self.weight, length=self.length, width=self.width, height=self.height
-    ).order_by('rate').first()
+        # Convert all dimensions to Decimal at the start for consistency
+        weight = self.weight
+        length = self.length
+        width = self.width
+        height = self.height
 
-     if exact_match:
-        return exact_match  
+        # Look for exact match in competitor rates
+        exact_match = CompetitorRate.objects.filter(
+            weight=weight, length=length, width=width, height=height
+        ).order_by('rate').first()
 
-     closest_match = CompetitorRate.objects.filter(
-        Q(weight__gte=self.weight - Decimal("0.5"), weight__lte=self.weight + Decimal("0.5")) &
-        Q(length__gte=self.length - Decimal("1"), length__lte=self.length + Decimal("1")) &
-        Q(width__gte=self.width - Decimal("1"), width__lte=self.width + Decimal("1")) &
-        Q(height__gte=self.height - Decimal("1"), height__lte=self.height + Decimal("1"))
-    ).order_by('rate').first()
+        if exact_match:
+            return exact_match
 
-     return closest_match
+        # If no exact match, look for closest match within defined tolerance
+        closest_match = CompetitorRate.objects.filter(
+            Q(weight__gte=weight - Decimal("0.5"), weight__lte=weight + Decimal("0.5")) &
+            Q(length__gte=length - Decimal("1"), length__lte=length + Decimal("1")) &
+            Q(width__gte=width - Decimal("1"), width__lte=width + Decimal("1")) &
+            Q(height__gte=height - Decimal("1"), height__lte=height + Decimal("1"))
+        ).order_by('rate').first()
+
+        return closest_match
 
     def calculate_discounted_price(self):
-     discount_percentage = Decimal(self.discount) / Decimal(100)
-    
-     if self.dynamic_pricing_enabled:
-        competitor_rate = self.get_competitor_rate()
-        
-        if competitor_rate:
-            self.original_price = Decimal(competitor_rate.rate)
+        discount_percentage = self.discount / Decimal(100)
+
+        if self.dynamic_pricing_enabled:
+            competitor_rate = self.get_competitor_rate()
+
+            if competitor_rate:
+                self.original_price = competitor_rate.rate
+            else:
+                # Fallback to estimated pricing if no competitor rate is found
+                self.original_price = self.weight * Decimal(2)
+
+            # Calculate the discounted price and discount amount
             self.discounted_price = self.original_price * (Decimal(1) - discount_percentage)
             self.discount_amount = self.original_price - self.discounted_price
+            self.total_cost = self.discounted_price
         else:
-            # If no competitor rate, fall back to estimated pricing
-            self.original_price = Decimal(self.weight) * Decimal(2)
-            self.discounted_price = self.original_price * (Decimal(1) - discount_percentage)
-            self.discount_amount = self.original_price - self.discounted_price
+            # Static pricing based on weight
+            base_price = Decimal(7) if self.weight <= 4 else self.weight * Decimal(2)
+            self.original_price = base_price
+            self.discount_amount = base_price * discount_percentage
+            self.discounted_price = base_price - self.discount_amount
+            self.total_cost = self.discounted_price
 
-        self.total_cost = self.discounted_price
-     else:
-        base_price = Decimal(7) if self.weight <= 4 else Decimal(self.weight) * Decimal(2)
-        self.original_price = base_price
-        self.discount_amount = base_price * discount_percentage
-        self.discounted_price = base_price - self.discount_amount
-        self.total_cost = self.discounted_price
-
-    # Ensure no NULL values
-     if self.discounted_price is None:
-        self.discounted_price = Decimal(0)
-     if self.discount_amount is None:
-        self.discount_amount = Decimal(0)
-     if self.total_cost is None:
-        self.total_cost = Decimal(0)
+        # Ensure no NULL values
+        self.discounted_price = self.discounted_price or Decimal(0)
+        self.discount_amount = self.discount_amount or Decimal(0)
+        self.total_cost = self.total_cost or Decimal(0)
 
     def save(self, *args, **kwargs):
-        self.calculate_discounted_price() 
+        self.calculate_discounted_price()
         super().save(*args, **kwargs)
 
     def __str__(self):
