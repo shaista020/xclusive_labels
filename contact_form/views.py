@@ -591,7 +591,7 @@ def handle_uploaded_file(request):
 
             elapsed_time = time.time() - start_time
             return render(request, 'Admin/upload.html', {
-                'success_message': f"Successfully processed {processed_rows} rows in {elapsed_time:.2f} seconds."
+                'success_message': f"Successfully uploaded the file."
             })
         
         except Exception as e:
@@ -601,10 +601,9 @@ def handle_uploaded_file(request):
 
 
 def find_closest_competitor_rate(weight, length, width, height):
-    """Find the closest competitor rate based on dimensions and weight."""
     closest_rate = CompetitorRate.objects.filter(
         weight=weight, length=length, width=width, height=height
-    ).order_by('rate').first()  # Get the lowest matching rate
+    ).order_by('rate').first()  
 
     return closest_rate
 
@@ -623,8 +622,6 @@ def create_package(request):
 
             if weight <= 0 or length <= 0 or width <= 0 or height <= 0:
                 raise ValueError("All dimensions and weight must be positive numbers.")
-
-            # Create or update the package
             new_package = Package(
                 user=request.user, name=name, weight=weight, length=length,
                 width=width, height=height, dynamic_pricing_enabled=dynamic_pricing_enabled,
@@ -632,7 +629,6 @@ def create_package(request):
             )
             new_package.save()
 
-            # Debugging output for total cost
             print(f"Package Created: {new_package.name}, Total Cost: {new_package.total_cost}")
 
             return redirect('/packages_admin')

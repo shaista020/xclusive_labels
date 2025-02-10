@@ -18,6 +18,8 @@ from django.contrib.auth.decorators import login_required
 from datetime import date
 from contact_form.models import *
 from decimal import Decimal
+
+
 class BatchView(APIView):
     def get(self, request, pk=None):
         if pk:
@@ -448,33 +450,33 @@ def update_discount(request):
 
     return redirect('/packages_admin')
 
-
-from decimal import Decimal
-
 @login_required
 def edit_package(request, package_id):
     package = get_object_or_404(Package, id=package_id, user=request.user)
 
     if request.method == "POST":
-       
-        package.name = request.POST.get('name')
-        package.weight = Decimal(request.POST.get('weight'))
-        package.length = Decimal(request.POST.get('length'))
-        package.width = Decimal(request.POST.get('width'))
-        package.height = Decimal(request.POST.get('height'))
-        package.discount = Decimal(request.POST.get('discount'))
-        
-        dynamic_pricing_enabled = 'dynamic_pricing_enabled' in request.POST
-        package.dynamic_pricing_enabled = dynamic_pricing_enabled
+        try:
+            package.name = request.POST.get('name').strip()
+            package.weight = Decimal(str(request.POST.get('weight')))
+            package.length = Decimal(str(request.POST.get('length')))
+            package.width = Decimal(str(request.POST.get('width')))
+            package.height = Decimal(str(request.POST.get('height')))
+            package.discount = Decimal(str(request.POST.get('discount')))
+            volume = package.length * package.width * package.height
+            package.dynamic_pricing_enabled = 'dynamic_pricing_enabled' in request.POST
 
-        volume = package.length * package.width * package.height
+            if package.dynamic_pricing_enabled:
+                discount_amount = (volume * package.discount) / Decimal(100)
+                package.total_cost = volume - discount_amount  
+            else:
+                package.total_cost = volume
 
-        if package.dynamic_pricing_enabled:
-            package.total_cost = volume - (volume * package.discount / Decimal(100))
-        else:
-            package.total_cost = volume  
-        package.save()
-        return redirect('/packages_admin')
+            package.save()
+            return redirect('/packages_admin')
+
+        except Exception as e:
+            print(f"Error: {e}")  
+            return render(request, 'Admin/edit_package.html', {'package': package, 'error': "Invalid input."})
 
     return render(request, 'Admin/edit_package.html', {'package': package})
 

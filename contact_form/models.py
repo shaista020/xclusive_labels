@@ -5,6 +5,11 @@ from django.db.models import F, ExpressionWrapper, FloatField
 from django.db.models.functions import Abs
 from decimal import Decimal
 User = settings.AUTH_USER_MODEL
+from decimal import Decimal
+from django.db import models
+# from django.contrib.auth.models import User
+from django.db.models import F, ExpressionWrapper, DecimalField
+from django.db.models.functions import Abs
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -39,29 +44,31 @@ class CompetitorRate(models.Model):
 class Package(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    weight = models.FloatField()
-    length = models.FloatField()
-    width = models.FloatField()
-    height = models.FloatField()
+    weight = models.DecimalField(max_digits=10, decimal_places=2)
+    length = models.DecimalField(max_digits=10, decimal_places=2)
+    width = models.DecimalField(max_digits=10, decimal_places=2)
+    height = models.DecimalField(max_digits=10, decimal_places=2)
+    discount = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    total_cost = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     dynamic_pricing_enabled = models.BooleanField(default=False)
-    discount = models.FloatField(default=20) 
+    
     discounted_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    total_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     original_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)  
     shipping_class = models.CharField(max_length=100, default='Standard')
 
     def get_competitor_rate(self):
         closest_rate = CompetitorRate.objects.annotate(
-            weight_diff=Abs(F("weight") - self.weight),
-            length_diff=Abs(F("length") - self.length),
-            width_diff=Abs(F("width") - self.width),
-            height_diff=Abs(F("height") - self.height),
+            weight_diff=Abs(ExpressionWrapper(F("weight") - F("weight"), output_field=DecimalField())),
+            length_diff=Abs(ExpressionWrapper(F("length") - F("length"), output_field=DecimalField())),
+            width_diff=Abs(ExpressionWrapper(F("width") - F("width"), output_field=DecimalField())),
+            height_diff=Abs(ExpressionWrapper(F("height") - F("height"), output_field=DecimalField())),
             total_diff=ExpressionWrapper(
                 F("weight_diff") + F("length_diff") + F("width_diff") + F("height_diff"),
-                output_field=FloatField()
+                output_field=DecimalField()
             )
         ).order_by("total_diff").first()  
+
         return closest_rate
 
     def calculate_discounted_price(self):
@@ -73,16 +80,16 @@ class Package(models.Model):
             competitor_rate = self.get_competitor_rate()
 
             if competitor_rate:
-                competitor_rate_value = Decimal(competitor_rate.rate)
+                competitor_rate_value = Decimal(competitor_rate.rate)  # Ensure it's a Decimal
                 self.original_price = competitor_rate_value  
-                self.discounted_price = competitor_rate_value * (1 - discount_percentage)
+                self.discounted_price = competitor_rate_value * (Decimal(1) - discount_percentage)
                 self.discount_amount = competitor_rate_value - self.discounted_price
 
                 print(f"Dynamic Pricing Enabled - Competitor Rate: {competitor_rate_value}")
                 print(f"Discount Applied: {self.discount}% → Discounted Price: {self.discounted_price}")
 
             else:
-                self.original_price = Decimal(self.weight * 2)  
+                self.original_price = Decimal(self.weight) * Decimal(2)  # Convert weight to Decimal
                 self.discounted_price = None
                 self.discount_amount = None
                 print("No competitor rate found, using fallback pricing.")
@@ -91,9 +98,9 @@ class Package(models.Model):
 
         else:
             if self.weight <= 4:
-                base_price = Decimal(7)
+                base_price = Decimal(7)  # Ensure it's a Decimal
             else:
-                base_price = Decimal(self.weight * 2)
+                base_price = Decimal(self.weight) * Decimal(2)  # Convert weight to Decimal
 
             self.original_price = base_price
             self.discount_amount = base_price * discount_percentage
