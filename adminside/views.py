@@ -432,8 +432,6 @@ def update_discount(request):
             package = get_object_or_404(Package, id=package_id, user=request.user)
 
             package.discount = Decimal(discount)
-
-            # Convert float values to Decimal before multiplication
             length = Decimal(str(package.length))
             width = Decimal(str(package.width))
             height = Decimal(str(package.height))

@@ -571,11 +571,8 @@ def handle_uploaded_file(request):
         try:
             with open(fs.path(file_path), mode='r') as file:
                 reader = csv.DictReader(file)
-
-                processed_rows = 0
+                bulk_create_list = []
                 for row in reader:
-                    if processed_rows >= 100:
-                        break  
                     weight = float(row.get('Weight', 0))
                     length = float(row.get('Length', 0))
                     width = float(row.get('Width', 0))
@@ -583,29 +580,18 @@ def handle_uploaded_file(request):
                     rate = float(row.get('Rate', 0))
                     shipping_class = row.get('Shipping Class', 'Unknown')
 
-                    CompetitorRate.objects.create(
+                    bulk_create_list.append(CompetitorRate(
                         weight=weight, length=length, width=width,
                         height=height, rate=rate, shipping_class=shipping_class
-                    )
-                    processed_rows += 1
+                    ))
+                CompetitorRate.objects.bulk_create(bulk_create_list)
 
-            elapsed_time = time.time() - start_time
             return render(request, 'Admin/upload.html', {
-                'success_message': f"Successfully uploaded the file."
+                'success_message': f"Successfully uploaded {len(bulk_create_list)} rows."
             })
-        
         except Exception as e:
             return HttpResponse(f"Error processing CSV: {e}", status=500)
-
     return render(request, 'Admin/upload.html')
-
-
-def find_closest_competitor_rate(weight, length, width, height):
-    closest_rate = CompetitorRate.objects.filter(
-        weight=weight, length=length, width=width, height=height
-    ).order_by('rate').first()  
-
-    return closest_rate
 
 @login_required
 def create_package(request):
@@ -617,35 +603,44 @@ def create_package(request):
             width = float(request.POST.get('width', 0))
             height = float(request.POST.get('height', 0))
             dynamic_pricing_enabled = request.POST.get('dynamic_pricing_enabled', 'off') == 'on'
-            discount_percentage = float(request.POST.get('dynamic_pricing_discount', 20))
             shipping_class = request.POST.get('shipping_class', 'Standard')
+            
+            discount_percentage_obj = ShippingClassDiscount.objects.filter(shipping_class=shipping_class).first()
+            discount_percentage = discount_percentage_obj.discount_percentage if discount_percentage_obj else 20
 
-            if weight <= 0 or length <= 0 or width <= 0 or height <= 0:
-                raise ValueError("All dimensions and weight must be positive numbers.")
+            # print(f"Creating package: {name}, {weight} lbs, {length}x{width}x{height}")
+            # print(f"Dynamic Pricing: {dynamic_pricing_enabled}, Shipping Class: {shipping_class}, Discount: {discount_percentage}%")
+
             new_package = Package(
                 user=request.user, name=name, weight=weight, length=length,
                 width=width, height=height, dynamic_pricing_enabled=dynamic_pricing_enabled,
                 discount=discount_percentage, shipping_class=shipping_class
             )
+
+            if dynamic_pricing_enabled:
+                competitor_rate = new_package.get_competitor_rate()
+                
+                if competitor_rate:
+                    print(f"Competitor Rate Found: {competitor_rate.rate} for {competitor_rate.length}x{competitor_rate.width}x{competitor_rate.height}")
+                else:
+                    print("No exact competitor rate found. Using estimated base pricing.")
+
+                new_package.calculate_discounted_price()
+
+                # print(f"Calculated Prices - Original: {new_package.original_price}, "
+                #       f"Discounted: {new_package.discounted_price}, "
+                #       f"Discount Amount: {new_package.discount_amount}")
+
             new_package.save()
-
-            print(f"Package Created: {new_package.name}, Total Cost: {new_package.total_cost}")
-
             return redirect('/packages_admin')
 
-        except ValueError as e:
+        except Exception as e:
+            print(f"Error in create_package: {str(e)}")
             return render(request, "Admin/Packages.html", {
                 "error": str(e), "packages": Package.objects.filter(user=request.user),
             })
-        except Exception as e:
-            print(f"Error occurred: {str(e)}")  # Debugging error output
-            return render(request, "Admin/Packages.html", {
-                "error": "An error occurred. Please try again.", "packages": Package.objects.filter(user=request.user),
-            })
 
-    return render(request, "Admin/Packages.html", {
-        "packages": Package.objects.filter(user=request.user),
-    })
+    return render(request, "Admin/Packages.html", {"packages": Package.objects.filter(user=request.user)})
 
 
 @login_required(login_url="/auth/signin/")
