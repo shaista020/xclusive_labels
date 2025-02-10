@@ -65,105 +65,12 @@
         <p class="mb-0">Thank you for your business with us!</p>
       </div>
       <div class="text-center mt-4">
-        <a href="{% url 'orders_admin' %}" class="btn btn-secondary">Back to the Orders</a>
-      </div>
-      <div class="text-center mt-4">
-        <button id="download-pdf" class="btn btn-primary">Download PDF</button>
-      </div>
+        <a href="{% url 'orders_admin' %}" class="btn btn-secondary">Back to Orders</a>
+        <a href="{% url 'generate_pdf' order.id %}" class="btn btn-primary">Download PDF</a>
+    </div>
     </div>
   </div>
-  <script>
-document.getElementById("download-pdf").addEventListener("click", function () {
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF();
-
-  // Styling variables
-  const leftMargin = 20;
-  const rightMargin = 145;
-  const centerX = 105; // Center of the page
-  let currentY = 20;
-  const lineSpacing = 10;
-
-  // Title
-  pdf.setFontSize(16);
-  pdf.setFont("helvetica", "bold");
-  pdf.text("Order Receipt", leftMargin, currentY);
-
-  // Add a line below the title
-  currentY += 0.5* lineSpacing;
-  pdf.setLineWidth(0.5);
-  pdf.line(leftMargin, currentY, 190, currentY); // Horizontal line
-  currentY += 2 * lineSpacing;
-
-  // Reset font for content
-  pdf.setFontSize(14);
-  pdf.setFont("helvetica", "bold");
-
-  // Content with labels and values
-  pdf.text("Order ID:", leftMargin, currentY);
-  pdf.setFont("helvetica", "normal");
-  pdf.text(`{{ order.id }}`, centerX, currentY, { align: 'center' });
-  currentY += lineSpacing;
-
-  pdf.setFont("helvetica", "bold");
-  pdf.text("Order Date:", leftMargin, currentY);
-  pdf.setFont("helvetica", "normal");
-  pdf.text(`{{ order.created_at|date:'Y-m-d H:i:s' }}`, centerX, currentY, { leftMargin: '150px' });
-  currentY += lineSpacing;
-
-  pdf.setFont("helvetica", "bold");
-  pdf.text("Batch Number:", leftMargin, currentY);
-  pdf.setFont("helvetica", "normal");
-  pdf.text(`{{ order.batch_number }}`, centerX, currentY, { leftMargin: '120px' });
-  currentY += lineSpacing;
-
-  pdf.setFont("helvetica", "bold");
-  pdf.text("Tracking Number:", leftMargin, currentY);
-  pdf.setFont("helvetica", "normal");
-  pdf.text(`{{ order.tracking_number }}`, centerX, currentY, { leftMargin: '120px' });
-  currentY += lineSpacing;
-
-  pdf.setFont("helvetica", "bold");
-  pdf.text("User Name:", leftMargin, currentY);
-  pdf.setFont("helvetica", "normal");
-  pdf.text(`{{ order.name }}`, centerX, currentY, { leftMargin: '150px' });
-  currentY += lineSpacing;
-
-  pdf.setFont("helvetica", "bold");
-  pdf.text("Order Type:", leftMargin, currentY);
-  pdf.setFont("helvetica", "normal");
-  pdf.text(`{{ order.type }}`, centerX, currentY, { leftMargin: '150px' });
-  currentY += lineSpacing;
-
-  pdf.setFont("helvetica", "bold");
-  pdf.text("Order Weight:", leftMargin, currentY);
-  pdf.setFont("helvetica", "normal");
-  pdf.text(`{{ order.weight }} kg`, centerX, currentY, { leftMargin: '150px' });
-  currentY += lineSpacing;
-
-  pdf.setFont("helvetica", "bold");
-  pdf.text("Order Cost:", leftMargin, currentY);
-  pdf.setFont("helvetica", "normal");
-  pdf.text(`${{ order.cost }}`, centerX, currentY, { leftMargin: '150px' });
-  currentY += lineSpacing;
-
-  pdf.setFont("helvetica", "bold");
-  pdf.text("Order Status:", leftMargin, currentY);
-  pdf.setFont("helvetica", "normal");
-  pdf.text(`{{ order.get_status_display }}`, centerX, currentY, { leftMargin: '150px' });
-  currentY += lineSpacing;
-
-  // Add a footer for a professional touch
-  currentY += 5 * lineSpacing;
-  pdf.setFont("helvetica", "italic");
-  pdf.setFontSize(10);
-  pdf.text("Thank you for your order!", rightMargin, currentY);
-
-  // Save the generated PDF with a dynamic filename
-  pdf.save(`receipt_{{ order.id }}.pdf`);
-});
-
-  </script>
+ 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
