@@ -276,12 +276,11 @@
               <table class="table table-hover" id="user">
                 <thead>
                     <tr>
-                        <th>Package Name</th>
+                        <th>Name</th>
                         <th>Weight</th>
-                        <th>Length</th>
-                        <th>Width</th>
-                        <th>Height</th>
-                        <th>Discount (%)</th>
+                        <th>Dimensions</th>
+                        <th>Pricing Type</th>
+                        <th>Discount</th>
                         <th>Total Cost</th>
                         <th>Actions</th>
                     </tr>
@@ -290,22 +289,34 @@
                     {% for package in packages %}
                     <tr>
                         <td>{{ package.name }}</td>
-                        <td>{{ package.weight }}</td>
-                        <td>{{ package.length }}</td>
-                        <td>{{ package.width }}</td>
-                        <td>{{ package.height }}</td>
-                        <td  data-bs-toggle="modal" 
-                        data-bs-target="#editModal" 
-                        data-id="{{ package.id }}" 
-                        data-discount="{{ package.discount }}">{{ package.discount }}%</td>
-                        <td>{{ package.total_cost }}</td>
+                        <td>{{ package.weight }} lbs</td>
+                        <td>{{ package.length }}x{{ package.width }}x{{ package.height }}</td>
                         <td>
-                          <a href="{% url 'edit_package' package.id %}" class="btn btn-primary">Edit</a>
+                          {% if package.dynamic_pricing_enabled %}
+                              Dynamic
+                          {% else %}
+                              Standard
+                          {% endif %}
                       </td>
+                      
+                      <td>
+                        <span data-bs-toggle="modal" 
+                              data-bs-target="#editModal" 
+                              data-id="{{ package.id }}" 
+                              data-discount="{{ package.discount }}">
+                            {{ package.discount|default:"0" }}%
+                        </span>
+                    </td>
+                        <td>${{ package.total_cost|default:"0.00"|floatformat:2 }}</td>
+                        <td>
+                            <a href="{% url 'edit_package' package.id %}" class="btn btn-primary">Edit</a>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            
+            
 <!-- Edit Discount Modal -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -362,9 +373,10 @@
            
               </div>
         </div>
+        
         <div id="createPackage" style="display: none">
           <div style="margin-left:2rem ;">
-
+           
             <h2>Create Saved Package</h2>
             <div style="display: flex">
               <div>
@@ -407,34 +419,49 @@
                 Create Saved Package </a>
             </div>
           </div>
-          <form action="/create_package" method="POST">
+         
+        
+          <form action="/create_package" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
-          <div class="card ship ">
-            <label>Name</label>
-            <input class="form-control" id="name" name="name" type="text" required value="" />
-
-            <label>Weight</label>
-            <input class="form-control" name="weight" type="number" required value="" />
-            <div>
-              <label>Type</label>
-              <input type="radio" name="lb" name="weightUnit" value="lb" />
-              <label for="lb">lb</label>
-              <input type="radio" name="oz" name="weightUnit" value="oz" checked />
-              <label for="oz">oz</label>
+            <div class="card ship">
+                <!-- Package Details -->
+                <label>Name</label>
+                <input class="form-control" id="name" name="name" type="text" required value="" />
+        
+                <label>Weight</label>
+                <input class="form-control" name="weight" type="number" required value="" />
+        
+                <div>
+                    <label>Type</label>
+                    <input type="radio" name="lb" value="lb" />
+                    <label for="lb">lb</label>
+                    <input type="radio" name="oz" value="oz" checked />
+                    <label for="oz">oz</label>
+                </div>
+        
+                <label>Length (inch)</label>
+                <input class="form-control" name="length" type="number" required value="" />
+        
+                <label>Width (inch)</label>
+                <input class="form-control" name="width" type="number" required value="" />
+        
+                <label>Height (inch)</label>
+                <input class="form-control" name="height" type="number" required value="" />
+        
+                <!-- Dynamic Pricing Settings -->
+                <label>Enable Dynamic Pricing</label>
+                <input type="checkbox" name="dynamic_pricing_enabled" value="on" />
+        
+                <label>Dynamic Pricing Discount (%)</label>
+                <input class="form-control" type="number" name="dynamic_pricing_discount" value="20" />
+        
+              
+                <button class="form-control btn btn-dark" style="width: fit-content; padding: 15px 30px; margin-top: 20px;">
+                    Save Package
+                </button>
             </div>
-            <label>Length (inch)</label>
-            <input class="form-control" name="length" type="number" required value="" />
-
-            <label>Width (inch)</label>
-            <input class="form-control" name="width" type="number" required value="" />
-
-            <label>Height (inch)</label>
-            <input class="form-control" name="height" type="number" required value="" />
-
-            <button class="form-control btn btn-dark" 
-              style="width: fit-content; padding: 15px 30px; margin-top: 20px;"> Save Package</button>
-          </div>
         </form>
+        
         </div>
       </main>
     </div>

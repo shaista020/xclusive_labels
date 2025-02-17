@@ -21,7 +21,16 @@ from django.shortcuts import get_object_or_404, render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import get_user_model
-
+import csv
+import time
+from django.http import HttpResponse
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+from django.db.models import Sum
+from decimal import Decimal
+from django.template.loader import get_template
+from xhtml2pdf import pisa
+import os
 
 
 class ContactInfoView(APIView):
@@ -328,29 +337,19 @@ class DeleteAccountView(APIView):
     def delete(self, request):
         user = request.user
         user.delete()
-from django.db.models import Sum
-from django.db.models import Sum
-from decimal import Decimal
 
 def referrals_view(request):
-    # Fetch referrals made by the logged-in user
     referrals = User.objects.filter(referred_by=request.user)
-
-    # Calculate total commission from referrals and the user's own balance
     referral_commission = referrals.aggregate(Sum('available_for_withdraw'))['available_for_withdraw__sum'] or Decimal('0.00')
     user_own_commission = request.user.available_for_withdraw
-
-    # Combine both to get the total commission
     total_commission = referral_commission + user_own_commission
-
-    # Generate the referral link
     referral_link = request.build_absolute_uri(f'/auth/signup/?referral_code={request.user.referral_code}')
 
     context = {
         'referrals': referrals,
-        'referral_commission': referral_commission,  # Commission from referrals
-        'user_own_commission': user_own_commission,  # The logged-in user's own earnings
-        'total_commission': total_commission,       # Combined total commission
+        'referral_commission': referral_commission,  
+        'user_own_commission': user_own_commission,  
+        'total_commission': total_commission,     
         'referral_link': referral_link,
     }
 
@@ -403,10 +402,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
 
 
 class newLabelView(APIView):
-    """
-    Handles CRUD operations for Labels.
-    Admins can see all labels; regular users can only see their own labels.
-    """
+   
 
     def get(self, request, pk=None):
         user = request.user 
@@ -439,9 +435,7 @@ class newLabelView(APIView):
             return Response(serializer.data)
 
     def post(self, request):
-        """
-        Create a new label. Associates the label with the logged-in user.
-        """
+        
         data = request.data
         data['user'] = request.user.id 
         serializer = LabelSerializer(data=data)
@@ -451,9 +445,6 @@ class newLabelView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request, pk):
-        """
-        Update a label. Only admins or label owners can update.
-        """
         try:
             label = NewLabel.objects.get(pk=pk)
 
@@ -474,9 +465,7 @@ class newLabelView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-        """
-        Delete a label. Only admins or label owners can delete.
-        """
+       
         try:
             label = NewLabel.objects.get(pk=pk)
             if not (request.user.is_staff or label.user == request.user):
@@ -507,7 +496,6 @@ def dashboard(request):
 
 @login_required(login_url="/auth/signin/")
 def orders(request):
-    # Filter orders based on the logged-in user
     user_orders = Order.objects.filter(created_by=request.user)
     return render(request, 'User/order.html', {"orders": user_orders})
 
@@ -531,16 +519,12 @@ def create_order(request):
         if request.user.is_authenticated:
             user = request.user
 
-            # Fetch the NewLabel instance
             new_label_instance = get_object_or_404(NewLabel, id=new_label_id)
-
-            # Automatically generate tracking number
-            tracking_no = str(uuid.uuid4()).replace("-", "").upper()[:12]  # Generate unique 12-character tracking number
-
-            # Create the Order
+            tracking_no = str(uuid.uuid4()).replace("-", "").upper()[:12] 
+            
             new_order = Order(
                 new_label=new_label_instance,
-                tracking_number=tracking_no,  # Automatically assigned
+                tracking_number=tracking_no,  
                 batch_number=batch_no,
                 name=name,
                 type=order_type,
@@ -550,7 +534,6 @@ def create_order(request):
             )
             new_order.save()
 
-            # Redirect to the orders list
             return redirect('/orders')
     
     return render(request, "User/create_order.html", {'new_label': new_labels})
@@ -571,54 +554,86 @@ def payment(request):
 @login_required(login_url="/auth/signin/")
 def referral(request):
     return render(request,'User/Referrals.html')
-
-@login_required(login_url="/auth/signin/")
 def package(request):
+    search_query = request.GET.get('search', '')  
     packages = Package.objects.all()
-    for package in packages:
-        package.original_price = package.weight * package.length * package.width * package.height
-    
-    print("user-pkjs:" ,packages)
-    return render(request,'User/savedPackages.html', {'packages':packages})
+    if search_query:
+        packages = packages.filter(name__icontains=search_query)  
+    return render(request, 'User/savedPackages.html', {'packages': packages})
 
+def handle_uploaded_file(request):
+    if request.method == 'POST' and request.FILES.get('csv_file'):
+        csv_file = request.FILES['csv_file']
+        fs = FileSystemStorage()
+        file_path = fs.save(csv_file.name, csv_file)
 
-@login_required 
+        start_time = time.time()
+        try:
+            with open(fs.path(file_path), mode='r') as file:
+                reader = csv.DictReader(file)
+                bulk_create_list = []
+                for row in reader:
+                    weight = float(row.get('Weight', 0))
+                    length = float(row.get('Length', 0))
+                    width = float(row.get('Width', 0))
+                    height = float(row.get('Height', 0))
+                    rate = float(row.get('Rate', 0))
+                    shipping_class = row.get('Shipping Class', 'Unknown')
+
+                    bulk_create_list.append(CompetitorRate(
+                        weight=weight, length=length, width=width,
+                        height=height, rate=rate, shipping_class=shipping_class
+                    ))
+                CompetitorRate.objects.bulk_create(bulk_create_list)
+
+            return render(request, 'Admin/upload.html', {
+                'success_message': f"Successfully uploaded {len(bulk_create_list)} rows."
+            })
+        except Exception as e:
+            return HttpResponse(f"Error processing CSV: {e}", status=500)
+    return render(request, 'Admin/upload.html')
+
+@login_required
 def create_package(request):
     if request.method == "POST":
         try:
-           
             name = request.POST.get('name', '').strip()
-            weight = float(request.POST.get('weight', 0))
-            length = float(request.POST.get('length', 0))
-            width = float(request.POST.get('width', 0))
-            height = float(request.POST.get('height', 0))
-
-            if weight <= 0 or length <= 0 or width <= 0 or height <= 0:
-                raise ValueError("All dimensions and weight must be positive numbers.")
+            weight = Decimal(request.POST.get('weight', 0))  # Convert to Decimal
+            length = Decimal(request.POST.get('length', 0))  # Convert to Decimal
+            width = Decimal(request.POST.get('width', 0))    # Convert to Decimal
+            height = Decimal(request.POST.get('height', 0))  # Convert to Decimal
+            dynamic_pricing_enabled = request.POST.get('dynamic_pricing_enabled', 'off') == 'on'
+            shipping_class = request.POST.get('shipping_class', 'Standard')
+            
+            discount_percentage_obj = ShippingClassDiscount.objects.filter(shipping_class=shipping_class).first()
+            discount_percentage = discount_percentage_obj.discount_percentage if discount_percentage_obj else 20
 
             new_package = Package(
-                user=request.user,
-                name=name,
-                weight=weight,
-                length=length,
-                width=width,
-                height=height,
+                user=request.user, name=name, weight=weight, length=length,
+                width=width, height=height, dynamic_pricing_enabled=dynamic_pricing_enabled,
+                discount=discount_percentage, shipping_class=shipping_class
             )
-            new_package.save()
 
+            if dynamic_pricing_enabled:
+                competitor_rate = new_package.get_competitor_rate()
+                
+                if competitor_rate:
+                    print(f"Competitor Rate Found: {competitor_rate.rate} for {competitor_rate.length}x{competitor_rate.width}x{competitor_rate.height}")
+                else:
+                    print("No exact competitor rate found. Using estimated base pricing.")
+
+                new_package.calculate_discounted_price()
+
+            new_package.save()
             return redirect('/packages_admin')
 
-        except ValueError as e:
-           
-            return render(request, "User/savedPackages.html", {
-                "error": str(e),
-                "packages": Package.objects.filter(user=request.user),  
+        except Exception as e:
+            print(f"Error in create_package: {str(e)}")
+            return render(request, "Admin/Packages.html", {
+                "error": str(e), "packages": Package.objects.filter(user=request.user),
             })
 
-    packages = Package.objects.filter(user=request.user)  
-    return render(request, "User/savedPackages.html", {
-        "packages": packages,
-    })
+    return render(request, "Admin/Packages.html", {"packages": Package.objects.filter(user=request.user)})
 
 
 @login_required(login_url="/auth/signin/")
@@ -676,9 +691,6 @@ def supports(request):
 
 @csrf_exempt
 def close_ticket(request, ticket_id):
-    """
-    Endpoint to mark a ticket as closed.
-    """
     if request.method == "POST":
         ticket = get_object_or_404(Ticket, id=ticket_id)
         ticket.status = "Closed"
@@ -750,3 +762,39 @@ def orders_admin(request):
 def view_receipt_admin(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     return render(request, 'Admin/receipt.html', {"order": order})
+
+
+
+def generate_pdf(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id)
+
+        user_name = request.user.username if request.user.is_authenticated else "Guest"
+
+        context = {
+    'order': order,
+    'user_name': user_name,  
+    'company_logo': request.build_absolute_uri(settings.MEDIA_URL + 'images/logo1.png'),
+    'company_name': 'Pirate Ship',
+    'ship_from_address': order.new_label.ship_from.address,
+    'ship_from_city': order.new_label.ship_from.city,
+    'ship_from_state': order.new_label.ship_from.state,
+    'ship_from_zip_code': order.new_label.ship_from.zip_code
+}
+
+
+        template = get_template('User/receipt_template.html')
+        html = template.render(context)
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="order_{order.id}_receipt.pdf"'
+
+        pisa_status = pisa.CreatePDF(html, dest=response)
+
+        if pisa_status.err:
+            return HttpResponse('We had an error generating your PDF', status=500)
+
+        return response
+
+    except Exception as e:
+        return HttpResponse(f'Internal Server Error: {str(e)}', status=500)

@@ -176,7 +176,7 @@
       margin: 0;
       max-width: 250px;  /* Adjust the max-width for smaller cards */
       padding: 0;
-      height: 320px;
+      height: 390px;
       margin-bottom: -30px;
     }
     .card-header {
@@ -391,69 +391,96 @@
 
           <div class="card mt-5">
             <div class="container mt-2">
-              <div class="input-group search-bar">
-                <input 
-                  type="search" 
-                  name="search" 
-                  class=" search-input" 
-                  value=""  
-                  placeholder="Search packages..."
-                />
-                <button 
-                  class="btn btn-dark search-button" 
-                  type="button">
-                  Search
-                </button>
-              </div>
-              
+             
+              <form method="GET" >
+                <div class="input-group mb-3 input-group search-bar">
+                    <input type="text"  class=" search-input"  class="form-control" placeholder="Search for packages..." name="search" value="{{ request.GET.search }}">
+                    <button class="btn btn-dark" type="submit">Search</button>
+                </div>
+              </form>
               <div class="row">
-                  {% for package in packages %}
-                      <div class="col-md-3 mb-5">
-                          <div class="cards shadow-sm border-custom rounded-lg overflow-hidden">
-                              <div class="card-header bg-light py-3 position-relative">
-                                  <!-- Package Name -->
-                                  <h5 class="card-title text-dark font-weight-bold mb-0">{{ package.name }}</h5>
-                                  
-                                  <!-- Original Price (Before Discount) -->
-                                  <div class="original-price position-absolute top-0 end-0 p-1">
-                                      <span class="text-muted text-decoration-line-through">
-                                          ${{ package.calculate_original_price|floatformat:2 }} 
-                                      </span>
-                                  </div>
-                                  <!-- Discounted Price -->
-                                  <h5 class="text-dark font-weight-bold position-absolute top-30 end-0 translate-middle-y p-1">
-                                      ${{ package.total_cost|floatformat:2 }}
-                                  </h5>
-                             </div>
-                              <div class="card-body p-3 cards shadow-sm border-custom rounded-lg overflow-hidden">
+                {% for package in packages %}
+                    <div class="col-md-3 mb-5">
+                        <div class="cards shadow-sm border-custom rounded-lg overflow-hidden">
+                            <div class="card-header bg-light py-3 position-relative">
+                                <!-- Package Name -->
+                                <h5 class="card-title text-dark font-weight-bold mb-0">{{ package.name }}</h5>
+            
+                                <!-- Original Price (Before Discount) -->
+                                <div class="original-price position-absolute top-0 end-0 p-1">
+                                    {% if package.dynamic_pricing_enabled %}
+                                        <span class="text-muted text-decoration-line-through">
+                                            ${{ package.original_price|floatformat:2 }}  <!-- Show original price if dynamic pricing enabled -->
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted text-decoration-line-through">
+                                            ${{ package.original_price|floatformat:2 }}  <!-- Fallback for flat rate -->
+                                        </span>
+                                    {% endif %}
+                                </div>
+            
+                                <!-- Discounted Price -->
+                                <h5 class="text-dark font-weight-bold position-absolute top-30 end-0 translate-middle-y p-1">
+                                    ${{package.total_cost|default:"0.00"|floatformat:2 }}
+                                </h5>
+                            </div>
+            
+                            <div class="card-body p-3 cards shadow-sm rounded-lg overflow-hidden">
                                 <div class="card-details">
-                                  <div class="card-detail">
-                                    <strong>Weight:</strong> <span>{{ package.weight }}</span>
-                                  </div>
-                                  <div class="card-detail">
-                                    <strong>Length:</strong> <span>{{ package.length }}</span>
-                                  </div>
-                                  <div class="card-detail">
-                                    <strong>Width:</strong> <span>{{ package.width }}</span>
-                                  </div>
-                                  <div class="card-detail">
-                                    <strong>Height:</strong> <span>{{ package.height }}</span>
-                                  </div>
-                                  <div class="card-detail">
-                                    <strong>Discount:</strong> <span>{{ package.discount }}%</span>
-                                  </div>
+                                    <div class="card-detail">
+                                        <strong>Weight:</strong> <span>{{ package.weight }} lbs
+                                    </div>
+                                    <div class="card-detail">
+                                        <strong>Length:</strong> <span>{{ package.length }} in
+                                    </div>
+                                    <div class="card-detail">
+                                        <strong>Width:</strong> <span>{{ package.width }} in
+                                    </div>
+                                    <div class="card-detail">
+                                        <strong>Height:</strong> <span>{{ package.height }} in
+                                    </div>
+                                    <div class="card-detail">
+                                        <strong>Discount:</strong> <span>{{ package.discount }}%
+                                    </div>
+                                    <!-- {% if package.shipping_class %}
+                                        <div class="card-detail">
+                                            <strong>Shipping Class:</strong> <span>{{ package.shipping_class }}
+                                        </div>
+                                    {% endif %} -->
+                                    <div class="card-detail">
+                                        <strong>Pricing Type:</strong> <span>
+                                            {% if package.dynamic_pricing_enabled %}
+                                                Dynamic
+                                            {% else %}
+                                                Standard
+                                            {% endif %}
+                                        
+                                    </div>
                                 </div>
+            
+                                {% if package.dynamic_pricing_enabled %}
+                                    <div class="card-footer text-center p-2">
+                                        <span>You Save: ${{ package.discount_amount|floatformat:2 }}
+                                    </div>
+                                {% endif %}
+            
                                 <div class="card-footer text-center p-2">
-                                  <a href="/newLable" class="btn btn-dark btn-block select rounded-pill py-1 px-3">
-                                    <strong>Select</strong>
-                                  </a>
+                                    <a href="/newLable" class="btn btn-dark btn-block select rounded-pill py-1 px-3">
+                                        <strong>Select</strong>
+                                    </a>
                                 </div>
-                              </div>
-                              
-                          </div>
-                      </div>
-                  {% endfor %}
-              </div>
+            
+                                <!-- Edit Button for Future Updates -->
+                               
+                            </div>
+            
+                            <!-- Option to delete or update -->
+                            
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
           </div>             
        </div>
         </div>
@@ -502,6 +529,7 @@
                 Create Saved Package </a>
             </div>
           </div>
+          
           <form action="/create_package" method="POST">
             {% csrf_token %}
           <div class="card ship ">
