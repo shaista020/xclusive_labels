@@ -728,7 +728,7 @@ def submit_view_tickets_user(request):
 def newLable(request):
     package= Package.objects.all()
     return render(request,'User/newLable.html',{"packages":package})
-
+ 
 @login_required(login_url="/auth/signin/")
 def contact(request):
     return render(request,'contact.html')

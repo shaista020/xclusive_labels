@@ -302,20 +302,31 @@
               <div class="table-responsive">
                 <table class="table table-hover" id="user">
                   <thead>
-                    <tr>
-                      <th>Batch Id</th>
-                      <th>Ship From Name</th>
-                      <th>Type</th>
-                      <th>Weight</th>
-                      <th>Cost</th>
-                      <th>Ship Date</th>
-                      <th>Status</th>
-                      <th>Created At</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tb">
+                 
+                      <tr>
+                          <th>Batch ID</th>
+                          <th>Ship From Name</th>
+                          <th>Type</th>
+                          <th>Weight</th>
+                          <th>Cost</th>
+                          <th>Ship Date</th>
+                          <th>Status</th>
+                      </tr>
+                     
                    
+                  </thead>
+                  <tbody  >
+                    {% for batch in batches %}
+                      <tr>
+                          <td>{{ batch.batch_id }}</td>
+                          <td>{{ batch.ship_from_name }}</td>
+                          <td>{{ batch.type }}</td>
+                          <td>{{ batch.weight }}</td>
+                          <td>{{ batch.cost }}</td>
+                          <td>{{ batch.ship_date }}</td>
+                          <td>{{ batch.status }}</td>
+                      </tr>
+                      {% endfor %}
                   </tbody>
                 </table>
               </div>
@@ -402,153 +413,6 @@
 
 
     <script src="../../static/index.js"></script>
-    <script>
-      $(document).ready(function () {
-        let batchesId = null; // Declare the batchesId variable here
-    
-        // Function to get CSRF token from the cookie
-        function getCSRFToken() {
-          let token = null;
-          const cookies = document.cookie.split(';');
-          cookies.forEach(function(cookie) {
-            if (cookie.trim().startsWith('csrftoken=')) {
-              token = cookie.split('=')[1];
-            }
-          });
-          return token;
-        }
-    
-        const csrfToken = getCSRFToken();
-    
-        fetchbatcheses();
-    
-        function fetchbatcheses() {
-          $.ajax({
-            url: "/api/batch/",
-            method: "GET",
-            success: function (response) {
-              console.log(response);
-              let tbody = $("#tb");
-              tbody.empty();
-              response.forEach(function (batch) {
-                let row = `<tr>
-                            <td>${batch.batch_id}</td>
-                            <td>${batch.ship_from_name}</td>
-                            <td>${batch.type}</td>
-                            <td>${batch.weight}</td>
-                            <td>${batch.cost}</td>
-                            <td>${batch.ship_date}</td>
-                            <td>${batch.status}</td>
-                            <td>${batch.created_at}</td>
-                            <td>
-                              <button id="editbatcheses" data-id="${batch.id}" class="btn btn-sm btn-primary">Edit</button>
-                              <button class="btn btn-sm btn-danger">Delete</button>
-                            </td>
-                          </tr>`;
-                tbody.append(row);
-              });
-            },
-            error: function () {
-              alert("Failed to retrieve data from the server.");
-            },
-          });
-        }
-    
-        // Delete batches
-        $(document).on("click", ".btn-danger", function () {
-          const batchesId = $(this).closest("tr").find("#editbatcheses").data("id");
-    
-          if (confirm("Are you sure you want to delete this batch?")) {
-            $.ajax({
-              url: `/api/batch/${batchesId}/`,
-              type: "DELETE",
-              headers: {
-                "X-CSRFToken": csrfToken,
-              },
-              success: function () {
-                alert("Batch deleted successfully!");
-                fetchbatcheses();
-              },
-              error: function () {
-                alert("Failed to delete batch.");
-              },
-            });
-          }
-        });
-    
-        // Open the Edit Modal with pre-filled data when "Edit" button is clicked
-        $(document).on("click", "#editbatcheses", function () {
-          batchesId = $(this).data("id"); // Store the batchesId when "Edit" button is clicked
-    
-          // Fetch the current details of the batch
-          $.ajax({
-            url: `/api/batch/${batchesId}/`,
-            method: "GET",
-            success: function (batch) {
-              // Populate the modal with the batch data
-              $("#batch_id").val(batch.batch_id);
-              $("#ship_from_name").val(batch.ship_from_name);
-              $("#type").val(batch.type);
-              $("#weight").val(batch.weight);
-              $("#cost").val(batch.cost);
-              $("#ship_date").val(batch.ship_date);
-              $("#status").val(batch.status);
-              $("#created_at").val(batch.created_at);
-    
-              // Show the modal
-              $("#editModal").modal("show");
-            },
-            error: function () {
-              alert("Failed to retrieve batch details.");
-            }
-          });
-        });
-    
-        // Handle the form submission to update the batch
-        $("#editForm").on("submit", function (e) {
-          e.preventDefault();
-    
-          const updatedData = {
-            batch_id: $("#batch_id").val(),
-            ship_from_name: $("#ship_from_name").val(),
-            type: $("#type").val(),
-            weight: $("#weight").val(),
-            cost: $("#cost").val(),
-            ship_date: $("#ship_date").val(),
-            status: $("#status").val(),
-          };
-    
-          console.log("Updated Data:", updatedData); // Log the data being sent
-    
-          $.ajax({
-            url: `/api/batch/${batchesId}/`, // Use the batchesId stored when "Edit" button was clicked
-            method: "PUT",
-            headers: {
-              "X-CSRFToken": csrfToken,
-            },
-            data: updatedData,
-            success: function () {
-              alert("Batch updated successfully!");
-              fetchbatcheses();
-              $("#editModal").modal("hide"); // Close the modal
-            },
-            error: function (jqXHR) {
-              console.log(jqXHR.responseText); // Log the error response from the server
-              alert("Failed to update batch.");
-            }
-          });
-        });
-      });
-      $(document).ready(function () {
-  $('#user').DataTable({
-      "paging": true,
-      "ordering": false,
-      "searching": true,
-      "info": true,
-      "responsive": true,
-  });
-});
-    </script>
     
   </body>
 </html>

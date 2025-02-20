@@ -1,36 +1,13 @@
 from django.db import models
-from django.contrib.auth.models import User
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import  BaseUserManager
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from django.utils import timezone
-import random
-import string
 from django.db import models
 from django.utils.crypto import get_random_string
-
-from contact_form.models import NewLabel, Package, Address 
-
+from contact_form.models import NewLabel 
 from django.conf import settings 
-
-
-
-class Batch(models.Model):
-    batch_id = models.CharField(max_length=100)
-    ship_from_name = models.CharField(max_length=100)
-    type = models.CharField(max_length=100)
-    weight = models.DecimalField(max_digits=10, decimal_places=2)
-    cost = models.DecimalField(max_digits=10, decimal_places=2)
-    ship_date = models.DateField()
-    status = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.batch_id
-    
 
 
 class Cron(models.Model):
@@ -104,21 +81,7 @@ class EmailConfig(models.Model):
     smtp_user = models.EmailField()
     smtp_password = models.CharField(max_length=255)
 
-class LabelAPIConfig(models.Model):
-    api_key = models.CharField(max_length=255)
-    host = models.CharField(max_length=255)
-
-
-# class Ticket(models.Model):
-#     title = models.CharField(max_length=255)
-#     ticket_type = models.CharField(max_length=100)
-#     data_id = models.CharField(max_length=100)
-#     status = models.CharField(max_length=50)
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-#     def __str__(self):
-#         return self.title
-
+ 
  
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
@@ -159,6 +122,9 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
+    @property
+    def verified_status(self):       
+        return "Yes" if self.is_active and self.is_2fa_enabled else "No"
 
     def generate_referral_code(self):
         while True:
@@ -181,8 +147,7 @@ class CustomUser(AbstractUser):
 
 class AdminUser(models.Model):
     email_address = models.EmailField(unique=True)
-   
-    # Proper reference to CustomUser
+    
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin_profile')
 
     def __str__(self):
@@ -199,47 +164,4 @@ class Weight(models.Model):
     def __str__(self):
         return self.label.name
 
-
-
-
-class Notification(models.Model):
-    description = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    send_by = models.ForeignKey(CustomUser, related_name='sent_notifications', on_delete=models.CASCADE)
-    send_to = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='received_notifications', on_delete=models.CASCADE)
-    is_seen = models.BooleanField()
-
-    def __str__(self):
-        return f'Notification from {self.send_by} to {self.send_to}'
-
-class newLabel(models.Model):
-    DELIVERY_CHOICES = [
-        ('usps_priority', 'USPS Priority'),
-    ]
-    PACKAGE_CHOICES = [
-        ('test', 'Test'), 
-    ]
-    SHIP_FROM_CHOICES = [
-        ('no_saved_address', "Don't use saved Ship From Address"),
-        ('address_1', "Test name, Street Address 1, City 1, 424424, NY"),
-        ('address_2', "Bob Doe, 1431 Brushed Lane, Lawrenceville, 30045-5507, GA"),
-    ]
-
-    delivery_type = models.CharField(max_length=20, choices=DELIVERY_CHOICES)
-    package = models.CharField(max_length=100, choices=PACKAGE_CHOICES)
-    ship_from = models.CharField(max_length=100, choices=SHIP_FROM_CHOICES)
-    weight = models.FloatField()
-    length = models.FloatField()
-    width = models.FloatField()
-    height = models.FloatField()
-    recipient_name = models.CharField(max_length=100)
-    recipient_company = models.CharField(max_length=100, blank=True, null=True)
-    recipient_address = models.CharField(max_length=200)
-    recipient_city = models.CharField(max_length=50)
-    recipient_zip_code = models.CharField(max_length=10)
-    recipient_state = models.CharField(max_length=50)
-    recipient_phone = models.CharField(max_length=15)
-    
-    def __str__(self):
-        return f"Label for {self.recipient_name} - {self.delivery_type}"
+ 
