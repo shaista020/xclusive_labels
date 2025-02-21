@@ -296,14 +296,14 @@
                 </div>
                 <div class="mb-3">
                   <label for="batch_number" class="form-label">Batch Number:</label>
-                  <input
-                    type="text"
-                    name="batch_number"
-                    id="batch_number"
-                    class="form-control"
-                    required
-                  />
+                  <select name="batch_id" id="batch_id" class="form-control" required>
+                    <option value="">Select Batch Number</option>
+                    {% for batch in batches %}
+                    <option value="{{ batch.id }}">{{ batch.batch_id }}</option>
+                    {% endfor %}
+                  </select>
                 </div>
+                
                 <input type="hidden" name="tracking_number" id="tracking_number" />
 
                 <div class="mb-3">
@@ -318,6 +318,22 @@
                   <label for="cost" class="form-label">Cost:</label>
                   <input type="number" name="cost" id="cost" class="form-control" required />
                 </div>
+                
+                  <div class="form-group">
+                    <label for="status">Status</label>
+                    <select name="status" id="status" class="form-control" required>
+                      <option value="select">Select Status</option>
+                      <option value="in_queue">In Queue</option>
+                      <option value="processing">Processing</option>
+                      <option value="awaiting">Awaiting</option>
+                      <option value="in_progress">In Progress</option>
+                      <option value="delivered">Delivered</option>
+                      <option value="complete">Complete</option>
+                      <option value="cancelled">Cancelled</option>
+                      <option value="none">None</option>
+                    </select>
+                  </div>
+                   
                 <button class="form-control btn btn-dark" 
               style="width: fit-content; padding: 15px 30px; margin-top: 20px;"> Save Oder</button>
          

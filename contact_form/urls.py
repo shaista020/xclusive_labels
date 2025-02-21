@@ -18,7 +18,7 @@ urlpatterns = [
    path('api/order/',OrderView.as_view() , name='order_api'),
    path('api/payments/',PaymentView.as_view() , name='Payment_api'),
    path('api/addfunds/',AddFundView.as_view() , name=' AddFunds_api'),
-   path('api/stores/', StoreView.as_view(), name='store_api'),
+  
    path('api/addresses/', AddressView.as_view(), name='address_api'),
    path('api/addresses/<int:pk>/', AddressView.as_view(), name='address-detail'),
 # path('api/create-order/', views.create_order_from_new_label, name='create_order'),
@@ -50,7 +50,7 @@ urlpatterns = [
    path('settings/',views.setting,name='settings'),
     path('update_profile/', views.update_profile, name='update_profile'),
    path('stores/',views.store,name='stores'),
-   path('api/stores/<int:pk>/', StoreView.as_view(), name='store-detail'),
+  
    # path('view_support/<int:id>/',views.view_support,name='view_support'),
    #  path('submit_view_supports/',views.submit_view_supports,name='submit_view_supports'),
    path('view_tickets_user/<int:id>/',views.view_tickets_user,name='view_tickets_user'),

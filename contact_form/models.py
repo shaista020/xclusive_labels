@@ -64,21 +64,19 @@ class Package(models.Model):
     shipping_class = models.CharField(max_length=100, default='Standard')
 
     def get_competitor_rate(self):
-        # Convert all dimensions to Decimal at the start for consistency
+       
         weight = self.weight
         length = self.length
         width = self.width
         height = self.height
-
-        # Look for exact match in competitor rates
+ 
         exact_match = CompetitorRate.objects.filter(
             weight=weight, length=length, width=width, height=height
         ).order_by('rate').first()
 
         if exact_match:
             return exact_match
-
-        # If no exact match, look for closest match within defined tolerance
+ 
         closest_match = CompetitorRate.objects.filter(
             Q(weight__gte=weight - Decimal("0.5"), weight__lte=weight + Decimal("0.5")) &
             Q(length__gte=length - Decimal("1"), length__lte=length + Decimal("1")) &
@@ -97,22 +95,20 @@ class Package(models.Model):
             if competitor_rate:
                 self.original_price = competitor_rate.rate
             else:
-                # Fallback to estimated pricing if no competitor rate is found
+               
                 self.original_price = self.weight * Decimal(2)
-
-            # Calculate the discounted price and discount amount
+ 
             self.discounted_price = self.original_price * (Decimal(1) - discount_percentage)
             self.discount_amount = self.original_price - self.discounted_price
             self.total_cost = self.discounted_price
         else:
-            # Static pricing based on weight
+           
             base_price = Decimal(7) if self.weight <= 4 else self.weight * Decimal(2)
             self.original_price = base_price
             self.discount_amount = base_price * discount_percentage
             self.discounted_price = base_price - self.discount_amount
             self.total_cost = self.discounted_price
-
-        # Ensure no NULL values
+ 
         self.discounted_price = self.discounted_price or Decimal(0)
         self.discount_amount = self.discount_amount or Decimal(0)
         self.total_cost = self.total_cost or Decimal(0)
@@ -235,6 +231,7 @@ class ShipFromAddress(models.Model):
     zip_code = models.CharField(max_length=10)
     state = models.CharField(max_length=50)
     country = models.CharField(max_length=50)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.full_name} - {self.address}'
@@ -275,8 +272,8 @@ class Referral(models.Model):
 
     def __str__(self):
         return self.name
+ 
 class NewLabel(models.Model):
-    # delivery_type = models.ForeignKey(DeliveryType, on_delete=models.CASCADE)
     delivery_type = models.CharField(max_length=255)
     package = models.ForeignKey(Package, on_delete=models.CASCADE)
     ship_from = models.ForeignKey(Address, on_delete=models.CASCADE)
@@ -289,11 +286,39 @@ class NewLabel(models.Model):
     state = models.CharField(max_length=50)
     phone = models.CharField(max_length=20)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
- 
 
     def __str__(self):
         return f"Label for {self.name}"
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+ 
+        if not Batch.objects.filter(new_label=self).exists():
+            Batch.objects.create(
+                new_label=self,
+                batch_id=f"BATCH-{self.id}"
+            )
+class Batch(models.Model):
+    new_label = models.ForeignKey(NewLabel, on_delete=models.CASCADE)  
+    batch_id = models.CharField(max_length=100, unique=True)
+    ship_from_name = models.CharField(max_length=100, blank=True, null=True)
+    type = models.CharField(max_length=100, blank=True, null=True)
+    weight = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    cost = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    ship_date = models.DateField(blank=True, null=True)
+    status = models.CharField(max_length=100, default="Pending")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self.new_label:
+            self.ship_from_name = self.new_label.name
+            self.type = self.new_label.delivery_type
+            self.weight = self.new_label.package.weight  
+            self.cost = self.new_label.package.total_cost   
+            self.ship_date = self.new_label.ship_from.created_at   
+
+        super().save(*args, **kwargs)
+ 
 class Order(models.Model):
     STATUS_CHOICES = [
         ('select', 'Select'),
@@ -308,7 +333,7 @@ class Order(models.Model):
     ]
     new_label = models.ForeignKey(NewLabel, on_delete=models.CASCADE)
     tracking_number = models.CharField(max_length=255)
-    batch_number = models.CharField(max_length=255)
+    batch_number = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name='order_batch')
     name = models.CharField(max_length=255)
     type = models.CharField(max_length=100)
     weight = models.FloatField()

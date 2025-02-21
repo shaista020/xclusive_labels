@@ -1,14 +1,7 @@
 from rest_framework import serializers
 from .models import *
-from contact_form.serializers import LabelSerializer
-
     
-
-class BatchSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Batch
-        fields = '__all__'
-
+ 
 class CronSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cron
@@ -41,11 +34,7 @@ class EmailConfigSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmailConfig
         fields = '__all__'
-
-class LabelAPIConfigSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LabelAPIConfig
-        fields = '__all__'
+ 
 
 class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -59,8 +48,4 @@ class WeightSerializer(serializers.ModelSerializer):
         model = Weight
         fields = '__all__'
 
-class newLableSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = newLabel
-        fields = '__all__'
-
+ 
