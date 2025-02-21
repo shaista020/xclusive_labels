@@ -30,110 +30,115 @@
     <link href="{% static 'bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css' %}" rel="stylesheet" />
     
     <style>
-       #cMenu {
-  display: none; 
+      #cMenu {
+ display: none; 
 }
-      .table {
-        border-radius: 10px;
-        overflow: hidden;
-      }
+     .table {
+       border-radius: 10px;
+       overflow: hidden;
+     }
 
-      .table th,
-      .table td {
-        vertical-align: middle;
-        padding: 15px;
-        text-align: center;
-      }
+     .table th,
+     .table td {
+       vertical-align: middle;
+       padding: 15px;
+       text-align: left;
+     }
 
-    
-  @media (max-width: 758px) {
-    .heading {
-    margin: 10px !important;
-  }
-}
+     .table thead {
+       background-color: #343a40;
+       color: white;
+     }
 
-      .table thead {
-        background-color: #343a40;
-        color: white;
-      }
+     .headDiv {
+       margin-left: 0px;
+     }
 
-      .headDiv {
-        margin-left: 0px;
-      }
-      .hidden {
-        display: none;
-      }
-      /* Pagination Styles */
-      .pagination {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin-top: 20px;
-      }
+     .heading {
+       @media (max-width: 758px) {
+         margin: 10px !important;
+       }
+     }
 
-      .pagination .page-item.active .page-link {
-        background-color: #67e6be;
-        border-color: #67e6be;
-      }
+     .hidden {
+       display: none;
+     }
 
-      .pagination .page-link {
-        background-color: white;
-        color: black;
-        padding: 10px 15px;
-        margin: 0 5px;
-      }
+     /* Pagination Styles */
+   
+     .prev {
+       background-color: #6c757d !important;
+       opacity: 30%;
+     }
 
-      .pagination .page-link:hover {
-        background-color: #e9ecef;
-        color: black;
-      }
-      .prev {
-        background-color: #6c757d !important;
-        opacity: 30%;
-      }
+     .dropdown {
+       position: relative;
+       display: inline-block;
+     }
 
-      .form-group {
-        margin-bottom: 15px;
-      }
+     .dropdown-content {
+       display: none;
+       position: absolute;
+       right: 20px;
+       top: 20px;
+       background-color: #f9f9f9;
+       min-width: 120px;
+       box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+       z-index: 1;
+     }
 
-      .dropdown {
-        position: relative;
-        display: inline-block;
-      }
+     .dropdown-content a {
+       color: black;
+       padding: 8px 12px;
+       text-decoration: none;
+       display: block;
+     }
 
-      .dropdown-content {
-        display: none;
-        position: absolute;
-        right: 20px;
-        top: 30px;
-        background-color: #f9f9f9;
-        min-width: 120px;
-        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-        z-index: 1;
-      }
+     .dropdown-content a:hover {
+       background-color: #f1f1f1;
+     }
 
-      .dropdown-content a {
-        color: black;
-        padding: 8px 12px;
-        text-decoration: none;
-        display: block;
-      }
+     .dropdown:hover .dropdown-content {
+       display: block;
+     }
 
-      .dropdown-content a:hover {
-        background-color: #f1f1f1;
-      }
+     .dropdown-btn {
+       background-color: transparent;
+       border: none;
+       cursor: pointer;
+       font-size: 20px;
+     }
 
-      .dropdown:hover .dropdown-content {
-        display: block;
-      }
+     .ship {
+       margin: 2rem;
+     }
 
-      .dropdown-btn {
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-        font-size: 20px;
-      }
-    </style>
+     .ship:hover {
+       background-color: white;
+       font-size: large;
+     }
+
+     label {
+       text-align: left;
+       margin-bottom: 5px;
+     }
+
+     input {
+       margin-bottom: 20px;
+     }
+
+     select {
+       margin-bottom: 20px;
+     }
+
+     .form-control {
+       padding: 0.75rem 0.75rem;
+     }
+
+     .form-select {
+       padding: 0.75rem 2.25rem 0.75rem 0.75rem;
+     }
+   </style>
 
     <script>
 
@@ -331,28 +336,7 @@
                 </table>
               </div>
 
-              <!-- Pagination -->
-              <!-- <nav aria-label="Page navigation" class="my-4">
-                <ul class="pagination justify-content-end">
-                  <li class="page-item">
-                    <a class="page-link prev text-white" href="#" tabindex="-1"
-                      >Previous</a
-                    >
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="#">1</a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="#">2</a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link" href="#">3</a>
-                  </li>
-                  <li class="page-item">
-                    <a class="page-link bg-black text-white" href="#">Next</a>
-                  </li>
-                </ul>
-              </nav> -->
+              
             </div>
             </div>
           </div>
@@ -413,6 +397,15 @@
 
 
     <script src="../../static/index.js"></script>
-    
+    <script>
+       $(document).ready(function () {
+     var table = $('#user').DataTable({
+         colReorder: true, // Enable column reordering
+         paging: true,
+         searching: true,
+         ordering: true
+     });
+    });
+    </script>
   </body>
 </html>

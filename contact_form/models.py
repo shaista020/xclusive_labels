@@ -333,7 +333,7 @@ class Order(models.Model):
     ]
     new_label = models.ForeignKey(NewLabel, on_delete=models.CASCADE)
     tracking_number = models.CharField(max_length=255)
-    batch_number = models.CharField(max_length=255)
+    batch_number = models.ForeignKey(Batch, on_delete=models.CASCADE, related_name='order_batch')
     name = models.CharField(max_length=255)
     type = models.CharField(max_length=100)
     weight = models.FloatField()

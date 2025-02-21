@@ -15,6 +15,7 @@ from rest_framework.response import Response
 from django.contrib import messages
 from django.utils.timezone import now
 import pytz
+import uuid
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, render
@@ -195,53 +196,6 @@ class AddFundView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-class StoreView(APIView):
-    permission_classes = [IsAuthenticated]  
-
-    def get(self, request, pk=None):
-        if pk:        
-            try:
-                store = Store.objects.get(pk=pk, user=request.user)  
-            except Store.DoesNotExist:
-                return Response({"detail": "Store not found."}, status=status.HTTP_404_NOT_FOUND)
-
-            serializer = StoreSerializer(store)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            stores = Store.objects.filter(user=request.user)  
-            serializer = StoreSerializer(stores, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request):
-        data = request.data
-        data['user'] = request.user.id
-
-        serializer = StoreSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request, pk):
-        try:
-            address = Store.objects.get(pk=pk, user=request.user)
-        except Store.DoesNotExist:
-            return Response({"error": "Address not found or not authorized"}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = StoreSerializer(address, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk):
-        try:
-            store = Store.objects.get(pk=pk, user=request.user) 
-        except Store.DoesNotExist:
-            return Response({"detail": "Store not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        store.delete()
-        return Response({"detail": "Store deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 class AddressView(APIView):
     permission_classes = [IsAuthenticated]  
@@ -493,50 +447,53 @@ class TransactionViewSet(viewsets.ModelViewSet):
 def dashboard(request):
     return render(request, 'User/user.html')
 
-
+#================================order==========================
 @login_required(login_url="/auth/signin/")
 def orders(request):
     user_orders = Order.objects.filter(created_by=request.user)
-    return render(request, 'User/order.html', {"orders": user_orders})
+    return render(request, 'User/order/order_list.html', {"orders": user_orders})
 
 @login_required(login_url="/auth/signin/")
 def view_receipt(request, order_id):
     order = get_object_or_404(Order, id=order_id)
-    return render(request, 'User/receipt.html', {"order": order})
-import uuid  
+    return render(request, 'User/order/receipt.html', {"order": order})
+ 
 def create_order(request):
     packages = Order.objects.all()
     new_labels = NewLabel.objects.all()
-    
+    batches = Batch.objects.all()   
     if request.method == "POST":
-        batch_no = request.POST.get('batch_number')
+        batch_id = request.POST.get('batch_id')  
         name = request.POST.get('name')
         order_type = request.POST.get('type')
         weight = request.POST.get('weight')
         cost = request.POST.get('cost')
         new_label_id = request.POST.get('new_label_id')
-
+        status = request.POST.get('status')  
         if request.user.is_authenticated:
             user = request.user
 
             new_label_instance = get_object_or_404(NewLabel, id=new_label_id)
-            tracking_no = str(uuid.uuid4()).replace("-", "").upper()[:12] 
-            
+            batch_instance = get_object_or_404(Batch, id=batch_id)
+
+            tracking_no = str(uuid.uuid4()).replace("-", "").upper()[:12]
+
             new_order = Order(
                 new_label=new_label_instance,
-                tracking_number=tracking_no,  
-                batch_number=batch_no,
+                tracking_number=tracking_no,
+                batch_number=batch_instance,  
                 name=name,
                 type=order_type,
                 weight=weight,
                 cost=cost,
+                status=status,  
                 created_by=user
             )
             new_order.save()
 
             return redirect('/orders')
-    
-    return render(request, "User/create_order.html", {'new_label': new_labels})
+
+    return render(request, "User/order/create_order.html", {'new_label': new_labels, 'batches': batches})
 
 @login_required(login_url="/auth/signin/")
 def addFund(request):
@@ -783,7 +740,7 @@ def generate_pdf(request, order_id):
 }
 
 
-        template = get_template('User/receipt_template.html')
+        template = get_template('User/order/receipt_template.html')
         html = template.render(context)
 
         response = HttpResponse(content_type='application/pdf')
