@@ -50,6 +50,6 @@ class UserAdmin(admin.ModelAdmin):
 class WeightAdmin(admin.ModelAdmin):
      list_display =('id', 'label', 'from_weight', 'to_weight', 'user_cost', 'reseller_cost', 'created_at')
 
- 
+admin.site.register(Notification)
  
 admin.site.register(CustomUser) 

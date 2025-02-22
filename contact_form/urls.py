@@ -1,12 +1,14 @@
 from django.urls import path, include
 from .views import *
 from . import views
+# from .notification import notifications_view
 from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r'transactions', TransactionViewSet)
 router.register('notifications', views.NotificationViewSet, basename='notification')
-
+ 
 urlpatterns = [
+    # path("notifications/", notifications_view, name="notifications"),
     path('api/contact/', ContactInfoView.as_view(), name='contact_api'),
     path('api/packages/', PackageView.as_view(), name='package_api'),
    #  path('api/chats/', ChatView.as_view(), name='chat_api'),
@@ -28,9 +30,7 @@ urlpatterns = [
    path('api/profile/', ProfileView.as_view(), name='profile_api'),
    path('api/coupons/', CouponView.as_view(), name='coupons_api'),
    path('api/delete-account/', DeleteAccountView.as_view(), name='delete_account_api'),
-   # path('api/referrals/', ReferralView.as_view(), name='referral-list'),
-   # path('api/notifications/', Notificationview.as_view(), name='notification-api'),
-   # path('api/notifications/<int:pk>/', Notificationview.as_view(), name='notification-details'),
+     path("create-notification/", create_notification, name="create_notification"),
    path("referrals/", views.referrals_view, name="referrals"),
   
    path('api/', include(router.urls)),
@@ -41,7 +41,7 @@ urlpatterns = [
     path('order/<int:order_id>/pdf/', generate_pdf, name='generate_pdf'),
    path('order/<int:order_id>/receipt/', views.view_receipt, name='view_receipt'),
    path('view_receipt_admin/<int:order_id>/', views.view_receipt_admin, name='view_receipt_admin'),
-    path('upload-csv/', views.handle_uploaded_file, name='upload_csv'),
+  path('upload-csv/', views.handle_uploaded_file, name='upload_csv'),
    path('address/',views.address,name='address'),
    path('payments/',views.payment,name='payments'),
    path('referrals/',views.referral,name='referrals'),
@@ -55,7 +55,8 @@ urlpatterns = [
    #  path('submit_view_supports/',views.submit_view_supports,name='submit_view_supports'),
    path('view_tickets_user/<int:id>/',views.view_tickets_user,name='view_tickets_user'),
    path('submit_view_tickets_user/',views.submit_view_tickets_user,name='submit_view_tickets_user'),
-
+  path('api/stores/<int:pk>/', StoreView.as_view(), name='store-detail'),
+  path('api/stores/', StoreView.as_view(), name='store_api'),
    path('supports/',views.supports,name='supports'),
    path('addfund/',views.addFund,name='addfund'),
    path('newLable/',views.newLable,name='newLable'),
@@ -63,7 +64,7 @@ urlpatterns = [
    path('delete-account/', views.delete_account, name='delete_account'),
    path('navbar.html', views.load_navbar, name='load_navbar'),
     path('sidebar.html', views.load_sidebar, name='load_sidebar'),
-   #  path('stores', views.stores, name='stores'),
+    
    #  path('store/create/', views.create_store, name='create_store'),
    #  path('store/<int:pk>/update/', views.update_store, name='update_store'),
    #  path('store/<int:pk>/delete/', views.delete_store, name='delete_store'),

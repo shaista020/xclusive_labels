@@ -17,8 +17,9 @@ from django.contrib.auth.decorators import login_required
 from datetime import date
 from contact_form.models import *
 from decimal import Decimal
-
-
+from contact_form.send_mail import send_ticket_update_email  
+from contact_form.notification import notification_create  
+ 
 
 
 class CronsView(APIView):
@@ -284,28 +285,41 @@ def view_ticket(request, id):
     tickets= Ticket.objects.get(id=id)
     return render(request,'Admin/view_tickets.html',{"tickets":tickets})
 
+ 
+ 
 def submit_view_tickets(request):
     if request.method == 'POST':
-        id = request.POST['id']
-        title = request.POST['title']
-        date = request.POST['date']
-        message = request.POST['message']
-        status = request.POST["status"]
-
+        user = request.user 
         try:
-            ticket= Ticket.objects.get(id=id)
-            ticket.title = title
-            ticket.created_at = date
-            ticket.message = message
-            ticket.status  = status
-            ticket.save() 
-            return redirect('/tickets/')
+            ticket_id = request.POST['id']
+            new_message = request.POST['description']
+            status = request.POST['status']
 
-        except:
-            msg = 'error'
-            return render(request,'Admin/view_tickets.html',{"msg":msg})
+            ticket = get_object_or_404(Ticket, id=ticket_id)
+ 
+            Message.objects.create(ticket=ticket, sender="admin", text=new_message)
+ 
+            if ticket.message:  
+                ticket.message += f"\nAdmin: {new_message}"
+            else:  
+                ticket.message = f"Admin: {new_message}"
 
-    
+            # Update ticket status
+            ticket.status = status
+            ticket.save()
+            notification_create(
+                user, 
+                message=f"Your ticket '{ticket.title}' has been updated with a new reply.", 
+                color="Black"
+            )
+ 
+            send_ticket_update_email(ticket.user.email, ticket.user.username, ticket.title, new_message, status, "Admin")
+
+            return JsonResponse({"status": "success", "message": "Reply sent successfully!"})
+
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": f"Error: {str(e)}"}, status=400)
+
 
 @login_required(login_url="/auth/signin/")
 def setting(request):

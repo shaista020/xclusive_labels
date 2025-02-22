@@ -10,16 +10,7 @@ from django.db import models
 # from django.contrib.auth.models import User
 from django.db.models import F, ExpressionWrapper, DecimalField, Q
 from django.db.models.functions import Abs
-
-class Notification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    message = models.TextField() 
-    is_read = models.BooleanField(default=False)  
-    created_at = models.DateTimeField(auto_now_add=True) 
-
-    def __str__(self):
-        return self.message
-
+ 
 class ContactInfo(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
@@ -132,12 +123,17 @@ class Ticket(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="Open")
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    description = models.CharField(max_length=255, null=True)
  
 
     def __str__(self):
         return self.title
 
-
+class Message(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name="messages")
+    sender = models.CharField(max_length=10, choices=[("admin", "Admin"), ("user", "User")])
+    text = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
     
 class Payment(models.Model):
     payment_number = models.CharField(max_length=255)
