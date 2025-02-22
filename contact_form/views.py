@@ -507,10 +507,14 @@ class TransactionViewSet(viewsets.ModelViewSet):
 def dashboard(request):
     user_notifications = Notification.objects.filter(user=request.user)
     global_notifications = Notification.objects.filter(is_global=True)
-
+    referrals = CustomUser.objects.filter(referred_by=request.user)
+    referral_commission = referrals.aggregate(Sum('available_for_withdraw'))['available_for_withdraw__sum'] or Decimal('0.00')
+    user_own_commission = request.user.available_for_withdraw
+    total_commission = referral_commission + user_own_commission
     return render(request, 'User/user.html', {
         "user_notifications": user_notifications,
         "global_notifications": global_notifications,
+        "total_commission":total_commission,
     })
 
 #================================order==========================
@@ -771,7 +775,7 @@ def submit_view_tickets_user(request):
             ticket.save()
             notification_create(
                 user, 
-                message=f"Your ticket '{ticket.title}' has been updated with a new reply.", 
+                message=f"Your ticket '{ticket.title}' message sent successfully!.", 
                 color="Black"
             )
             send_ticket_update_email(ticket.user.email, ticket.user.username, ticket.title, new_message, ticket.status, "User")

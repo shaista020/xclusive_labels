@@ -487,13 +487,26 @@
           <div class="mb-4 d-flex justify-content-between align-items-center">
             <h1 class="mb-0">Dashboard</h1>
             <div class="d-flex align-items-center">
-              <label class="me-2 mb-0">Today Date:</label>
-              <select class="form-select form-select-sm">
-                <option>Last 7 Days</option>
-                <option>Last 30 Days</option>
-                <option>Last 60 Days</option>
-                <option>Last 90 Days</option>
-              </select>
+              <form method="GET" class="d-flex align-items-center">
+                <label for="date_filter" class="me-2">Select Date Range:</label>
+                <select class="form-select form-select-sm me-2" name="date_filter" id="date_filter" onchange="toggleCustomRange()">
+                    <option value="today" {% if date_filter == "today" %}selected{% endif %}>Today</option>
+                    <option value="yesterday" {% if date_filter == "yesterday" %}selected{% endif %}>Yesterday</option>
+                    <option value="last_7_days" {% if date_filter == "last_7_days" %}selected{% endif %}>Last 7 Days</option>
+                    <option value="current_month" {% if date_filter == "current_month" %}selected{% endif %}>Current Month</option>
+                    <option value="last_month" {% if date_filter == "last_month" %}selected{% endif %}>Last Month</option>
+                    <option value="custom" {% if date_filter == "custom" %}selected{% endif %}>Custom Range</option>
+                </select>
+    
+                <div id="custom_range" class="d-flex align-items-center me-2" style="display: none;">
+                    <label for="start_date" class="me-2">Start:</label>
+                    <input type="date" class="form-control form-control-sm me-2" name="start_date" value="{{ start_date }}">
+                    <label for="end_date" class="me-2">End:</label>
+                    <input type="date" class="form-control form-control-sm me-2" name="end_date" value="{{ end_date }}">
+                </div>
+    
+                <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+            </form>
             </div>
           </div>
           
@@ -513,7 +526,7 @@
             <div class="col-md-4">
               <div class="card p-3 text-center">
                 <h5 class="card-title">Referral Balance</h5>
-                <p class="card-text">$0.00</p>
+                <p class="card-text">${{ total_commission }}</p>
               </div>
             </div>
           </div>

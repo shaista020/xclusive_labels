@@ -5,6 +5,7 @@ def notification_create(user, message, color="Black"):
         message=message,
         user=user,  
         created_by=user,   
-        color=color
+        color=color,
+        
     )
- 
+   

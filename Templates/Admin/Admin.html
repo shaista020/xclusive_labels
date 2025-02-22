@@ -254,7 +254,42 @@
         </div>
         <main style="padding: 15px">
           <div>
-            <h2 style="padding: 10px">Admin Dashboard</h2>
+            <div class="mb-4 d-flex justify-content-between align-items-center">
+              <h1 class="mb-0">Admin Dashboard</h1>
+              <div class="d-flex align-items-center">
+                <form method="GET" class="d-flex align-items-center">
+                  <label for="date_filter" class="me-2">Select Date Range:</label>
+                  <select class="form-select form-select-sm me-2" name="date_filter" id="date_filter" onchange="toggleCustomRange()">
+                      <option value="today" {% if date_filter == "today" %}selected{% endif %}>Today</option>
+                      <option value="yesterday" {% if date_filter == "yesterday" %}selected{% endif %}>Yesterday</option>
+                      <option value="last_7_days" {% if date_filter == "last_7_days" %}selected{% endif %}>Last 7 Days</option>
+                      <option value="current_month" {% if date_filter == "current_month" %}selected{% endif %}>Current Month</option>
+                      <option value="last_month" {% if date_filter == "last_month" %}selected{% endif %}>Last Month</option>
+                      <option value="custom" {% if date_filter == "custom" %}selected{% endif %}>Custom Range</option>
+                  </select>
+      
+                  <div id="custom_range" class="d-flex align-items-center me-2" style="display: none;">
+                      <label for="start_date" class="me-2">Start:</label>
+                      <input type="date" class="form-control form-control-sm me-2" name="start_date" value="{{ start_date }}">
+                      <label for="end_date" class="me-2">End:</label>
+                      <input type="date" class="form-control form-control-sm me-2" name="end_date" value="{{ end_date }}">
+                  </div>
+      
+                  <button type="submit" class="btn btn-primary btn-sm">Apply</button>
+              </form>
+              </div>
+          </div>
+          
+          <script>
+              function toggleCustomRange() {
+                  var filter = document.getElementById("date_filter").value;
+                  document.getElementById("custom_range").style.display = filter === "custom" ? "flex" : "none";
+              }
+          
+              // Ensure the correct state is shown on page load
+              toggleCustomRange();
+          </script>
+          
             <div class="dashboard">
               <div>
                 <div class="card">Total Users<br />{{total_users}}</div>

@@ -5,10 +5,20 @@ def send_ticket_update_email(user_email, username, ticket_title, message, status
     
     subject = f"Ticket Update: {ticket_title}"
 
+    # Generate dynamic email message based on action
+    if status.lower() == "closed":
+        action_message = f"Your ticket '{ticket_title}' has been closed by {sender}."
+    elif status.lower() == "in progress":
+        action_message = f"Your ticket '{ticket_title}' is now in progress. {sender} is working on it."
+    elif status.lower() == "open":
+        action_message = f"Your ticket '{ticket_title}' has been reopened by {sender}."
+    else:
+        action_message = f"Your ticket '{ticket_title}' has been updated by {sender} with a new reply."
+
     body = f"""
     Dear {username},
 
-    Your ticket "{ticket_title}" has been updated.
+    {action_message}
 
     Status: {status}
 

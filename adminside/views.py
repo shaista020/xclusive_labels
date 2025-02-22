@@ -289,31 +289,46 @@ def view_ticket(request, id):
  
 def submit_view_tickets(request):
     if request.method == 'POST':
-        user = request.user 
+        user = request.user  
         try:
             ticket_id = request.POST['id']
             new_message = request.POST['description']
             status = request.POST['status']
 
             ticket = get_object_or_404(Ticket, id=ticket_id)
- 
-            Message.objects.create(ticket=ticket, sender="admin", text=new_message)
- 
+
+            # Create a new message with the logged-in user's name
+            Message.objects.create(ticket=ticket, sender=user.username, text=new_message)
+
+            # Append message to ticket history
             if ticket.message:  
-                ticket.message += f"\nAdmin: {new_message}"
+                ticket.message += f"\n{user.username}: {new_message}"
             else:  
-                ticket.message = f"Admin: {new_message}"
+                ticket.message = f"{user.username}: {new_message}"
 
             # Update ticket status
             ticket.status = status
             ticket.save()
+
+            # Generate a dynamic notification message based on the action performed
+            if status.lower() == "closed":
+                notification_message = f"Your ticket '{ticket.title}' has been closed by {user.username}."
+            elif status.lower() == "in progress":
+                notification_message = f"Your ticket '{ticket.title}' is now in progress. {user.username} is working on it."
+            elif status.lower() == "open":
+                notification_message = f"Your ticket '{ticket.title}' has been reopened by {user.username}."
+            else:
+                notification_message = f"Your ticket '{ticket.title}' has been updated by {user.username} with a new reply."
+
+            # Send notification with dynamic message
             notification_create(
-                user, 
-                message=f"Your ticket '{ticket.title}' has been updated with a new reply.", 
+                ticket.user,  
+                message=notification_message,
                 color="Black"
             )
- 
-            send_ticket_update_email(ticket.user.email, ticket.user.username, ticket.title, new_message, status, "Admin")
+
+            # Send email update
+            send_ticket_update_email(ticket.user.email, ticket.user.username, ticket.title, new_message, status, user.username)
 
             return JsonResponse({"status": "success", "message": "Reply sent successfully!"})
 
