@@ -37,46 +37,52 @@
         color: white;
       }
 
-      .heading {
-        @media (max-width: 758px) {
-          margin: 10px !important;
-        }
-      }
+       
+.chat-box {
+    border: 1px solid #ccc;
+    padding: 10px;
+    height: 200px;
+    overflow-y: auto;
+    background: #f9f9f9;
+    border-radius: 5px;
+}
 
-      .headDiv {
-        margin-left: 0px;
-      }
-      .hidden {
-        display: none;
-      }
-      /* Pagination Styles */
-      .pagination {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin-top: 20px;
-      }
+.user-message {
+    background: #d1e7dd;
+    padding: 8px;
+    margin: 5px;
+    border-radius: 5px;
+    width: fit-content;
+    max-width: 80%;
+}
 
-      .pagination .page-item.active .page-link {
-        background-color: #67e6be;
-        border-color: #67e6be;
-      }
+.admin-message {
+    background: #f8d7da;
+    padding: 8px;
+    margin: 5px;
+    border-radius: 5px;
+    width: fit-content;
+    max-width: 80%;
+    align-self: flex-end;
+}
 
-      .pagination .page-link {
-        background-color: white;
-        color: black;
-        padding: 10px 15px;
-        margin: 0 5px;
-      }
+.message-time {
+    font-size: 0.7em;
+    /* color: #888; */
+    margin-left: 8px;
+    margin-top: 13px;
+}
 
-      .pagination .page-link:hover {
-        background-color: #e9ecef;
-        color: black;
-      }
-      .prev {
-        background-color: #6c757d !important;
-        opacity: 30%;
-      }
+.sender .message-time {
+    color: #6c757d;  /* Muted gray for sender's timestamp */
+}
+
+.receiver .message-time {
+    color: white;  /* White for receiver's timestamp */
+}
+
+</style>
+
     </style>
 
     <script>
@@ -153,64 +159,99 @@
               <a href="#" style="text-decoration: none; color: black; margin-left: 10px">testing</a>
             </div>
           
-            
+            <div id="loadingModal" style="display: none; position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8); padding: 20px; color: white; border-radius: 8px; text-align: center;">
+                <p>Please wait, processing your request...</p>
+              </div>
             <div class="card tmaindiv vMDiv" style="text-align: left">
               <form action="/submit_view_tickets_user/" method="POST" id="ticketForm">
                 {% csrf_token %}
-                <input type="text" class="form-control" name="id" value="{{tickets.id}}" hidden>  
+                <input type="text" name="id" value="{{ tickets.id }}" hidden>
+            
                 <label for="title">Title</label>
                 <input type="text" class="form-control" name="title" value="{{ tickets.title }}" readonly>
-              
-                <!-- Date Field -->
+            
                 <label for="date">Date</label>
-                <input type="date" class="form-control " name="date" value="{{ tickets.created_at|date:'Y-m-d' }}" readonly>
+                <input type="date" class="form-control" name="date" value="{{ tickets.created_at|date:'Y-m-d' }}" readonly>
+            
                 <label for="message">Message</label>
-                <textarea
-                  id="messageText"
-                  class="form-control "
-                  placeholder="Write your message here"
-                  rows="5"
-                  name="message"
-                >{{tickets.message}}</textarea>
-          
-              <button class="form-control btn btn-dark mt-4" style="width: fit-content; padding: 15px 30px" id="updateTicketBtn">
-                Send
-              </button>
+                <div id="messageContainer" class="chat-box">
+                  {% for msg in tickets.message.splitlines %}
+                      {% if "Admin:" in msg %}
+                          <div class="admin-message">{{ msg }}</div>
+                      {% else %}
+                          <div class="user-message">{{ msg }}</div>
+                      {% endif %}
+                  {% endfor %}
+              </div>
+              
+              
+            
+                <label for="description">Reply</label>
+                <textarea id="descriptionText" class="form-control" placeholder="Write your message here" rows="5" name="description"></textarea>
+            
+                <button class="form-control btn btn-dark mt-4" id="updateTicketBtn">
+                    Send
+                </button>
             </form>
+            
             </div>
           </div>
-<script>
-  function submitTicketForm() {
-    var formData = new FormData(document.getElementById('ticketForm')); // Assuming your form has the id 'ticketForm'
-
-    $.ajax({
-        url: '/submit_view_tickets_user/', // URL of the view handling the form submission
-        method: 'POST',
-        data: formData,
-        processData: false,  // Prevents jQuery from converting data to a query string
-        contentType: false,  // Tells jQuery to not set a content type
-        success: function(response) {
-            if (response.status === 'success') {
-                // Trigger the notification after a successful submission
-                addNotification(response.message);
-                // Optionally, redirect or reload the page
-                window.location.href = '/supports/';
-            } else {
-                addNotification('An error occurred: ' + response.message);
-            }
-        },
-        error: function(xhr, status, error) {
-            addNotification('An unexpected error occurred. Please try again.');
-        }
-    });
-}
-
-// Assuming you have an event listener to call submitTicketForm when the form is submitted
-document.getElementById('ticketForm').addEventListener('submit', function(e) {
-    e.preventDefault(); // Prevent the form from submitting the normal way
-    submitTicketForm();
-});
-
-</script>
+          <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                let ticketForm = document.getElementById("ticketForm");
+            
+                if (ticketForm) {  
+                    ticketForm.addEventListener("submit", function(event) {
+                        event.preventDefault(); 
+            
+                        let formData = new FormData(this);
+                        let descriptionBox = document.getElementById("descriptionText");
+                        let messageContainer = document.getElementById("messageContainer");
+                        let sendButton = document.getElementById("updateTicketBtn");
+                        let loadingModal = document.getElementById("loadingModal");
+             
+                        loadingModal.style.display = "block"; 
+                        sendButton.disabled = true; 
+            
+                        fetch("/submit_view_tickets_user/", {
+                            method: "POST",
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                             
+                            loadingModal.style.display = "none"; 
+                            sendButton.disabled = false; 
+            
+                            if (data.status === "success") {
+                               
+                                let newMessage = document.createElement("div");
+                                newMessage.className = "user-message";
+                                 
+                                let timestamp = new Date().toLocaleTimeString();
+                                newMessage.innerHTML = `<strong>User:</strong> ${descriptionBox.value} <br>`;
+             
+                                messageContainer.appendChild(newMessage);
+                                messageContainer.scrollTop = messageContainer.scrollHeight;
+             
+                                descriptionBox.value = "";
+                            } else {
+                                alert("Error: " + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                            loadingModal.style.display = "none"; 
+                            sendButton.disabled = false;
+                        });
+                    });
+                } else {
+                    console.error("Error: #ticketForm not found in DOM!");
+                }
+            });
+            </script>
+            
+            
         </body>
 </html>

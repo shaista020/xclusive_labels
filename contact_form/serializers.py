@@ -1,12 +1,13 @@
 from rest_framework import serializers
 from .models import *
+from adminside.models import *
 class NotificationSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)  
-
+    created_by = serializers.CharField(source="created_by.username", read_only=True)   
     class Meta:
         model = Notification
-        fields = ['id', 'message', 'is_read', 'created_at', 'user', 'username']  
-      
+        fields = ['id', 'message', 'is_read', 'created_at', 'user', 'username', 'created_by', 'color']  
+
 class ContactInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactInfo

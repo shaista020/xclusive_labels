@@ -29,149 +29,117 @@
   <link href="{% static 'bootstrap/bootstrap-5.2.2-dist/bootstrap-5.2.2-dist/css/bootstrap.min.css' %}"
     rel="stylesheet" />
 
-  <style>
-    #cMenu {
-      display: none;
-    }
+    <style>
+      #cMenu {
+ display: none; 
+}
+     .table {
+       border-radius: 10px;
+       overflow: hidden;
+     }
 
-    body {
-      background-color: #f8f9fa;
-    }
+     .table th,
+     .table td {
+       vertical-align: middle;
+       padding: 15px;
+       text-align: left;
+     }
 
-    .table {
-      border-radius: 10px;
-      overflow: hidden;
-    }
+     .table thead {
+       background-color: #343a40;
+       color: white;
+     }
 
-    .table th,
-    .table td {
-      vertical-align: middle;
-      padding: 15px;
-      text-align: left;
-    }
+     .headDiv {
+       margin-left: 0px;
+     }
 
-    .table thead {
-      background-color: #343a40;
-      color: white;
-    }
+     .heading {
+       @media (max-width: 758px) {
+         margin: 10px !important;
+       }
+     }
 
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      right: 10px;
-      top: 30px;
-      background-color: #f9f9f9;
-      min-width: 120px;
-      box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-      z-index: 1;
-    }
+     .hidden {
+       display: none;
+     }
 
-    .dropdown:hover .dropdown-content {
-      display: block;
-    }
+     /* Pagination Styles */
+   
+     .prev {
+       background-color: #6c757d !important;
+       opacity: 30%;
+     }
 
-    .dropdown-btn {
-      background-color: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 20px;
-    }
+     .dropdown {
+       position: relative;
+       display: inline-block;
+     }
 
-    .card {
-      border: none;
-      margin-bottom: 20px;
-    }
+     .dropdown-content {
+       display: none;
+       position: absolute;
+       right: 20px;
+       top: 20px;
+       background-color: #f9f9f9;
+       min-width: 120px;
+       box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+       z-index: 1;
+     }
 
-    .hidden {
-      display: none;
-    }
+     .dropdown-content a {
+       color: black;
+       padding: 8px 12px;
+       text-decoration: none;
+       display: block;
+     }
 
-    /* Pagination Styles */
-    .pagination {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 20px;
-    }
+     .dropdown-content a:hover {
+       background-color: #f1f1f1;
+     }
 
-    .pagination .page-item.active .page-link {
-      background-color: #67e6be;
-      border-color: #67e6be;
-    }
+     .dropdown:hover .dropdown-content {
+       display: block;
+     }
 
-    .pagination .page-link {
-      background-color: white;
-      color: black;
-      padding: 10px 15px;
-      margin: 0 5px;
-    }
+     .dropdown-btn {
+       background-color: transparent;
+       border: none;
+       cursor: pointer;
+       font-size: 20px;
+     }
 
-    .pagination .page-link:hover {
-      background-color: #e9ecef;
-      color: black;
-    }
+     .ship {
+       margin: 2rem;
+     }
 
-    .prev {
-      background-color: #6c757d !important;
-      opacity: 30%;
-    }
+     .ship:hover {
+       background-color: white;
+       font-size: large;
+     }
 
-    .hidden {
-      display: none;
-    }
+     label {
+       text-align: left;
+       margin-bottom: 5px;
+     }
 
-    .heading {
-      @media (max-width: 758px) {
-        margin: 10px !important;
-      }
-    }
+     input {
+       margin-bottom: 20px;
+     }
 
-    .dropdown {
-      position: relative;
-      display: inline-block;
-    }
+     select {
+       margin-bottom: 20px;
+     }
 
-    .dropdown-content a {
-      color: black;
-      padding: 8px 12px;
-      text-decoration: none;
-      display: block;
-    }
+     .form-control {
+       padding: 0.75rem 0.75rem;
+     }
 
-    .dropdown-content a:hover {
-      background-color: #f1f1f1;
-    }
+     .form-select {
+       padding: 0.75rem 2.25rem 0.75rem 0.75rem;
+     }
+   </style>
 
-    .ship {
-      margin: 2rem;
-    }
-
-    .ship:hover {
-      background-color: white;
-      font-size: large;
-    }
-
-    label {
-      text-align: left;
-      margin-bottom: 10px;
-    }
-
-    input {
-      margin-bottom: 10px;
-    }
-
-    @media (max-width:560px) {
-      .tableDiv {
-        height: 300px;
-      }
-    }
-
-    input.form-control {
-      display: block;
-      width: 100%;
-      padding: .75rem .75rem;
-    }
-  </style>
   <script>
     document.addEventListener("DOMContentLoaded", function (event3) {
       const cBtn = document.getElementById("cBtn");
@@ -482,7 +450,14 @@
         modalDiscount.value = discount;
     });
 });
-
+$(document).ready(function () {
+     var table = $('#user').DataTable({
+         colReorder: true, // Enable column reordering
+         paging: true,
+         searching: true,
+         ordering: true
+     });
+    });
 </script>
 </body>
 

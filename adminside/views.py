@@ -7,7 +7,6 @@ from contact_form.models import Ticket
 from django.http import JsonResponse
 from .serializers import *
 from rest_framework import status
-from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
@@ -18,38 +17,9 @@ from django.contrib.auth.decorators import login_required
 from datetime import date
 from contact_form.models import *
 from decimal import Decimal
-
-
-class BatchView(APIView):
-    def get(self, request, pk=None):
-        if pk:
-            batch = get_object_or_404(Batch, pk=pk)
-            serializer = BatchSerializer(batch)
-            return Response(serializer.data)
-        else:
-            batches = Batch.objects.all()
-            serializer = BatchSerializer(batches, many=True)
-            return Response(serializer.data)
-
-    def post(self, request):
-        serializer = BatchSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request, pk):
-        batch = get_object_or_404(Batch, pk=pk)
-        serializer = BatchSerializer(batch, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk):
-        batch = get_object_or_404(Batch, pk=pk)
-        batch.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+from contact_form.send_mail import send_ticket_update_email  
+from contact_form.notification import notification_create  
+ 
 
 
 class CronsView(APIView):
@@ -204,21 +174,7 @@ class email_config_View(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class label_api_config_view(APIView):
-
-    def get(self, request):
-       label_api_config= LabelAPIConfig.objects.all()
-       serializer = LabelAPIConfigSerializer(label_api_config, many=True)
-       return Response(serializer.data)
-
-
-    def post(self, request):
-        serializer = LabelAPIConfigSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+ 
 class Userview(APIView):
    
     def get(self, request, pk=None):
@@ -292,19 +248,7 @@ class Weightview(APIView):
  
 
 
-class LabelView(APIView):
-    def get(self, request):
-        labels = newLabel.objects.all()
-        serializer = newLableSerializer(labels, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = newLableSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+   
 @login_required(login_url="/auth/signin/")
 def dashboard(request):
     total_users = CustomUser.objects.all().count()
@@ -313,9 +257,11 @@ def dashboard(request):
     open_tickets_count = Ticket.objects.filter(status="Open").count()
     return render(request, 'Admin/Admin.html',{"total_users": total_users, "today_registered": today_registered,  'open_tickets': open_tickets_count,})
 
+ 
 @login_required(login_url="/auth/signin/")
 def batch(request):
-    return render(request, 'Admin/Abatches.html')
+    batches = Batch.objects.all()   
+    return render(request, 'Admin/Abatches.html', {'batches': batches})
 
 @login_required(login_url="/auth/signin/")
 def cron(request):
@@ -339,28 +285,41 @@ def view_ticket(request, id):
     tickets= Ticket.objects.get(id=id)
     return render(request,'Admin/view_tickets.html',{"tickets":tickets})
 
+ 
+ 
 def submit_view_tickets(request):
     if request.method == 'POST':
-        id = request.POST['id']
-        title = request.POST['title']
-        date = request.POST['date']
-        message = request.POST['message']
-        status = request.POST["status"]
-
+        user = request.user 
         try:
-            ticket= Ticket.objects.get(id=id)
-            ticket.title = title
-            ticket.created_at = date
-            ticket.message = message
-            ticket.status  = status
-            ticket.save() 
-            return redirect('/tickets/')
+            ticket_id = request.POST['id']
+            new_message = request.POST['description']
+            status = request.POST['status']
 
-        except:
-            msg = 'error'
-            return render(request,'Admin/view_tickets.html',{"msg":msg})
+            ticket = get_object_or_404(Ticket, id=ticket_id)
+ 
+            Message.objects.create(ticket=ticket, sender="admin", text=new_message)
+ 
+            if ticket.message:  
+                ticket.message += f"\nAdmin: {new_message}"
+            else:  
+                ticket.message = f"Admin: {new_message}"
 
-    
+            # Update ticket status
+            ticket.status = status
+            ticket.save()
+            notification_create(
+                user, 
+                message=f"Your ticket '{ticket.title}' has been updated with a new reply.", 
+                color="Black"
+            )
+ 
+            send_ticket_update_email(ticket.user.email, ticket.user.username, ticket.title, new_message, status, "Admin")
+
+            return JsonResponse({"status": "success", "message": "Reply sent successfully!"})
+
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": f"Error: {str(e)}"}, status=400)
+
 
 @login_required(login_url="/auth/signin/")
 def setting(request):
