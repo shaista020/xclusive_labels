@@ -175,7 +175,7 @@
                 <input type="date" class="form-control" name="date" value="{{ tickets.created_at|date:'Y-m-d' }}" readonly>
             
                 <label for="message">Message</label>
-                <div id="messageContainer" class="chat-box">
+                <div id="messageContainer" class="chat-box" readonly>
                   {% for msg in tickets.message.splitlines %}
                       {% if "Admin:" in msg %}
                           <div class="admin-message">{{ msg }}</div>

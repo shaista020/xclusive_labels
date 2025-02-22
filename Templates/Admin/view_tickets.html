@@ -177,7 +177,7 @@ background: rgba(0, 0, 0, 0.8); padding: 20px; color: white; border-radius: 8px;
             
                 <!-- Message Field (Chat Display) -->
                 <label for="message">Messages</label>
-                <div id="messageContainer" class="chat-box">
+                <div id="messageContainer" class="chat-box" readonly>
                     {% for msg in tickets.message.splitlines %}
                         {% if "Admin:" in msg %}
                             <div class="admin-message">{{ msg }}</div>
