@@ -168,30 +168,63 @@
 <h2>Create Notification</h2>
 <form method="POST">
   {% csrf_token %}
-  <label>Message:</label>
-  <textarea name="message" class="form-control" required></textarea>
-  
-  <label>Select User (leave blank for global notification):</label>
-  <select name="user_id" class="form-control">
-      <option value="">-- Select User --</option>
-      {% for user in users %}
-      <option value="{{ user.id }}">{{ user.username }}</option>
-      {% endfor %}
-  </select>
 
-  <label>Color:</label>
-  <select name="color" class="form-control" required>
-      <option value="select">Select</option>
-      <option value="Red">Red</option>
-      <option value="Yellow">Yellow</option>
-      <option value="Green">Green</option>
-  </select>
+  <!-- Message Row -->
+  <div class="row mb-3">
+    <div class="col-md-12">
+      <label for="message" class="form-label">Message:</label>
+      <textarea name="message" class="form-control" required></textarea>
+    </div>
+  </div>
 
-  <label>Global Notification:</label>
-  <input type="checkbox" name="is_global">
+  <!-- Select User & Global Notification Row -->
+  <div class="row mb-3" >
+    <div class="col-md-6" id="user-row">
+      <label for="user_id" class="form-label">Select User (leave blank for global notification):</label>
+      <select name="user_id" class="form-control" id="user_select">
+        <option value="">-- Select User --</option>
+        {% for user in users %}
+          <option value="{{ user.id }}">{{ user.username }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-6">
+      <label for="is_global" class="form-label">Global Notification:</label>
+      <input type="checkbox" name="is_global" id="is_global" class="form-check-input">
+    </div>
+  </div>
+
+  <!-- Color Row -->
+  <div class="row mb-3">
+    <div class="col-md-6">
+      <label for="color" class="form-label">Color:</label>
+      <select name="color" class="form-control" required>
+        <option value="select">Select</option>
+        <option value="Red">Red</option>
+        <option value="Yellow">Yellow</option>
+        <option value="Green">Green</option>
+      </select>
+    </div>
+    <div class="col-md-6"></div> <!-- Empty column for spacing -->
+  </div>
 
   <button class="form-control btn btn-dark mt-4" type="submit">Create Notification</button>
 </form>
+
+<!-- jQuery to handle checkbox visibility -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#is_global').change(function() {
+      if ($(this).prop('checked')) {
+        $('#user-row').hide();  // Hide the user select row
+      } else {
+        $('#user-row').show();  // Show the user select row
+      }
+    });
+  });
+</script>
+
 
             
             </div>

@@ -40,9 +40,14 @@ class CompetitorRate(models.Model):
 
 
 class Package(models.Model):
+    Type_CHOICES = [
+        ("oz", "oz"),
+        ("lb", "lb"),
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     weight = models.DecimalField(max_digits=10, decimal_places=2)
+    type = models.CharField(max_length=20, choices=Type_CHOICES, default="lb")
     length = models.DecimalField(max_digits=10, decimal_places=2)
     width = models.DecimalField(max_digits=10, decimal_places=2)
     height = models.DecimalField(max_digits=10, decimal_places=2)
@@ -53,7 +58,6 @@ class Package(models.Model):
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     original_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     shipping_class = models.CharField(max_length=100, default='Standard')
-
     def get_competitor_rate(self):
        
         weight = self.weight
@@ -77,39 +81,44 @@ class Package(models.Model):
 
         return closest_match
 
+
     def calculate_discounted_price(self):
+        
         discount_percentage = self.discount / Decimal(100)
+        competitor_rate = self.get_competitor_rate()
 
-        if self.dynamic_pricing_enabled:
-            competitor_rate = self.get_competitor_rate()
-
-            if competitor_rate:
-                self.original_price = competitor_rate.rate
-            else:
-               
-                self.original_price = self.weight * Decimal(2)
- 
-            self.discounted_price = self.original_price * (Decimal(1) - discount_percentage)
-            self.discount_amount = self.original_price - self.discounted_price
-            self.total_cost = self.discounted_price
+        if competitor_rate:
+            self.original_price = competitor_rate.rate
         else:
-           
-            base_price = Decimal(7) if self.weight <= 4 else self.weight * Decimal(2)
-            self.original_price = base_price
-            self.discount_amount = base_price * discount_percentage
-            self.discounted_price = base_price - self.discount_amount
-            self.total_cost = self.discounted_price
- 
-        self.discounted_price = self.discounted_price or Decimal(0)
-        self.discount_amount = self.discount_amount or Decimal(0)
-        self.total_cost = self.total_cost or Decimal(0)
+            self.original_price = self.weight * Decimal(2)
+
+        self.discounted_price = self.original_price * (Decimal(1) - discount_percentage)
+        self.discount_amount = self.original_price - self.discounted_price
+        self.total_cost = self.discounted_price
+
+    def calculate_manual_price(self):
+       
+        if self.original_price > 0:
+            base_price = self.original_price   
+        else:
+            base_price = Decimal(7) if self.weight <= 4 else self.weight * Decimal(2)  
+
+        discount_percentage = self.discount / Decimal(100)
+        self.original_price = base_price
+        self.discount_amount = base_price * discount_percentage
+        self.discounted_price = base_price - self.discount_amount
+        self.total_cost = self.discounted_price
 
     def save(self, *args, **kwargs):
-        self.calculate_discounted_price()
+        if self.dynamic_pricing_enabled:
+            self.calculate_discounted_price()
+        else:
+            self.calculate_manual_price()
+
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Package: {self.name} - {self.weight} lbs - Dynamic Pricing: {self.dynamic_pricing_enabled}"
+        return f"Package: {self.name} - {self.weight} {self.type} - Dynamic Pricing: {self.dynamic_pricing_enabled}"
 
 class Ticket(models.Model):
     STATUS_CHOICES = [
@@ -131,7 +140,7 @@ class Ticket(models.Model):
 
 class Message(models.Model):
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name="messages")
-    sender = models.CharField(max_length=10, choices=[("admin", "Admin"), ("user", "User")])
+    sender = models.CharField(max_length=10, choices=[("admin", "admin"), ("user", "User")])
     text = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     

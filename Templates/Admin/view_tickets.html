@@ -50,7 +50,7 @@
       .hidden {
         display: none;
       }
-       
+           
 .chat-box {
     border: 1px solid #ccc;
     padding: 10px;
@@ -60,24 +60,66 @@
     border-radius: 5px;
 }
 
+ 
+ 
+ 
+
+.sender .message-time {
+    color: #6c757d;  /* Muted gray for sender's timestamp */
+}
+
+.receiver .message-time {
+    color: white;  /* White for receiver's timestamp */
+}
+.message {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4px;
+    position: relative;
+}
+
+.message-date {
+    font-size: 12px;
+    font-weight: bold;
+    color: gray;
+    margin-bottom: 2px;
+    align-self: flex-start;
+    display: block;
+}
+
+.user-message, .admin-message, .unknown-message {
+    position: relative;
+    padding: 8px 12px;
+    border-radius: 8px;
+    max-width: 70%;
+    word-wrap: break-word;
+    display: flex;
+    flex-direction: column;
+}
+
 .user-message {
-    background: #d1e7dd;
-    padding: 8px;
-    margin: 5px;
-    border-radius: 5px;
-    width: fit-content;
-    max-width: 80%;
+    background-color: #e1f5fe;
+    align-self: flex-end;
+    
 }
 
 .admin-message {
-    background: #f8d7da;
-    padding: 8px;
-    margin: 5px;
-    border-radius: 5px;
-    width: fit-content;
-    max-width: 80%;
-    align-self: flex-end;
+    background: #f8cdd1;
+    align-self: flex-start;
 }
+
+.unknown-message {
+    background-color: #f5f5f5;
+    align-self: center;
+}
+
+.time {
+    font-size: 10px;
+    color: gray;
+    align-self: flex-end;
+    margin-top: 4px;
+}
+
 </style>
  
 
@@ -158,73 +200,107 @@
               <a href="#" style="text-decoration: none; color: black; margin-left: 10px">testing</a>
             </div>
           
-            <div class="card tmaindiv vMDiv" style="text-align: left">
-              <div id="loadingModal" style="display: none; position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%);
+            <div id="loadingModal" style="display: none; position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%);
 background: rgba(0, 0, 0, 0.8); padding: 20px; color: white; border-radius: 8px; text-align: center;">
-    <p>Please wait, processing your request...</p>
-  </div>
+  <p>Please wait, processing your request...</p>
+</div>
+            <div class="card tmaindiv vMDiv" style="text-align: left">
   <form action="/submit_view_tickets/" method="POST" id="ticketForm">
-                {% csrf_token %}
-                <input type="text" name="id" value="{{ tickets.id }}" hidden>
-            
-                <!-- Title Field -->
-                <label for="title">Title</label>
-                <input type="text" class="form-control" name="title" value="{{ tickets.title }}" readonly>
-            
-                <!-- Date Field -->
-                <label for="date">Date</label>
-                <input type="date" class="form-control" name="date" value="{{ tickets.created_at|date:'Y-m-d' }}" readonly>
-            
-                <!-- Message Field (Chat Display) -->
-                <label for="message">Messages</label>
-                <div id="messageContainer" class="chat-box" readonly>
-                    {% for msg in tickets.message.splitlines %}
-                        {% if "Admin:" in msg %}
-                            <div class="admin-message">{{ msg }}</div>
-                        {% else %}
-                            <div class="user-message">{{ msg }}</div>
-                        {% endif %}
-                    {% endfor %}
+    {% csrf_token %}
+    <input type="text" name="id" value="{{ tickets.id }}" hidden>
+
+    <!-- Row for Title & Status -->
+    <div class="row">
+        <div class="col-md-9">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" name="title" value="{{ tickets.title }}" readonly>
+        </div>
+        <div class="col-md-3 ">  {# Status field aligned to the top-right #}
+            <label for="status">Status</label>
+            <select name="status" id="status" class="form-select">
+                {% for key, value in tickets.STATUS_CHOICES %}
+                    <option value="{{ key }}" {% if tickets.status == key %}selected{% endif %}>{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Message Field (Chat Display) -->
+    <label for="message"> </label>
+    <div id="messageContainers" class="chat-box">
+        {% for msg in tickets.message.splitlines %}
+            {% if "[" in msg and "]" in msg %}
+                {% with msg|slice:"1:17" as timestamp %}
+                    {% with timestamp|slice:"0:10" as date %}
+                    {% with timestamp|slice:"11:16" as time %}
+                    {% with msg|slice:"18:" as content %}
+
+                        <div class="message">
+                            {% if "User:" in content %}
+                                <div class="user-message">
+                                    <small class="message-date">{{ date }}</small>
+                                    {{ content|slice:"9:" }}
+                                    <small class="time">{{ time }}</small>
+                                </div>
+                            {% elif "[admin]" in content %}
+                                <div class="admin-message">
+                                    <small class="message-date">{{ date }}</small>
+                                    {{ content|slice:"8:" }}
+                                    <small class="time">{{ time }}</small>
+                                </div>
+                            {% else %}
+                                <div class="unknown-message">
+                                    <small class="message-date">{{ date }}</small>
+                                    {{ content }}
+                                    <small class="time">{{ time }}</small>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+                {% endwith %}
+            {% else %}
+                <div class="unknown-message">
+                    <small class="message-date">{{ date }}</small>
+                    {{ msg }}
                 </div>
-            
-                <!-- Reply Box -->
-                <label for="description">Reply</label>
-                <textarea id="descriptionText" class="form-control" placeholder="Write your message here" rows="5" name="description"></textarea>
-            
-                <!-- Status Field -->
-                <label for="status">Status</label>
-                <select name="status" id="status" class="form-select">
-                    {% for key, value in tickets.STATUS_CHOICES %}
-                        <option value="{{ key }}" {% if tickets.status == key %}selected{% endif %}>{{ value }}</option>
-                    {% endfor %}
-                </select>
-            
-                <!-- Submit Button -->
-                <button class="form-control btn btn-dark mt-4" id="updateTicketBtn">
-                    Send
-                </button>
-            </form>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Reply Box -->
+    <label for="description">Type Your Message</label>
+    <input id="descriptionText" class="form-control" placeholder="Write your message here" rows="5" name="description"></input>
+
+    <!-- Submit Button -->
+    <button class="btn btn-dark mt-4" id="updateTicketBtn">
+        Send
+    </button>
+</form>
+
             
             </div>
           </div>
           <script>
             document.addEventListener("DOMContentLoaded", function() {
                 let ticketForm = document.getElementById("ticketForm");
-            
-                if (ticketForm) {  
+        
+                if (ticketForm) {
                     ticketForm.addEventListener("submit", function(event) {
                         event.preventDefault(); 
-            
+        
                         let formData = new FormData(this);
                         let descriptionBox = document.getElementById("descriptionText");
-                        let messageContainer = document.getElementById("messageContainer");
+                        let messageContainer = document.getElementById("messageContainers");
                         let sendButton = document.getElementById("updateTicketBtn");
                         let loadingModal = document.getElementById("loadingModal");
-            
+        
                         // Show loading message
                         loadingModal.style.display = "block"; 
                         sendButton.disabled = true;  // Disable button while processing
-            
+        
                         fetch("/submit_view_tickets/", {
                             method: "POST",
                             body: formData
@@ -234,18 +310,29 @@ background: rgba(0, 0, 0, 0.8); padding: 20px; color: white; border-radius: 8px;
                             // Hide loading message after processing
                             loadingModal.style.display = "none"; 
                             sendButton.disabled = false; 
-            
+        
                             if (data.status === "success") {
-                                // Create new message element
+                                let today = new Date();
+                                let formattedDate = today.toISOString().split("T")[0];  // YYYY-MM-DD
+                                let formattedTime = today.toTimeString().split(" ")[0].slice(0, 5);  // HH:MM
+        
                                 let newMessage = document.createElement("div");
-                                newMessage.className = "admin-message";
-                                newMessage.innerText = "Admin: " + descriptionBox.value;
-            
-                                // Append new message and scroll to latest
+                                newMessage.classList.add("message");
+        
+                                newMessage.innerHTML = `
+                                    <div class="admin-message">
+                                        <small class="message-date">${formattedDate}</small>
+                                        <strong>admin:</strong> ${descriptionBox.value}
+                                        <small class="time">${formattedTime}</small>
+                                    </div>`;
+        
+                                // Append the new message inside the message container
                                 messageContainer.appendChild(newMessage);
+        
+                                // Scroll to the latest message
                                 messageContainer.scrollTop = messageContainer.scrollHeight;
-            
-                                // Clear input field
+        
+                                // Clear the input field
                                 descriptionBox.value = "";
                             } else {
                                 alert(data.message);
@@ -261,7 +348,8 @@ background: rgba(0, 0, 0, 0.8); padding: 20px; color: white; border-radius: 8px;
                     console.error("Error: #ticketForm not found in DOM!");
                 }
             });
-            </script>
+        </script>
+        
             
 
         </body>
