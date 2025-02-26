@@ -7,7 +7,6 @@ from contact_form.models import Ticket
 from django.http import JsonResponse
 from .serializers import *
 from rest_framework import status
-from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
@@ -20,36 +19,6 @@ from contact_form.models import *
 from decimal import Decimal
 
 
-class BatchView(APIView):
-    def get(self, request, pk=None):
-        if pk:
-            batch = get_object_or_404(Batch, pk=pk)
-            serializer = BatchSerializer(batch)
-            return Response(serializer.data)
-        else:
-            batches = Batch.objects.all()
-            serializer = BatchSerializer(batches, many=True)
-            return Response(serializer.data)
-
-    def post(self, request):
-        serializer = BatchSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request, pk):
-        batch = get_object_or_404(Batch, pk=pk)
-        serializer = BatchSerializer(batch, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk):
-        batch = get_object_or_404(Batch, pk=pk)
-        batch.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CronsView(APIView):
@@ -204,21 +173,7 @@ class email_config_View(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class label_api_config_view(APIView):
-
-    def get(self, request):
-       label_api_config= LabelAPIConfig.objects.all()
-       serializer = LabelAPIConfigSerializer(label_api_config, many=True)
-       return Response(serializer.data)
-
-
-    def post(self, request):
-        serializer = LabelAPIConfigSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+ 
 class Userview(APIView):
    
     def get(self, request, pk=None):
@@ -292,19 +247,7 @@ class Weightview(APIView):
  
 
 
-class LabelView(APIView):
-    def get(self, request):
-        labels = newLabel.objects.all()
-        serializer = newLableSerializer(labels, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = newLableSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+   
 @login_required(login_url="/auth/signin/")
 def dashboard(request):
     total_users = CustomUser.objects.all().count()
@@ -313,9 +256,11 @@ def dashboard(request):
     open_tickets_count = Ticket.objects.filter(status="Open").count()
     return render(request, 'Admin/Admin.html',{"total_users": total_users, "today_registered": today_registered,  'open_tickets': open_tickets_count,})
 
+ 
 @login_required(login_url="/auth/signin/")
 def batch(request):
-    return render(request, 'Admin/Abatches.html')
+    batches = Batch.objects.all()   
+    return render(request, 'Admin/Abatches.html', {'batches': batches})
 
 @login_required(login_url="/auth/signin/")
 def cron(request):
