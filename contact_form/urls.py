@@ -64,10 +64,8 @@ urlpatterns = [
    path('delete-account/', views.delete_account, name='delete_account'),
    path('navbar.html', views.load_navbar, name='load_navbar'),
     path('sidebar.html', views.load_sidebar, name='load_sidebar'),
-    
-   #  path('store/create/', views.create_store, name='create_store'),
-   #  path('store/<int:pk>/update/', views.update_store, name='update_store'),
-   #  path('store/<int:pk>/delete/', views.delete_store, name='delete_store'),
+     path('calculate_package_price/', calculate_package_price, name='calculate_package_price'),
 ]
 
 
+ 

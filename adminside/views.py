@@ -286,7 +286,9 @@ def view_ticket(request, id):
     return render(request,'Admin/view_tickets.html',{"tickets":tickets})
 
  
- 
+from django.utils import timezone
+   
+  
 def submit_view_tickets(request):
     if request.method == 'POST':
         user = request.user  
@@ -296,21 +298,28 @@ def submit_view_tickets(request):
             status = request.POST['status']
 
             ticket = get_object_or_404(Ticket, id=ticket_id)
-
-            # Create a new message with the logged-in user's name
-            Message.objects.create(ticket=ticket, sender=user.username, text=new_message)
-
-            # Append message to ticket history
-            if ticket.message:  
-                ticket.message += f"\n{user.username}: {new_message}"
-            else:  
-                ticket.message = f"{user.username}: {new_message}"
-
-            # Update ticket status
+ 
+            sender_label = "[admin]" if user.is_superuser else "[User]"
+            timestamp = timezone.now().strftime('%Y-%m-%d %H:%M')
+ 
+            messages_to_add = []
+ 
+            if ticket.status != status: 
+                status_message = f"[{timestamp}] {sender_label} {user.username}: changed the ticket status to '{status}'."
+                messages_to_add.append(status_message)
+ 
+            if new_message.strip():
+                formatted_message = f"[{timestamp}] {sender_label} {user.username}: {new_message}"
+                messages_to_add.append(formatted_message)
+ 
+                Message.objects.create(ticket=ticket, sender=user.username, text=new_message)
+ 
+            if messages_to_add:
+                ticket.message += "\n" + "\n".join(messages_to_add) if ticket.message else "\n".join(messages_to_add)
+ 
             ticket.status = status
             ticket.save()
-
-            # Generate a dynamic notification message based on the action performed
+ 
             if status.lower() == "closed":
                 notification_message = f"Your ticket '{ticket.title}' has been closed by {user.username}."
             elif status.lower() == "in progress":
@@ -320,17 +329,17 @@ def submit_view_tickets(request):
             else:
                 notification_message = f"Your ticket '{ticket.title}' has been updated by {user.username} with a new reply."
 
-            # Send notification with dynamic message
+            
             notification_create(
                 ticket.user,  
                 message=notification_message,
                 color="Black"
             )
 
-            # Send email update
+            
             send_ticket_update_email(ticket.user.email, ticket.user.username, ticket.title, new_message, status, user.username)
 
-            return JsonResponse({"status": "success", "message": "Reply sent successfully!"})
+            return JsonResponse({"status": "success", "message": "Reply and status update sent successfully!"})
 
         except Exception as e:
             return JsonResponse({"status": "error", "message": f"Error: {str(e)}"}, status=400)
@@ -349,7 +358,7 @@ def type(request):
 
 @login_required(login_url="/auth/signin/")
 def user(request):
-    # Fetch all users
+    
     users = CustomUser.objects.all()
     
     return render(request, 'Admin/AUsers.html', {'users': users})
@@ -363,7 +372,7 @@ def get_user_details(request):
             user_data = {
                 "full_name": user.username,  
                 "email": user.email,
-                "verified_status": user.verified_status,  # No extra check needed here
+                "verified_status": user.verified_status,   
                 "current_balance": user.current_balance,
                 "total_spent": user.total_spent,
                 "date_joined": user.date_joined.strftime("%Y-%m-%d"),
@@ -422,35 +431,49 @@ def update_discount(request):
 
     return redirect('/packages_admin')
 
-@login_required
+ 
+ 
 def edit_package(request, package_id):
-    package = get_object_or_404(Package, id=package_id, user=request.user)
-
+    
+    package = get_object_or_404(Package, pk=package_id)
+ 
     if request.method == "POST":
-        try:
-            package.name = request.POST.get('name').strip()
-            package.weight = Decimal(str(request.POST.get('weight')))
-            package.length = Decimal(str(request.POST.get('length')))
-            package.width = Decimal(str(request.POST.get('width')))
-            package.height = Decimal(str(request.POST.get('height')))
-            package.discount = Decimal(str(request.POST.get('discount')))
-            volume = package.length * package.width * package.height
-            package.dynamic_pricing_enabled = 'dynamic_pricing_enabled' in request.POST
-
-            if package.dynamic_pricing_enabled:
-                discount_amount = (volume * package.discount) / Decimal(100)
-                package.total_cost = volume - discount_amount  
-            else:
-                package.total_cost = volume
-
-            package.save()
-            return redirect('/packages_admin')
-
-        except Exception as e:
-            print(f"Error: {e}")  
-            return render(request, 'Admin/edit_package.html', {'package': package, 'error': "Invalid input."})
-
-    return render(request, 'Admin/edit_package.html', {'package': package})
+        weight = Decimal(request.POST.get('weight', 0))
+        length = Decimal(request.POST.get('length', 0))
+        width = Decimal(request.POST.get('width', 0))
+        height = Decimal(request.POST.get('height', 0))
+        dynamic_pricing_enabled = request.POST.get('dynamic_pricing_enabled', 'off') == 'on'
+        discount_percentage = Decimal(request.POST.get('discount', 20))  
+        original_price = Decimal(request.POST.get('original_price', 0))   
+        if dynamic_pricing_enabled:
+           
+            original_price = weight * Decimal(2)  
+            discounted_price = original_price * (Decimal(1) - (discount_percentage / Decimal(100)))
+            discount_amount = original_price - discounted_price
+            total_cost = discounted_price
+        else:
+            
+            discounted_price = original_price * (Decimal(1) - (discount_percentage / Decimal(100)))
+            discount_amount = original_price - discounted_price
+            total_cost = discounted_price
+ 
+        package.weight = weight
+        package.length = length
+        package.width = width
+        package.height = height
+        package.discount = discount_percentage
+        package.dynamic_pricing_enabled = dynamic_pricing_enabled
+        package.original_price = original_price
+        package.discounted_price = discounted_price
+        package.discount_amount = discount_amount
+        package.total_cost = total_cost
+        package.save()
+ 
+        return redirect('package_detail', package_id=package.id)
+ 
+    return render(request, 'Admin/edit_package.html', {
+        'package': package
+    })
 
 
 @login_required

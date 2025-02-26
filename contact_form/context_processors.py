@@ -14,7 +14,7 @@ def notification_context(request):
             all_notifications = (user_notifications | global_notifications | admin_created_notifications).order_by("-created_at")
 
         unread_count = all_notifications.count()  
-        notifications = all_notifications[:5]   
+        notifications = all_notifications  
     else:
         notifications = []
         unread_count = 0

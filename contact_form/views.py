@@ -639,43 +639,70 @@ def create_package(request):
             height = Decimal(request.POST.get('height', 0))  
             dynamic_pricing_enabled = request.POST.get('dynamic_pricing_enabled', 'off') == 'on'
             shipping_class = request.POST.get('shipping_class', 'Standard')
-            
+             
+            shipping_type = request.POST.get('type', 'lb')   
+            original_price = Decimal(request.POST.get('original_price', 0)) if not dynamic_pricing_enabled else Decimal(0)
+ 
             discount_percentage_obj = ShippingClassDiscount.objects.filter(shipping_class=shipping_class).first()
             discount_percentage = discount_percentage_obj.discount_percentage if discount_percentage_obj else 20
-
+ 
             new_package = Package(
-                user=request.user, name=name, weight=weight, length=length,
+                user=user, name=name, weight=weight, length=length,
                 width=width, height=height, dynamic_pricing_enabled=dynamic_pricing_enabled,
-                discount=discount_percentage, shipping_class=shipping_class
+                discount=discount_percentage, shipping_class=shipping_class,
+                original_price=original_price, type=shipping_type  
             )
 
-            if dynamic_pricing_enabled:
-                competitor_rate = new_package.get_competitor_rate()
-                
-                if competitor_rate:
-                    print(f"Competitor Rate Found: {competitor_rate.rate} for {competitor_rate.length}x{competitor_rate.width}x{competitor_rate.height}")
-                else:
-                    print("No exact competitor rate found. Using estimated base pricing.")
-
-                new_package.calculate_discounted_price()
-
             new_package.save()
+
             notification_create(
                 user, 
-                message=f"New Package '{new_package.name}' has been Added In list.", 
+                message=f"New Package '{new_package.name}' has been added.", 
                 color="Black"
             )
             return redirect('/packages_admin')
-        
 
         except Exception as e:
             print(f"Error in create_package: {str(e)}")
             return render(request, "Admin/Packages.html", {
-                "error": str(e), "packages": Package.objects.filter(user=request.user),
+                "error": str(e), "packages": Package.objects.filter(user=user),
             })
 
     return render(request, "Admin/Packages.html", {"packages": Package.objects.filter(user=request.user)})
 
+def calculate_package_price(request):
+    if request.method == "POST":
+        try:
+            weight = Decimal(request.POST.get('weight', 0))
+            length = Decimal(request.POST.get('length', 0))
+            width = Decimal(request.POST.get('width', 0))
+            height = Decimal(request.POST.get('height', 0))
+            dynamic_pricing_enabled = request.POST.get('dynamic_pricing_enabled', 'off') == 'on'
+            discount_percentage = Decimal(request.POST.get('discount', 20))  
+            if dynamic_pricing_enabled:
+                
+                original_price = weight * Decimal(2)   
+                discounted_price = original_price * (Decimal(1) - (discount_percentage / Decimal(100)))
+                discount_amount = original_price - discounted_price
+                total_cost = discounted_price
+            else:
+                
+                original_price = Decimal(request.POST.get('original_price', 0))   
+                discount_amount = original_price * (discount_percentage / Decimal(100))
+                discounted_price = original_price - discount_amount
+                total_cost = discounted_price
+
+            return JsonResponse({
+                'original_price': str(original_price),
+                'discounted_price': str(discounted_price),
+                'discount_amount': str(discount_amount),
+                'total_cost': str(total_cost),
+            })
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    return JsonResponse({'error': 'Invalid method'}, status=400)
 
 @login_required(login_url="/auth/signin/")
 def setting(request):
@@ -703,8 +730,7 @@ def update_profile(request):
 
         try:
             user.save() 
-            
-            # ✅ Fix the notification message
+             
             status = "enabled" if is_2fa_enabled else "disabled"
             notification_create(
                 user, 
@@ -758,29 +784,45 @@ def view_tickets_user(request, id):
     return render(request,'User/view_tickets.html',{"tickets":tickets})
 
 
- 
+  
 def submit_view_tickets_user(request):
     if request.method == 'POST':
-        user = request.user 
+        user = request.user
         try:
-            ticket_id = request.POST['id']
-            new_message = request.POST['description']
+            ticket_id = request.POST.get('id')
+            new_message = request.POST.get('description')
 
             ticket = get_object_or_404(Ticket, id=ticket_id)
- 
+
+            # Append new message with timestamp
+            timestamp = now().strftime('%Y-%m-%d %I:%M %p')  
             if ticket.message:
-                ticket.message += f"\nUser: {new_message}"
+                ticket.message += f"\n[{timestamp}] User: {new_message}"
             else:
-                ticket.message = f"User: {new_message}"
+                ticket.message = f"[{timestamp}] User: {new_message}"
             ticket.save()
+ 
             notification_create(
-                user, 
-                message=f"Your ticket '{ticket.title}' message sent successfully!.", 
+                user,
+                message=f"Your ticket '{ticket.title}' message was sent successfully.",
                 color="Black"
             )
-            send_ticket_update_email(ticket.user.email, ticket.user.username, ticket.title, new_message, ticket.status, "User")
+ 
+            send_ticket_update_email(
+                ticket.user.email,
+                ticket.user.username,
+                ticket.title,
+                new_message,
+                ticket.status,
+                "User"
+            )
 
-            return JsonResponse({"status": "success", "message": "Reply sent successfully!"})
+            return JsonResponse({
+                "status": "success",
+                "date": now().strftime('%Y-%m-%d'),
+                "time": now().strftime('%H:%M'),
+                "message": "Reply sent successfully!"
+            })
 
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=400)

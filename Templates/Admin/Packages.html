@@ -30,6 +30,34 @@
     rel="stylesheet" />
 
     <style>
+     form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    text-align: left;
+}
+
+input, select {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+input[type="checkbox"] {
+    display: inline-block;
+    margin-top: 8px;
+}
+
+button {
+    display: block;
+    margin-top: 20px;
+}
+
+.col-md-6 input[type="checkbox"] {
+    margin-left: 35px; /* For slight space adjustment between label and checkbox */
+}
+
       #cMenu {
  display: none; 
 }
@@ -257,7 +285,7 @@
                     {% for package in packages %}
                     <tr>
                         <td>{{ package.name }}</td>
-                        <td>{{ package.weight }} lbs</td>
+                        <td>{{ package.weight }} {{ package.type }}</td>
                         <td>{{ package.length }}x{{ package.width }}x{{ package.height }}</td>
                         <td>
                           {% if package.dynamic_pricing_enabled %}
@@ -387,50 +415,81 @@
                 Create Saved Package </a>
             </div>
           </div>
-         
+          <div>
+            <form id="package_form" action="/create_package" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card ship">
+                    <h2>Create New Package</h2>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="id_name">Name</label>
+                            <input class="form-control" id="id_name" name="name" type="text" required value="" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_weight">Weight</label>
+                            <input class="form-control" id="id_weight" name="weight" type="number" required value="" />
+                        </div>
+                    </div>
         
-          <form action="/create_package" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="card ship">
-                <!-- Package Details -->
-                <label>Name</label>
-                <input class="form-control" id="name" name="name" type="text" required value="" />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="id_length">Length (inch)</label>
+                            <input class="form-control" id="id_length" name="length" type="number" required value="" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_width">Width (inch)</label>
+                            <input class="form-control" id="id_width" name="width" type="number" required value="" />
+                        </div>
+                    </div>
         
-                <label>Weight</label>
-                <input class="form-control" name="weight" type="number" required value="" />
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="id_height">Height (inch)</label>
+                            <input class="form-control" id="id_height" name="height" type="number" required value="" />
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_type">Shipping Type</label>
+                            <select class="form-control" name="type" id="id_type" required>
+                                <option value="lb" {% if package and package.type == 'lb' %}selected{% endif %}>lb</option>
+                                <option value="oz" {% if package and package.type == 'oz' %}selected{% endif %}>oz</option>
+                            </select>
+                        </div>
+                    </div>
+                     
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div for="dynamicPricing">
+                                <input type="checkbox" id="dynamicPricing" name="dynamic_pricing_enabled" />
+                                <label for="dynamic_pricing_enabled" class="form-check-label">Enable Dynamic Pricing</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_discount">Dynamic Pricing Discount (%)</label>
+                            <input class="form-control" id="id_discount" type="number" name="discount" value="20" />
+                        </div>
+                    </div>
         
-                <div>
-                    <label>Type</label>
-                    <input type="radio" name="lb" value="lb" />
-                    <label for="lb">lb</label>
-                    <input type="radio" name="oz" value="oz" checked />
-                    <label for="oz">oz</label>
+                    <div id="originalPriceContainer" class="row">
+                        <div class="col-md-6">
+                            <label for="id_original_price">Original Price ($)</label>
+                            <input class="form-control" id="id_original_price" type="number" name="original_price" step="0.01" />
+                        </div>
+                    </div>
+        
+                    <button class="form-control btn btn-dark" style="width: fit-content; padding: 15px 30px; margin-top: 20px;">
+                        Save Package
+                    </button>
+        
+                    <div>
+                        <strong>Original Price: </strong><span id="id_original_price_display">0.00</span>
+                    </div>
+                    <div>
+                        <strong>Discounted Price: </strong><span id="id_discounted_price">0.00</span>
+                    </div>
                 </div>
-        
-                <label>Length (inch)</label>
-                <input class="form-control" name="length" type="number" required value="" />
-        
-                <label>Width (inch)</label>
-                <input class="form-control" name="width" type="number" required value="" />
-        
-                <label>Height (inch)</label>
-                <input class="form-control" name="height" type="number" required value="" />
-        
-                <!-- Dynamic Pricing Settings -->
-                <label>Enable Dynamic Pricing</label>
-                <input type="checkbox" name="dynamic_pricing_enabled" value="on" />
-        
-                <label>Dynamic Pricing Discount (%)</label>
-                <input class="form-control" type="number" name="dynamic_pricing_discount" value="20" />
-        
-              
-                <button class="form-control btn btn-dark" style="width: fit-content; padding: 15px 30px; margin-top: 20px;">
-                    Save Package
-                </button>
-            </div>
-        </form>
-        
+            </form>
         </div>
+        
       </main>
     </div>
     <script src="../../static/index.js"></script>
@@ -438,11 +497,10 @@
   document.addEventListener("DOMContentLoaded", function () {
     var editModal = document.getElementById('editModal');
     editModal.addEventListener('show.bs.modal', function (event) {
-        var button = event.relatedTarget; // Button that triggered the modal
+        var button = event.relatedTarget; 
         var packageId = button.getAttribute('data-id');
         var discount = button.getAttribute('data-discount');
-
-        // Populate the modal form fields
+ 
         var modalPackageId = editModal.querySelector('#packageId');
         var modalDiscount = editModal.querySelector('#discount');
 
@@ -452,13 +510,116 @@
 });
 $(document).ready(function () {
      var table = $('#user').DataTable({
-         colReorder: true, // Enable column reordering
+         colReorder: true,  
          paging: true,
          searching: true,
          ordering: true
      });
     });
+    $(document).ready(function() {
+    
+    let dynamicPricingCheckbox = $('#dynamicPricing');
+    let originalPriceContainer = $('#originalPriceContainer');
+ 
+    function toggleOriginalPrice() {
+        if (dynamicPricingCheckbox.prop('checked')) {
+            originalPriceContainer.hide();   
+        } else {
+            originalPriceContainer.show();   
+        }
+    }
+ 
+    toggleOriginalPrice();
+ 
+    dynamicPricingCheckbox.change(function() {
+        toggleOriginalPrice();
+    });
+ 
+    function getCSRFToken() {
+        var name = 'csrftoken';
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    $(document).ready(function() {
+    
+    let dynamicPricingCheckbox = $('#dynamicPricing');
+    let originalPriceContainer = $('#originalPriceContainer');
+ 
+    function toggleOriginalPrice() {
+        if (dynamicPricingCheckbox.prop('checked')) {
+            originalPriceContainer.hide();  
+        } else {
+            originalPriceContainer.show();   
+        }
+    }
+ 
+    toggleOriginalPrice();
+ 
+    dynamicPricingCheckbox.change(function() {
+        toggleOriginalPrice();
+    });
+
+  
+    $('#package_form input').on('input', function() {
+        console.log("Form inputs changed, preparing data...");
+
+        let formData = {
+            weight: $('#id_weight').val(),
+            length: $('#id_length').val(),
+            width: $('#id_width').val(),
+            height: $('#id_height').val(),
+            dynamic_pricing_enabled: $('#dynamicPricing').is(':checked') ? 'on' : 'off',
+            discount: $('#id_discount').val(),
+        };
+ 
+        if (!$('#dynamicPricing').is(':checked')) {
+            formData.original_price = $('#id_original_price').val();
+        }
+
+        console.log("Form data:", formData);
+
+        $.ajax({
+            url: '{% url "calculate_package_price" %}',   
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken()   
+            },
+            data: formData,
+            success: function(response) {
+                console.log("Success:", response);   
+                if (response.error) {
+                     
+                    alert('Error: ' + response.error);
+                } else {
+                    
+                    $('#id_original_price_display').text(response.original_price);   
+                    $('#id_discounted_price').text(response.discounted_price);  
+                    $('#id_discount_amount').text(response.discount_amount);   
+                    $('#id_total_cost').text(response.total_cost);  
+                }
+            },
+            error: function(xhr, errmsg, err) {
+                // console.log('Error:', errmsg);
+            }
+        });
+    });
+});
+
+    });
 </script>
+
+
 </body>
 
 </html>
