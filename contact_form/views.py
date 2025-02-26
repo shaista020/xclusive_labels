@@ -4,10 +4,11 @@ from rest_framework import status
 from django.core.mail import send_mail
 from .serializers import *
 from contact_form.models import *
+from adminside.models import *
 from django.conf import settings
 from django.shortcuts import render,redirect
 from rest_framework import viewsets
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required,user_passes_test
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -31,9 +32,8 @@ from django.db.models import Sum
 from decimal import Decimal
 from django.template.loader import get_template
 from xhtml2pdf import pisa
-import os
-
-
+from contact_form.send_mail import send_ticket_update_email 
+from contact_form.notification import notification_create
 class ContactInfoView(APIView):
     def post(self, request):
         serializer = ContactInfoSerializer(data=request.data)
@@ -97,7 +97,7 @@ class PackageView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+ 
 class TicketView(APIView):
     permission_classes = [IsAuthenticated] 
     def get(self, request, ticket_id=None):
@@ -273,6 +273,53 @@ class ProfileView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class StoreView(APIView):
+    permission_classes = [IsAuthenticated]  
+
+    def get(self, request, pk=None):
+        if pk:        
+            try:
+                store = Store.objects.get(pk=pk, user=request.user)  
+            except Store.DoesNotExist:
+                return Response({"detail": "Store not found."}, status=status.HTTP_404_NOT_FOUND)
+
+            serializer = StoreSerializer(store)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            stores = Store.objects.filter(user=request.user)  
+            serializer = StoreSerializer(stores, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        data = request.data
+        data['user'] = request.user.id
+
+        serializer = StoreSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk):
+        try:
+            address = Store.objects.get(pk=pk, user=request.user)
+        except Store.DoesNotExist:
+            return Response({"error": "Address not found or not authorized"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = StoreSerializer(address, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        try:
+            store = Store.objects.get(pk=pk, user=request.user) 
+        except Store.DoesNotExist:
+            return Response({"detail": "Store not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        store.delete()
+        return Response({"detail": "Store deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
 class CouponView(APIView):
     def get(self, request):
@@ -293,7 +340,7 @@ class DeleteAccountView(APIView):
         user.delete()
 
 def referrals_view(request):
-    referrals = User.objects.filter(referred_by=request.user)
+    referrals = CustomUser.objects.filter(referred_by=request.user)
     referral_commission = referrals.aggregate(Sum('available_for_withdraw'))['available_for_withdraw__sum'] or Decimal('0.00')
     user_own_commission = request.user.available_for_withdraw
     total_commission = referral_commission + user_own_commission
@@ -309,51 +356,64 @@ def referrals_view(request):
 
     return render(request, "User/Referrals.html", context)
 
-
+ 
+ 
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-       
-        if self.request.user.is_staff:  
-            return self.queryset  
-        else:
-            return self.queryset.filter(user=self.request.user)  
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
-    def get_notifications(self, request):
-      
-        notifications = self.get_queryset()
-        unread_count = notifications.filter(is_read=False).count()
-        serialized_notifications = NotificationSerializer(notifications, many=True)
-        return Response({
-            'username': request.user.username,  
-            'unread_count': unread_count,
-            'notifications': serialized_notifications.data
-        })
-
-    @action(detail=False, methods=['patch'], permission_classes=[IsAuthenticated])
-    def mark_as_read(self, request):
-        unread_notifications = self.queryset.filter(user=request.user, is_read=False)
-        
-        if unread_notifications.exists():
-            unread_notifications.update(is_read=True)
-            return Response({"status": "All notifications marked as read."})
-        else:
-            return Response({"status": "No unread notifications to mark."}, status=400)
-
-    @action(detail=False, methods=['delete'], permission_classes=[IsAuthenticated])
+    def perform_create(self, serializer):
+        # Automatically set created_by from the authenticated user
+        serializer.save(created_by=self.request.user)
+    @action(detail=False, methods=["delete"], permission_classes=[IsAuthenticated])
     def delete_notifications(self, request):
-        """Delete all read notifications."""
-        deleted_notifications = self.queryset.filter(user=request.user, is_read=True)
-        
-        if deleted_notifications.exists():
-            deleted_notifications.delete()
-            return Response({"status": "All read notifications deleted."})
-        else:
-            return Response({"status": "No read notifications to delete."}, status=400)
+     """Delete all notifications for the current user."""
+     self.get_queryset().delete()
+     return Response({"message": "All notifications deleted."}, status=200)
+    @action(detail=False, methods=["patch"], permission_classes=[IsAuthenticated])
+    def mark_as_read(self, request):
+        """Mark all notifications as read for the current user."""
+        notifications = self.get_queryset().filter(is_read=False)
+        notifications.update(is_read=True)
+        return Response({"message": "All notifications marked as read."}, status=200)
 
+    
+ 
+    def get_queryset(self):
+        """Return notifications for the user. Admins see all notifications."""
+        if self.request.user.is_staff:
+            return self.queryset   
+        else:
+            return self.queryset.filter(Q(user=self.request.user) | Q(is_global=True))
+
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
+    def get_notifications(self, request):
+        """Fetch user notifications and print debug logs."""
+        
+        print(f"\n🔍 DEBUG: User '{request.user.username}' requested notifications.")
+
+        notifications = self.get_queryset().order_by("-created_at")
+
+        if not notifications.exists():
+            print("⚠️ DEBUG: No notifications found for this user.")
+
+        data = []
+        for n in notifications:
+            created_by_name = n.created_by.full_name if n.created_by else "Admin"
+            print(f"✅ DEBUG: Notification ID={n.id}, Message='{n.message}', Created By={created_by_name}")
+
+            data.append({
+                "id": n.id,
+                "message": n.message,
+                "is_read": n.is_read,
+                "created_at": n.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                "username": created_by_name,
+            })
+
+        print("✅ DEBUG: Finished processing notifications, returning response.\n")
+        return Response(data)
+
+ 
 
 class newLabelView(APIView):
    
@@ -445,7 +505,17 @@ class TransactionViewSet(viewsets.ModelViewSet):
 
 @login_required(login_url="/auth/signin/")
 def dashboard(request):
-    return render(request, 'User/user.html')
+    user_notifications = Notification.objects.filter(user=request.user)
+    global_notifications = Notification.objects.filter(is_global=True)
+    referrals = CustomUser.objects.filter(referred_by=request.user)
+    referral_commission = referrals.aggregate(Sum('available_for_withdraw'))['available_for_withdraw__sum'] or Decimal('0.00')
+    user_own_commission = request.user.available_for_withdraw
+    total_commission = referral_commission + user_own_commission
+    return render(request, 'User/user.html', {
+        "user_notifications": user_notifications,
+        "global_notifications": global_notifications,
+        "total_commission":total_commission,
+    })
 
 #================================order==========================
 @login_required(login_url="/auth/signin/")
@@ -458,10 +528,15 @@ def view_receipt(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     return render(request, 'User/order/receipt.html', {"order": order})
  
+ 
+
+ 
+@login_required
 def create_order(request):
     packages = Order.objects.all()
     new_labels = NewLabel.objects.all()
     batches = Batch.objects.all()   
+
     if request.method == "POST":
         batch_id = request.POST.get('batch_id')  
         name = request.POST.get('name')
@@ -470,9 +545,9 @@ def create_order(request):
         cost = request.POST.get('cost')
         new_label_id = request.POST.get('new_label_id')
         status = request.POST.get('status')  
-        if request.user.is_authenticated:
-            user = request.user
 
+        if request.user.is_authenticated:
+            user = request.user  
             new_label_instance = get_object_or_404(NewLabel, id=new_label_id)
             batch_instance = get_object_or_404(Batch, id=batch_id)
 
@@ -490,6 +565,8 @@ def create_order(request):
                 created_by=user
             )
             new_order.save()
+ 
+            notification_create(user, f"New order created: {tracking_no}", color="Black")
 
             return redirect('/orders')
 
@@ -549,16 +626,17 @@ def handle_uploaded_file(request):
         except Exception as e:
             return HttpResponse(f"Error processing CSV: {e}", status=500)
     return render(request, 'Admin/upload.html')
-
+ 
 @login_required
 def create_package(request):
     if request.method == "POST":
+        user = request.user
         try:
             name = request.POST.get('name', '').strip()
-            weight = Decimal(request.POST.get('weight', 0))  # Convert to Decimal
-            length = Decimal(request.POST.get('length', 0))  # Convert to Decimal
-            width = Decimal(request.POST.get('width', 0))    # Convert to Decimal
-            height = Decimal(request.POST.get('height', 0))  # Convert to Decimal
+            weight = Decimal(request.POST.get('weight', 0))  
+            length = Decimal(request.POST.get('length', 0))  
+            width = Decimal(request.POST.get('width', 0))    
+            height = Decimal(request.POST.get('height', 0))  
             dynamic_pricing_enabled = request.POST.get('dynamic_pricing_enabled', 'off') == 'on'
             shipping_class = request.POST.get('shipping_class', 'Standard')
             
@@ -582,7 +660,13 @@ def create_package(request):
                 new_package.calculate_discounted_price()
 
             new_package.save()
+            notification_create(
+                user, 
+                message=f"New Package '{new_package.name}' has been Added In list.", 
+                color="Black"
+            )
             return redirect('/packages_admin')
+        
 
         except Exception as e:
             print(f"Error in create_package: {str(e)}")
@@ -603,11 +687,11 @@ User = get_user_model()
 def update_profile(request):
     user = request.user 
     if request.method == 'POST':
-    
         first_name = request.POST.get('first_name', user.first_name)
         email = request.POST.get('email', user.email)
         timezone_str = request.POST.get('timezone', 'UTC')  
         is_2fa_enabled = request.POST.get('is_2fa_enabled') == 'True'  
+
         if not first_name:
             messages.error(request, "First Name is required.")
             return redirect('/settings/')
@@ -616,15 +700,25 @@ def update_profile(request):
         user.email = email
         user.timezone = timezone_str
         user.is_2fa_enabled = is_2fa_enabled  
+
         try:
-            user.save()  
+            user.save() 
+            
+            # ✅ Fix the notification message
+            status = "enabled" if is_2fa_enabled else "disabled"
+            notification_create(
+                user, 
+                message=f"'{first_name}' has {status} 2FA.", 
+                color="Black"
+            ) 
+            
             messages.success(request, "Profile updated successfully.")
         except Exception as e:
             messages.error(request, f"An error occurred: {e}")
 
         return redirect('/settings/')  
+
     else:
-        
         try:
             if user.timezone:
                 user_timezone = pytz.timezone(user.timezone)  
@@ -633,6 +727,7 @@ def update_profile(request):
                 current_time = now()  
         except pytz.UnknownTimeZoneError:
             current_time = now()  
+        
         return render(request, 'profile.html', {'user': user, 'current_time': current_time})
 
 
@@ -663,44 +758,57 @@ def view_tickets_user(request, id):
     return render(request,'User/view_tickets.html',{"tickets":tickets})
 
 
+ 
 def submit_view_tickets_user(request):
     if request.method == 'POST':
-        id = request.POST['id']
-        title = request.POST['title']
-        date = request.POST['date']
-        message = request.POST['message']
+        user = request.user 
         try:
-            ticket = Ticket.objects.get(id=id)
-            ticket.title = title
-            ticket.created_at = date
-            ticket.message = message
+            ticket_id = request.POST['id']
+            new_message = request.POST['description']
+
+            ticket = get_object_or_404(Ticket, id=ticket_id)
+ 
+            if ticket.message:
+                ticket.message += f"\nUser: {new_message}"
+            else:
+                ticket.message = f"User: {new_message}"
             ticket.save()
+            notification_create(
+                user, 
+                message=f"Your ticket '{ticket.title}' message sent successfully!.", 
+                color="Black"
+            )
+            send_ticket_update_email(ticket.user.email, ticket.user.username, ticket.title, new_message, ticket.status, "User")
 
-            return JsonResponse({"status": "success", "message": "Your message has been sent successfully!"})
+            return JsonResponse({"status": "success", "message": "Reply sent successfully!"})
 
-        except Ticket.DoesNotExist:
-            return JsonResponse({"status": "error", "message": "Ticket not found."}, status=400)
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
 
-@login_required(login_url="/auth/signin/")
 def newLable(request):
     package= Package.objects.all()
+   
     return render(request,'User/newLable.html',{"packages":package})
  
 @login_required(login_url="/auth/signin/")
 def contact(request):
     return render(request,'contact.html')
 
-
 @login_required
 def delete_account(request):
     user = request.user
     if request.method == 'GET':
-        user.delete()
+        notification_create(user, f"User '{user.username}' has deleted their account.", color="Red")
+
+       
+
+        user.delete()  
         messages.success(request, "Your account has been permanently deleted.")
-        return redirect('/') 
+        return redirect('/')  
     else:
         messages.error(request, "Invalid request method.")
         return redirect('/settings/')  
+
 def load_navbar(request):
     if request.user.is_staff: 
         return render(request, "navbarAdmin.html")
@@ -755,3 +863,42 @@ def generate_pdf(request, order_id):
 
     except Exception as e:
         return HttpResponse(f'Internal Server Error: {str(e)}', status=500)
+
+#===========================Globel notification==============================
+ 
+ 
+def is_admin(user):
+    return user.is_superuser
+
+@login_required
+@user_passes_test(is_admin)
+def create_notification(request):
+    if request.method == "POST":
+        message = request.POST.get("message")
+        user_id = request.POST.get("user_id") or None
+        is_global = request.POST.get("is_global") == "on"
+        color = request.POST.get("color", "black")  
+        created_by = request.user   
+        if is_global:
+            Notification.objects.create(
+                message=message,
+                is_global=True,  
+                user=None,  
+                created_by=created_by,
+                color=color
+            )
+        else:
+            user = CustomUser.objects.get(id=user_id)
+            Notification.objects.create(
+                message=message,
+                user=user,
+                is_global=False,   
+                created_by=created_by,
+                color=color
+            )
+
+        messages.success(request, "Notification created successfully!")
+        return redirect("create_notification")
+
+    users = CustomUser.objects.all()
+    return render(request, "Admin/create_notification.html", {"users": users})

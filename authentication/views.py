@@ -6,7 +6,7 @@ from django.conf import settings
 import pyotp
 from django.contrib import messages
 from decimal import Decimal
-
+from contact_form.notification import notification_create
 User = get_user_model()
 
 
@@ -60,22 +60,18 @@ def user_logout(request):
     return redirect('/auth/signin/')
 
 def signup(request):
-    referral_code = request.GET.get('referral_code')  # Get referral code from GET request
-
-    print(f"Referral code received in GET request: {referral_code}")  # Debugging
-
+    referral_code = request.GET.get('referral_code')   
+    print(f"Referral code received in GET request: {referral_code}")  # 
     error_messages = []
 
     if request.method == 'POST':
-        # Referral code from POST request (if any)
+       
         referral_code = request.POST.get('referral_code', referral_code)
-        print(f"Referral code received in POST request: {referral_code}")  # Debugging
-
+        print(f"Referral code received in POST request: {referral_code}")  
         username = request.POST['username']
         email = request.POST['email']
         password = request.POST['password']
-
-        # Validation
+ 
         if User.objects.filter(username=username).exists():
             error_messages.append("Username already exists.")
 
@@ -92,22 +88,30 @@ def signup(request):
                 },
             )
 
-        # Create user
+        
         user = User.objects.create_user(username=username, email=email, password=password)
         print(f"Created user: {user.username}")
-
-        # Generate referral code
+ 
         user.generate_referral_code()
         user.save()
         print(f"Generated referral code for user: {user.referral_code}")
 
         if referral_code:
-            print(f"Handling referral code: {referral_code}")  # Debugging
+            print(f"Handling referral code: {referral_code}")   
             referrer = User.objects.filter(referral_code=referral_code).first()
             if referrer:
-                print(f"Referrer: {referrer}")  # Debugging
+                print(f"Referrer: {referrer}")  
                 user.referred_by = referrer
                 user.save()
+                 
+                message = f"Congratulations! '{referrer}'<br>A new user '{user.username}' signed up <br>using your referral code."
+                notification_create(
+    user, 
+    message=message,  # Use the updated message
+    color="Black"
+)
+
+
 
                 # Add 10% commission
                 from decimal import Decimal

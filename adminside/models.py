@@ -163,5 +163,19 @@ class Weight(models.Model):
 
     def __str__(self):
         return self.label.name
-
- 
+class Notification(models.Model):
+    color_CHOICES = [
+         ('select', 'Select'),
+        ('Red', 'Red'),
+        ('Yellow', 'Yellow'),
+        ('Green', 'Green'),
+        ('Black', 'Black'),
+        
+    ]
+    message = models.TextField()
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)  
+    is_read = models.BooleanField(default=False)  
+    is_global = models.BooleanField(default=False)
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="created_notifications" , null=True)  
+    created_at = models.DateTimeField(auto_now_add=True)
+    color = models.CharField(max_length=100, choices=color_CHOICES, default='select')

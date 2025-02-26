@@ -4,7 +4,6 @@ from .models import *
 # Registering models with custom admin classes
 admin.site.register(ContactInfo)
 admin.site.register(Package)
-admin.site.register(Notification)
 admin.site.register(Ticket)
 admin.site.register(Order)
 admin.site.register(Payment)

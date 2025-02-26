@@ -124,31 +124,57 @@
   
       <!-- Notifications Section -->
        <!-- Notifications Section -->
-    <div class="nav-item position-relative">
-      <button type="button" id="nBtn" class="btn btn-light" aria-haspopup="true" aria-expanded="false"
-      style="display: flex; align-items: center" onclick="toggleNotifications()">
-<img src="/media/images/menu.svg" alt="Notifications" />
-<span id="notificationBadge"
-      class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-      style="display: none; font-size: 0.8rem;">
-  0
-</span>
-</button>
+       <div class="nav-item position-relative">
+        <button type="button" id="nBtn" class="btn btn-light" aria-haspopup="true" aria-expanded="false"
+            style="display: flex; align-items: center" onclick="toggleNotifications()">
+            <img src="/media/images/menu.svg" alt="Notifications" />
+            <span id="notificationBadge"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                style="{% if unread_count == 0 %} display: none; {% endif %} font-size: 0.8rem;">
+                {{ unread_count }}
+            </span>
+        </button>
+    
+        <!-- Notifications Dropdown -->
+        <div id="nMenus" class="customize-menu card position-absolute mt-2"
+            style="display: none; right: 0; z-index: 1500; max-height: 400px; overflow-y: auto;">
+            <div class="card-body">
+                <h6>Notifications</h6>
+                <p id="noNotificationsMessage">
+                    {% if unread_count > 0 %}
+                    Hello, {{ request.user.username }}! 
+                    You have <strong>{{ unread_count }}</strong> unread notification(s).
+                    {% else %}
+                        No new notifications.
+                    {% endif %}
+                </p>
 
-      <!-- Notifications Dropdown -->
-      <div id="nMenus" class="customize-menu card position-absolute mt-2"
-        style="display: none; right: 0; z-index: 1500; max-height: 400px; overflow-y: auto;">
-        <div class="card-body">
-          <h6>Notifications</h6>
-          <p id="noNotificationsMessage">You have 0 unread messages.</p>
-          <div id="notificationItemsContainer">
-            <!-- Dynamic notifications will be added here -->
-          </div>
-          <button class="btn btn-dark w-100 mt-2" onclick="markAllAsRead()">Mark all as read</button>
+                <div id="notificationItemsContainer">
+                    {% for notification in notifications %}
+                        <div class="alert"
+                            style="background-color: {{ notification.color|default:'black' }}; color: white; padding: 10px; border-radius: 5px;">
+                            <small>{{ notification.created_at }} 
+                              {% if notification.is_global %}
+                                  <strong> </strong>
+                              {% else %}
+                                  by {{ notification.created_by.username|default:'System' }}
+                              {% endif %}
+                          </small>
+                            <br>
+                            <strong>{{ notification.message|safe }}</strong>
+                            <br>
+                            <small>by: {{ notification.created_by.username|default:'System' }} </small>
+                        </div>
+                    {% empty %}
+                        <p>No notifications available.</p>
+                    {% endfor %}
+                </div>
+                <button class="btn btn-dark w-100 mt-2" onclick="markAllAsRead()">Mark all as read</button>
+            </div>
         </div>
-      </div>
     </div>
-
+    
+    
       <!-- Dropdown for small devices -->
       <div class="d-lg-none">
         <button
@@ -181,10 +207,7 @@
     </div>
   </nav>
   <script>
-    $(document).ready(function () {
-  
-      fetchNotifications();
-    });
+    
     // Define the function to get CSRF token
     function getCSRFToken() {
       let token = null;
@@ -197,92 +220,37 @@
       return token;
     }
   
-    function addNotification(message) {
-      const csrfToken = getCSRFToken();
-      const userId = window.userId;
-      const notificationData = {
-        message: message,
-        is_read: false,
-        user: userId,
-      };
+    function addNotification(message, color = "Black") {  
+  const csrfToken = getCSRFToken();
+  const userId = window.userId;
   
-      $.ajax({
-        url: "/api/notifications/",
-        type: "POST",
-        headers: {
-          "X-CSRFToken": csrfToken,
-          "Content-Type": "application/json",
-        },
-        data: JSON.stringify(notificationData),
-        success: function () {
-          console.log("Notification saved in the backend.");
-          fetchNotifications();
-        },
-        error: function (xhr, status, error) {
-          console.error("Failed to save notification in the backend.", error);
-          console.error("Response Text: ", xhr.responseText);
-        },
-      });
-    }
-  
-    function fetchNotifications() {
-    $.ajax({
-      url: "/api/notifications/",
-      type: "GET",
-      success: function (response) {
-        const container = document.getElementById("notificationItemsContainer");
-        const noNotificationsMessage = document.getElementById("noNotificationsMessage");
-        const notificationBadge = document.getElementById("notificationBadge");
-  
-        if (container) {
-          container.innerHTML = "";
-  
-          if (response.length === 0) {
-            noNotificationsMessage.textContent = "You have 0 unread messages.";
-            notificationBadge.style.display = "none"; 
-          } else {
-            let unreadCount = 0;
-            let username = ""; 
-            response.forEach(notification => {
-              const item = document.createElement("div");
-              item.className = "notification-item border p-2 mb-2";
-  
-              username = notification.username;
-  
-              const timestamp = formatTime(notification.created_at);
-  
-              item.innerHTML = `
-                <p class="mb-0 text-muted">${timestamp} by ${username}</p>
-                <h6 class="mb-1">${notification.message}</h6>
-                <p class="mb-0 text-muted">by ${username}</p>
-              `;
-  
-              if (notification.is_read) {
-                item.style.opacity = 0.5; 
-              } else {
-                unreadCount++; 
-              }
-  
-              container.appendChild(item);
-            });
-           
-            noNotificationsMessage.textContent = `Hello, ${username}! You have ${unreadCount} unread message(s).`;
-  
-            if (unreadCount > 0) {
-              notificationBadge.textContent = unreadCount;
-              notificationBadge.style.display = "block"; 
-            } else {
-              notificationBadge.style.display = "none"; 
-            }
-          }
-        }
-      },
-      error: function () {
-        console.error("Failed to fetch notifications.");
-      },
-    });
-  }
-  
+  const notificationData = {
+    message: message,
+    is_read: false,
+    user: userId,
+    color: color,  
+  };
+
+  $.ajax({
+    url: "/api/notifications/",
+    type: "POST",
+    headers: {
+      "X-CSRFToken": csrfToken,
+      "Content-Type": "application/json",
+    },
+    data: JSON.stringify(notificationData),
+    success: function () {
+      console.log("Notification saved in the backend.");
+      fetchNotifications(); // Refresh the notifications
+    },
+    error: function (xhr, status, error) {
+      console.error("Failed to save notification in the backend.", error);
+      console.error("Response Text: ", xhr.responseText);
+    },
+  });
+}
+
+ 
     function formatTime(timestamp) {
       const notificationDate = new Date(timestamp);
       const now = new Date();
@@ -302,41 +270,40 @@
     }
   
     function markAllAsRead() {
-      const csrfToken = getCSRFToken();
+  const csrfToken = getCSRFToken();   
+  $.ajax({
+    url: "/api/notifications/mark_as_read/",
+    type: "PATCH",
+    headers: {
+      "X-CSRFToken": csrfToken,
+      "Content-Type": "application/json",
+    },
+    success: function () {
+      console.log("All notifications marked as read.");
+
+      // Now delete the notifications
       $.ajax({
-        url: "/api/notifications/mark_as_read/",
-        type: "PATCH",
+        url: "/api/notifications/delete_notifications/",
+        type: "DELETE",
         headers: {
           "X-CSRFToken": csrfToken,
-          "Content-Type": "application/json",
         },
         success: function () {
-          console.log("All notifications marked as read.");
-  
-          $.ajax({
-            url: "/api/notifications/delete_notifications/",
-            type: "DELETE",
-            headers: {
-              "X-CSRFToken": csrfToken,
-            },
-            success: function () {
-  
-              fetchNotifications();
-              document.getElementById("noNotificationsMessage").textContent = "You have 0 unread messages.";
-              console.log("All notifications deleted.");
-              fetchNotifications();
-            },
-            error: function () {
-              console.error("Failed to delete notifications.");
-            }
-          });
+          fetchNotifications();  // Reload notifications
+          document.getElementById("noNotificationsMessage").textContent = "You have 0 unread messages.";
+          console.log("All notifications deleted.");
         },
         error: function () {
-          console.error("Failed to mark notifications as read.");
-        },
+          console.error("Failed to delete notifications.");
+        }
       });
-    }
-  
+    },
+    error: function () {
+      console.error("Failed to mark notifications as read.");
+    },
+  });
+}
+
     function toggleNotifications() {
       const nMenus = document.getElementById("nMenus");
       if (nMenus) {
