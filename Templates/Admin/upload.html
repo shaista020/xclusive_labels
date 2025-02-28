@@ -100,50 +100,67 @@
         </div>
 
         <!-- Page Content -->
-        <main style="margin: 2rem auto; max-width: 800px;">
+        <main style="margin: 2rem auto;  ">
 
-            <!-- Form Section -->
-            <div class="card shadow-lg">
-              <div class="card-header text-center bg-success text-white">
-                <h4>Upload Competitor Rate CSV</h4>
-              </div>
-              <div class="card-body">
-                <form method="POST" enctype="multipart/form-data" action="/upload-csv/" class="needs-validation" novalidate>
-                  {% csrf_token %}
-                  
-                  <!-- File Upload Input -->
-                  <div class="mb-4">
-                    <label for="csv_file" class="form-label fs-5">Choose CSV File</label>
-                    <input type="file" class="form-control" name="csv_file" accept=".csv" required>
-                    <div class="invalid-feedback">Please select a valid CSV file.</div>
-                  </div>
-          
-                  <!-- Submit Button -->
-                  <div class="text-center">
-                    <button type="submit" class="btn btn-dark w-100 py-2">Upload CSV</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          
-            <!-- Success Modal -->
-            <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header  ">
-                    <h5 class="modal-title" id="successModalLabel">Success!</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <p>{{ success_message }}</p>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  </div>
+          <div class="card-body">
+            <div class="card-body">
+              <form method="POST" enctype="multipart/form-data" action="/upload-csv/" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <!-- File Upload Input -->
+                <div class="mb-4">
+                  <label for="csv_file" class="form-label fs-5">Choose CSV File</label>
+                  <input type="file" class="form-control" name="csv_file" accept=".csv" required>
+                  <div class="invalid-feedback">Please select a valid CSV file.</div>
                 </div>
-              </div>
+        
+                <!-- Submit Button -->
+                <div class="text-center">
+                  <button type="submit" class="btn btn-dark w-100 py-2">Upload CSV</button>
+                </div>
+              </form>
             </div>
-          
+          </div>
+
+        <!-- Data Table -->
+        <table class="table table-striped mt-3">
+          <thead>
+              <tr>
+                  <th>ID</th>
+                  <th>Weight (lbs)</th>
+                  <th>Dimensions (L x W x H)</th>
+                  <th>FedEx Ground</th>
+                  <th>FedEx Overnight</th>
+                  <th>UPS Ground</th>
+                  <th>UPS 3-Day</th>
+                  <th>UPS 2nd Day</th>
+                  <th>UPS Next Day</th>
+                  <th>USPS Priority</th>
+                  <th>USPS Express</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for rate in competitor_rates %}
+              <tr>
+                  <td>{{ rate.id }}</td>
+                  <td>{{ rate.weight }}</td>
+                  <td>{{ rate.length }} x {{ rate.width }} x {{ rate.height }}</td>
+                  <td>{{ rate.fedex_ground|default:"-" }}</td>
+                  <td>{{ rate.fedex_standard_overnight|default:"-" }}</td>
+                  <td>{{ rate.ups_ground|default:"-" }}</td>
+                  <td>{{ rate.ups_3_day_select|default:"-" }}</td>
+                  <td>{{ rate.ups_2nd_day_air|default:"-" }}</td>
+                  <td>{{ rate.ups_next_day_air|default:"-" }}</td>
+                  <td>{{ rate.usps_priority|default:"-" }}</td>
+                  <td>{{ rate.usps_priority_express|default:"-" }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                  <td colspan="11" class="text-center">No data available</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
           </main>
           
           <!-- Custom CSS -->
@@ -152,6 +169,7 @@
     </div>
     
     <script>
+     
       {% if success_message %}
         console.log("Success message:", "{{ success_message }}");
         var successModal = new bootstrap.Modal(document.getElementById('successModal'));
@@ -159,7 +177,7 @@
       {% else %}
         console.log("No success message.");
       {% endif %}
-    </script>
+  </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
   </body>

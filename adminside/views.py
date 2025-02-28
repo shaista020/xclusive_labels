@@ -469,7 +469,7 @@ def edit_package(request, package_id):
         package.total_cost = total_cost
         package.save()
  
-        return redirect('package_detail', package_id=package.id)
+        return redirect('packages_admin' )
  
     return render(request, 'Admin/edit_package.html', {
         'package': package

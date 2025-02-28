@@ -13,3 +13,7 @@ db.sqlite3
 
 # map
 # AIzaSyByYeW0X4jqDfGGalQr1K7wpLKljD2RGEc
+# py manage.py makemigrations
+# py manage.py migrate
+# py manage.py createsuperuser
+# 
