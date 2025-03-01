@@ -36,28 +36,7 @@
     font-weight: bold;
     text-align: left;
 }
-
-input, select {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-}
-
-input[type="checkbox"] {
-    display: inline-block;
-    margin-top: 8px;
-}
-
-button {
-    display: block;
-    margin-top: 20px;
-}
-
-.col-md-6 input[type="checkbox"] {
-    margin-left: 35px; /* For slight space adjustment between label and checkbox */
-}
-
+ 
       #cMenu {
  display: none; 
 }
@@ -458,9 +437,12 @@ button {
                      
                     <div class="row">
                         <div class="col-md-6">
-                            <div for="dynamicPricing">
+                            <div for="dynamicPricing" style="   display: block;
+                            margin-bottom: 5px;
+                            font-weight: bold;
+                            text-align: left;">
                                 <input type="checkbox" id="dynamicPricing" name="dynamic_pricing_enabled" />
-                                <label for="dynamic_pricing_enabled" class="form-check-label">Enable Dynamic Pricing</label>
+                                <span for="dynamic_pricing_enabled" class="form-check-label">Enable Dynamic Pricing</span>
                             </div>
                         </div>
                         <div class="col-md-6">

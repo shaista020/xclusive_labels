@@ -198,25 +198,23 @@ class AddFundView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AddressView(APIView):
-    permission_classes = [IsAuthenticated]  
-    def get(self, request, pk=None):
-        if request.user.is_staff:
-            addresses = Address.objects.all()  
-        elif pk:
-            try:
-                address = Address.objects.get(pk=pk, user=request.user)
-            except Address.DoesNotExist:
-                return Response({"error": "Address not found or not authorized"}, status=status.HTTP_404_NOT_FOUND)
-            return Response(AddressSerializer(address).data, status=status.HTTP_200_OK)
-        else:
-            addresses = Address.objects.filter(user=request.user)
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request, pk=None):
+        if pk:
+            try:
+                address = Address.objects.get(pk=pk)
+                return Response(AddressSerializer(address).data, status=status.HTTP_200_OK)
+            except Address.DoesNotExist:
+                return Response({"error": "Address not found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            addresses = Address.objects.all()
+        
         serializer = AddressSerializer(addresses, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
     def post(self, request):
-        data = request.data
-        data['user'] = request.user.id
+        data = request.data.copy()
+        data['user'] = request.user.id  # Ensure the user is assigned
 
         serializer = AddressSerializer(data=data)
         if serializer.is_valid():
@@ -224,11 +222,12 @@ class AddressView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    
     def put(self, request, pk):
         try:
-            address = Address.objects.get(pk=pk, user=request.user)
+            address = Address.objects.get(pk=pk)
         except Address.DoesNotExist:
-            return Response({"error": "Address not found or not authorized"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Address not found"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = AddressSerializer(address, data=request.data, partial=True)
         if serializer.is_valid():
@@ -238,7 +237,10 @@ class AddressView(APIView):
 
     def delete(self, request, pk):
         try:
-            address = Address.objects.get(pk=pk, user=request.user)
+            if request.user.is_superuser:  # Superuser can delete any address
+                address = Address.objects.get(pk=pk)
+            else:  # Regular user can only delete their own address
+                address = Address.objects.get(pk=pk, user=request.user)
         except Address.DoesNotExist:
             return Response({"error": "Address not found or not authorized"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -595,6 +597,7 @@ def package(request):
         packages = packages.filter(name__icontains=search_query)  
     return render(request, 'User/savedPackages.html', {'packages': packages})
 
+
 def handle_uploaded_file(request):
     if request.method == 'POST' and request.FILES.get('csv_file'):
         csv_file = request.FILES['csv_file']
@@ -602,31 +605,67 @@ def handle_uploaded_file(request):
         file_path = fs.save(csv_file.name, csv_file)
 
         start_time = time.time()
-        try:
-            with open(fs.path(file_path), mode='r') as file:
-                reader = csv.DictReader(file)
-                bulk_create_list = []
-                for row in reader:
-                    weight = float(row.get('Weight', 0))
-                    length = float(row.get('Length', 0))
-                    width = float(row.get('Width', 0))
-                    height = float(row.get('Height', 0))
-                    rate = float(row.get('Rate', 0))
-                    shipping_class = row.get('Shipping Class', 'Unknown')
+        bulk_create_list = []
 
-                    bulk_create_list.append(CompetitorRate(
-                        weight=weight, length=length, width=width,
-                        height=height, rate=rate, shipping_class=shipping_class
-                    ))
-                CompetitorRate.objects.bulk_create(bulk_create_list)
+        try:
+            with open(fs.path(file_path), mode='r', encoding='utf-8') as file:
+                reader = csv.DictReader(file)
+                 
+                print(f"CSV Headers: {reader.fieldnames}")
+
+                for row in reader:
+                    try:
+                        
+                        print(f"Row Data: {row}")
+ 
+                        weight = Decimal(row.get('Weight (lbs)', '0').strip() or '0')
+                        dimensions = row.get('Dimensions', '0x0x0').split('x')
+                        length = Decimal(dimensions[0]) if len(dimensions) > 0 else Decimal(0)
+                        width = Decimal(dimensions[1]) if len(dimensions) > 1 else Decimal(0)
+                        height = Decimal(dimensions[2]) if len(dimensions) > 2 else Decimal(0)
+ 
+                        print(f"Weight: {weight}, Dimensions: {length}x{width}x{height}")
+ 
+                        fedex_ground = Decimal(row.get('FedEx Ground or FedEx Home Delivery', '0') or '0')
+
+                        fedex_standard_overnight = Decimal(row.get('FedEx Standard Overnight', '0').strip() or '0')
+                        ups_ground = Decimal(row.get('UPS Ground', '0').strip() or '0')
+                        ups_3_day_select = Decimal(row.get('UPS 3 Day Select', '0').strip() or '0')
+                        ups_2nd_day_air = Decimal(row.get('UPS 2nd Day Air', '0').strip() or '0')
+                        ups_next_day_air_saver = Decimal(row.get('UPS Next Day Air Saver', '0').strip() or '0')
+                        ups_next_day_air = Decimal(row.get('UPS Next Day Air', '0').strip() or '0')
+                        usps_priority = Decimal(row.get('USPS Priority', '0').strip() or '0')
+                        usps_priority_express = Decimal(row.get('USPS Priority Express', '0').strip() or '0')
+
+                        # Debug: Print extracted rates
+                        print(f"FedEx Ground: {fedex_ground}, UPS Ground: {ups_ground}, USPS Priority: {usps_priority}")
+
+                        # Append to bulk create list
+                        bulk_create_list.append(CompetitorRate(
+                            weight=weight, length=length, width=width, height=height,
+                            fedex_ground=fedex_ground, fedex_standard_overnight=fedex_standard_overnight,
+                            ups_ground=ups_ground, ups_3_day_select=ups_3_day_select,
+                            ups_2nd_day_air=ups_2nd_day_air, ups_next_day_air_saver=ups_next_day_air_saver,
+                            ups_next_day_air=ups_next_day_air, usps_priority=usps_priority,
+                            usps_priority_express=usps_priority_express
+                        ))
+                    except Exception as e:
+                        print(f"Skipping row due to error: {e}")
+ 
+                if bulk_create_list:
+                    CompetitorRate.objects.bulk_create(bulk_create_list)
 
             return render(request, 'Admin/upload.html', {
                 'success_message': f"Successfully uploaded {len(bulk_create_list)} rows."
             })
         except Exception as e:
             return HttpResponse(f"Error processing CSV: {e}", status=500)
-    return render(request, 'Admin/upload.html')
- 
+    
+    competitor_rates = CompetitorRate.objects.all()
+
+    return render(request, 'Admin/upload.html', {'competitor_rates': competitor_rates})
+
+  
 @login_required
 def create_package(request):
     if request.method == "POST":
@@ -670,6 +709,7 @@ def create_package(request):
 
     return render(request, "Admin/Packages.html", {"packages": Package.objects.filter(user=request.user)})
 
+
 def calculate_package_price(request):
     if request.method == "POST":
         try:
@@ -679,15 +719,27 @@ def calculate_package_price(request):
             height = Decimal(request.POST.get('height', 0))
             dynamic_pricing_enabled = request.POST.get('dynamic_pricing_enabled', 'off') == 'on'
             discount_percentage = Decimal(request.POST.get('discount', 20))  
+
             if dynamic_pricing_enabled:
-                
-                original_price = weight * Decimal(2)   
+               
+                competitor_rate = CompetitorRate.objects.filter(
+                    weight=weight, length=length, width=width, height=height
+                ).first()
+
+                if competitor_rate:
+                    original_price = (
+                        competitor_rate.fedex_ground or
+                        competitor_rate.ups_ground or
+                        competitor_rate.usps_priority or
+                        Decimal(10)
+                    )
+                else:
+                    original_price = weight * Decimal(2)  
                 discounted_price = original_price * (Decimal(1) - (discount_percentage / Decimal(100)))
                 discount_amount = original_price - discounted_price
                 total_cost = discounted_price
             else:
-                
-                original_price = Decimal(request.POST.get('original_price', 0))   
+                original_price = Decimal(request.POST.get('original_price', 0)) or weight * Decimal(2)  
                 discount_amount = original_price * (discount_percentage / Decimal(100))
                 discounted_price = original_price - discount_amount
                 total_cost = discounted_price

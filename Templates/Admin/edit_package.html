@@ -226,20 +226,28 @@ button {
             </div>
         
             <!-- Original Price input field, hidden if dynamic pricing is enabled -->
-            <div id="originalPriceContainer" class="row mb-3">
-                <div class="col-md-6">
-                    <label for="original_price" class="form-label">Original Price ($):</label>
-                    <input type="number" step="0.01" id="id_original_price" name="original_price" value="{{ package.original_price }}" class="form-control" />
-                </div>
-            </div>
+          
         
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="discount" class="form-label">Discount (%):</label>
                     <input type="number" step="0.01" id="discount" name="discount" value="{{ package.discount }}" class="form-control" required>
                 </div>
+                <div class="col-md-6">
+                  <label for="id_type">Shipping Type</label>
+                  <select class="form-control" name="type" id="id_type" required>
+                      <option value="lb" {% if package and package.type == 'lb' %}selected{% endif %}>lb</option>
+                      <option value="oz" {% if package and package.type == 'oz' %}selected{% endif %}>oz</option>
+                  </select>
+              </div>
             </div>
-        
+            <div id="originalPriceContainer" class="row mb-3">
+              <div class="col-md-6">
+                  <label for="original_price" class="form-label">Original Price ($):</label>
+                  <input type="number" step="0.01" id="id_original_price" name="original_price" value="{{ package.original_price }}" class="form-control" />
+              </div>
+              
+          </div>
             <div class="d-flex justify-content-between mb-3">
                 <button type="submit" class="btn btn-dark">Save Changes</button>
                 <!-- <a href="/packages_admin" class="btn btn-secondary">Cancel</a> -->

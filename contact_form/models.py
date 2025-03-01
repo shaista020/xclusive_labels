@@ -26,17 +26,25 @@ class ShippingClassDiscount(models.Model):
 
     def __str__(self):
         return f"{self.shipping_class} - {self.discount_percentage}% discount"
-
+ 
+ 
 class CompetitorRate(models.Model):
     weight = models.FloatField()
     length = models.FloatField()
     width = models.FloatField()
     height = models.FloatField()
-    rate = models.DecimalField(max_digits=10, decimal_places=2)
-    shipping_class = models.CharField(max_length=100, default='Standard')
+    fedex_ground = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    fedex_standard_overnight = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    ups_ground = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    ups_3_day_select = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    ups_2nd_day_air = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    ups_next_day_air_saver = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    ups_next_day_air = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    usps_priority = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    usps_priority_express = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.length}x{self.width}x{self.height} - {self.rate}"
+        return f"{self.length}x{self.width}x{self.height} - {self.weight} lbs"
 
 
 class Package(models.Model):
@@ -58,37 +66,40 @@ class Package(models.Model):
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     original_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     shipping_class = models.CharField(max_length=100, default='Standard')
+
     def get_competitor_rate(self):
-       
         weight = self.weight
         length = self.length
         width = self.width
         height = self.height
- 
+
         exact_match = CompetitorRate.objects.filter(
             weight=weight, length=length, width=width, height=height
-        ).order_by('rate').first()
+        ).first()
 
         if exact_match:
             return exact_match
- 
+
         closest_match = CompetitorRate.objects.filter(
             Q(weight__gte=weight - Decimal("0.5"), weight__lte=weight + Decimal("0.5")) &
             Q(length__gte=length - Decimal("1"), length__lte=length + Decimal("1")) &
             Q(width__gte=width - Decimal("1"), width__lte=width + Decimal("1")) &
             Q(height__gte=height - Decimal("1"), height__lte=height + Decimal("1"))
-        ).order_by('rate').first()
+        ).first()
 
         return closest_match
 
-
     def calculate_discounted_price(self):
-        
         discount_percentage = self.discount / Decimal(100)
         competitor_rate = self.get_competitor_rate()
 
         if competitor_rate:
-            self.original_price = competitor_rate.rate
+            self.original_price = (
+                competitor_rate.fedex_ground or
+                competitor_rate.ups_ground or
+                competitor_rate.usps_priority or
+                Decimal(10)
+            )
         else:
             self.original_price = self.weight * Decimal(2)
 
@@ -97,11 +108,10 @@ class Package(models.Model):
         self.total_cost = self.discounted_price
 
     def calculate_manual_price(self):
-       
         if self.original_price > 0:
             base_price = self.original_price   
         else:
-            base_price = Decimal(7) if self.weight <= 4 else self.weight * Decimal(2)  
+            base_price = Decimal(7) if self.weight <= 4 else self.weight * Decimal(2)
 
         discount_percentage = self.discount / Decimal(100)
         self.original_price = base_price
@@ -213,7 +223,7 @@ class Store(models.Model):
 
 class Address(models.Model):
     name = models.CharField(max_length=255)
-    company_reference = models.CharField(max_length=255)
+    company_reference = models.CharField(max_length=255, null=True, blank=True)
     phone_number = models.CharField(max_length=15)
     apt_unit_suite = models.CharField(max_length=255, null=True, blank=True)
     address = models.CharField(max_length=100, null= True)
