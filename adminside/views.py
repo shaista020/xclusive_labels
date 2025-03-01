@@ -444,7 +444,9 @@ def edit_package(request, package_id):
         height = Decimal(request.POST.get('height', 0))
         dynamic_pricing_enabled = request.POST.get('dynamic_pricing_enabled', 'off') == 'on'
         discount_percentage = Decimal(request.POST.get('discount', 20))  
-        original_price = Decimal(request.POST.get('original_price', 0))   
+        original_price = Decimal(request.POST.get('original_price', 0)) 
+        
+        shipping_type = request.POST.get('type', 'lb')     
         if dynamic_pricing_enabled:
            
             original_price = weight * Decimal(2)  
@@ -467,6 +469,7 @@ def edit_package(request, package_id):
         package.discounted_price = discounted_price
         package.discount_amount = discount_amount
         package.total_cost = total_cost
+        package.type = shipping_type
         package.save()
  
         return redirect('packages_admin' )
