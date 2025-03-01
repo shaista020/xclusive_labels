@@ -218,22 +218,27 @@
 
             <div class="row">
               <div class="col-md-3 mb-3">
-                <label for="weight">Weight (lb)</label>
-                <input class="form-control" type="number" id="weight" required />
+                  <label for="weight">Weight (lb)</label>
+                  <input class="form-control" type="number" id="weight" required />
               </div>
               <div class="col-md-3 mb-3">
-                <label for="length">Length (inch)</label>
-                <input class="form-control" type="number" id="length" required />
+                  <label for="length">Length (inch)</label>
+                  <input class="form-control" type="number" id="length" required />
               </div>
               <div class="col-md-3 mb-3">
-                <label for="width">Width (inch)</label>
-                <input class="form-control" type="number" id="width" required />
+                  <label for="width">Width (inch)</label>
+                  <input class="form-control" type="number" id="width" required />
               </div>
               <div class="col-md-3 mb-3">
-                <label for="height">Height (inch)</label>
-                <input class="form-control" type="number" id="height" required />
+                  <label for="height">Height (inch)</label>
+                  <input class="form-control" type="number" id="height" required />
               </div>
-            </div>
+              <div class="col-md-3 mb-3">
+                  <label for="total-price">Total Price ($)</label>
+                  <input class="form-control" type="number" id="total-price" readonly />
+              </div>
+          </div>
+          
           </div>
 
           <div class="card p-4 d-flex align-items-center mb-4">
@@ -355,24 +360,45 @@
       });
   
       // Fetch and populate Packages
-      $.ajax({
+    $(document).ready(function () {
+    let packageData = {};  // Object to store package details
+
+    // Fetch and populate Packages
+    $.ajax({
         url: '/api/packages/',
         method: 'GET',
         success: function (data) {
-          const packageSelect = $('#package');
-          data.forEach(item => {
-            const option = $('<option></option>')
-              .val(item.id)
-              .text(item.name);
-            packageSelect.append(option);
-          });
+            const packageSelect = $('#package');
+            packageSelect.append('<option selected disabled>Choose a Package</option>');
+            
+            data.forEach(item => {
+                packageData[item.id] = item;  // Store details by package ID
+                const option = $('<option></option>')
+                    .val(item.id)
+                    .text(item.name);
+                packageSelect.append(option);
+            });
         },
         error: function (xhr, status, error) {
-          console.error('Failed to load packages:', error);
-          alert('Could not load package options.');
+            console.error('Failed to load packages:', error);
+            alert('Could not load package options.');
         }
-      });
-  
+    });
+
+    // When a package is selected, auto-fill the fields
+    $('#package').on('change', function () {
+        const selectedPackageId = $(this).val();
+        if (selectedPackageId && packageData[selectedPackageId]) {
+            const pkg = packageData[selectedPackageId];
+            
+            $('#width').val(pkg.width);
+            $('#height').val(pkg.height);
+            $('#length').val(pkg.length);
+            $('#total-price').val(pkg.total_price);
+        }
+    });
+});
+
       // Fetch and populate Ship From Addresses
       $.ajax({
     url: '/api/addresses/',

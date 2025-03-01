@@ -438,6 +438,8 @@ def edit_package(request, package_id):
     package = get_object_or_404(Package, pk=package_id)
  
     if request.method == "POST":
+        
+        name = request.POST.get('name')   
         weight = Decimal(request.POST.get('weight', 0))
         length = Decimal(request.POST.get('length', 0))
         width = Decimal(request.POST.get('width', 0))
@@ -458,7 +460,7 @@ def edit_package(request, package_id):
             discounted_price = original_price * (Decimal(1) - (discount_percentage / Decimal(100)))
             discount_amount = original_price - discounted_price
             total_cost = discounted_price
- 
+        package.name = name
         package.weight = weight
         package.length = length
         package.width = width
