@@ -20,4 +20,4 @@ admin.site.register(Transaction)
 admin.site.register(CompetitorRate) 
 @admin.register(Batch)
 class BatchfoAdmin(admin.ModelAdmin):
-    list_display = ('batch_id','ship_from_name','type','weight','cost','ship_date','status','created_at')
+    list_display = ('batch_id','ship_from_name','delivery_type','weight','cost','ship_date','status','created_at')

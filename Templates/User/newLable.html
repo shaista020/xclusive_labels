@@ -208,7 +208,7 @@
               <div class="col-md-6 mb-3">
                 <label for="delivery-type">Delivery Type</label>
                 <select id="delivery-type" class="form-select">
-                  <option selected>Choose a delivery type</option>
+                  <option  >Choose a delivery type</option>
                 </select>
                 
               </div>
@@ -223,7 +223,7 @@
 
                 </select> -->
                 <select id="package" class="form-select">
-                  <option selected>Choose a Package</option>
+                  
               </select>
               
               </div>
@@ -235,25 +235,26 @@
                 <option selected>Choose an address</option>
               </select>
             </div>
-
             <div class="row">
               <div class="col-md-3 mb-3">
-                <label for="weight">Weight (lb)</label>
-                <input class="form-control" type="number" id="weight" required />
+                  <label for="weight">Weight (lb)</label>
+                  <input class="form-control" type="number" id="weight" required />
               </div>
               <div class="col-md-3 mb-3">
-                <label for="length">Length (inch)</label>
-                <input class="form-control" type="number" id="length" required />
+                  <label for="length">Length (inch)</label>
+                  <input class="form-control" type="number" id="length" required />
               </div>
               <div class="col-md-3 mb-3">
-                <label for="width">Width (inch)</label>
-                <input class="form-control" type="number" id="width" required />
+                  <label for="width">Width (inch)</label>
+                  <input class="form-control" type="number" id="width" required />
               </div>
               <div class="col-md-3 mb-3">
-                <label for="height">Height (inch)</label>
-                <input class="form-control" type="number" id="height" required />
+                  <label for="height">Height (inch)</label>
+                  <input class="form-control" type="number" id="height" required />
               </div>
-            </div>
+              
+          </div>
+          
           </div>
 
           <div class="card p-4 d-flex align-items-center mb-4">
@@ -319,7 +320,8 @@
 
             <div class="col-lg-4">
               <div class="card p-4 mb-4">
-                <p>Single Label Cost: $0.00</p>
+                <p id="single-label-cost">Single Label Cost: $0.00</p>
+
                 <p>Total Recipients: 1</p>
                 <hr />
                 <p>You will pay in total: $0.00</p>
@@ -359,98 +361,139 @@
   <script src="../../static/index.js"></script>
   <script>
     $(document).ready(function () {
-      // Manually populate Delivery Types
-      const deliveryTypes = [
-        { id: 1, name: 'USPS Priority' },
-        { id: 2, name: 'FedEx Ground' },
-        { id: 3, name: 'UPS Next Day Air' }
-      ];
-  
-      const deliveryTypeSelect = $('#delivery-type');
-      deliveryTypes.forEach(type => {
+       let packageData = {};  
+       console.log("Document ready. Initializing script...");
+ 
+const deliveryTypes = [
+    { id: 'USPS Priority', name: 'USPS Priority' },
+    { id: 'FedEx Ground', name: 'FedEx Ground' },
+    { id: 'UPS Next Day Air', name: 'UPS Next Day Air' }
+];
+
+$(document).ready(function () {
+    const deliveryTypeSelect = $('#delivery-type');
+
+    
+    deliveryTypeSelect.empty().append('<option value="select">Choose a delivery type</option>');
+ 
+    deliveryTypes.forEach(type => {
         const option = $('<option></option>')
-          .val(type.id)
-          .text(type.name);
+            .val(type.id)   
+            .text(type.name);
         deliveryTypeSelect.append(option);
-      });
-  
-      // Fetch and populate Packages
-      $.ajax({
+    });
+
+    console.log("Delivery types loaded.");
+});
+
+    console.log("Document ready. Initializing script...");
+ 
+    $.ajax({
         url: '/api/packages/',
         method: 'GET',
         success: function (data) {
-          const packageSelect = $('#package');
-          data.forEach(item => {
-            const option = $('<option></option>')
-              .val(item.id)
-              .text(item.name);
-            packageSelect.append(option);
-          });
+            console.log("Package API returned data:", data);
+            const packageSelect = $('#package');
+            packageSelect.append('<option selected disabled>Choose a Package</option>');
+
+            data.forEach(item => {
+                packageData[item.id] = item; 
+                const option = $('<option></option>')
+                    .val(item.id)
+                    .text(item.name);
+                packageSelect.append(option);
+            });
+
+            console.log("Package Data Loaded:", packageData);
         },
         error: function (xhr, status, error) {
-          console.error('Failed to load packages:', error);
-          alert('Could not load package options.');
+            console.error('Failed to load packages:', error);
+            alert('Could not load package options.');
         }
-      });
+    });
+ 
+    $('#package').on('change', function () {
+        const selectedPackageId = $(this).val();
+        console.log("Package selected. ID:", selectedPackageId);
+
+        if (selectedPackageId && packageData[selectedPackageId]) {
+            const pkg = packageData[selectedPackageId];
+            console.log("Auto-filling details for package:", pkg);
+            $('#weight').val(pkg.weight);
+            $('#width').val(pkg.width);
+            $('#height').val(pkg.height);
+            $('#length').val(pkg.length);
+              
+            let totalCost = parseFloat(pkg.total_cost) || 0;  
+            $('#single-label-cost').text(`Single Label Cost: $${totalCost.toFixed(2)}`);
+
+            console.log("Updated Single Label Cost:", pkg.total_cost);
+        } else {
+            console.warn("No package details found for ID:", selectedPackageId);
+        }
+    });
   
-      // Fetch and populate Ship From Addresses
-      $.ajax({
-    url: '/api/addresses/',
-    method: 'GET',
-    success: function (data) {
-        const shipFromSelect = $('#ship-from');
-        data.forEach(item => {
-            const option = $('<option></option>')
-                .val(item.id)
-                .text(`${item.name}, ${item.address}, ${item.city}, ${item.zip_code}, ${item.state}`);
-            shipFromSelect.append(option);
-        });
-    },
-    error: function (xhr, status, error) {
-        console.error('Failed to load addresses:', error);
-        alert('Could not load address options.');
-    }
-});
-
-      $('#confirmPayButton').on('click', function () {
-    const labelData = {
-        delivery_type: $('#delivery-type').val(),   // Ensure this is the ID of the selected delivery type
-        package: $('#package').val(),                // Ensure this is the ID of the selected package
-        ship_from: $('#ship-from').val(),            // Ensure this is the ID of the selected ship-from address
-        name: $('#name').val(),
-        company: $('#company').val(),
-        address: $('#address').val(),
-        apt_unit: $('#apt').val(),
-        city: $('#city').val(),
-        zip_code: $('#zip-code').val(),
-        state: $('#state').val(),
-        phone: $('#phone').val(),
-    };
-
-    console.log(labelData);  // Log the data to verify it's correct before sending
-
-    $.ajax({
-        url: '/api/newlabels/',
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrfToken  // Include CSRF token in the request header
-        },
-        contentType: 'application/json',
-        data: JSON.stringify(labelData),
-        success: function (data) {
-            alert('Label created successfully!');
-            $('#label')[0].reset();
-        },
-        error: function (xhr, status, error) {
-            console.error('Error:', error);
-            console.log(xhr.responseText);  // Log the full response for more insights
-            alert('Failed to create the label. Please check the form and try again.');
-        }
-    });
-});
-
-    });
-  </script>
+       $.ajax({
+           url: '/api/addresses/',
+           method: 'GET',
+           success: function (data) {
+               console.log("Addresses API returned data:", data);
+               const shipFromSelect = $('#ship-from');
+               data.forEach(item => {
+                   const option = $('<option></option>')
+                       .val(item.id)
+                       .text(`${item.name}, ${item.address}, ${item.city}, ${item.zip_code}, ${item.state}`);
+                   shipFromSelect.append(option);
+               });
+               console.log("Ship-from addresses loaded.");
+           },
+           error: function (xhr, status, error) {
+               console.error('Failed to load addresses:', error);
+               alert('Could not load address options.');
+           }
+       });
+    
+       $('#confirmPayButton').on('click', function () {
+           const labelData = {
+               delivery_type: $('#delivery-type').val(),    
+               package: $('#package').val(),                
+               ship_from: $('#ship-from').val(),            
+               name: $('#name').val(),
+               company: $('#company').val(),
+               address: $('#address').val(),
+               apt_unit: $('#apt').val(),
+               city: $('#city').val(),
+               zip_code: $('#zip-code').val(),
+               state: $('#state').val(),
+               phone: $('#phone').val(),
+           };
+   
+           console.log("Label Data to be sent:", labelData);
+   
+           $.ajax({
+               url: '/api/newlabels/',
+               method: 'POST',
+               headers: {
+                   'X-CSRFToken': csrfToken   
+               },
+               contentType: 'application/json',
+               data: JSON.stringify(labelData),
+               success: function (data) {
+                   console.log("Label created successfully:", data);
+                   alert('Label created successfully!');
+                   $('#label')[0].reset();
+                  
+               },
+               error: function (xhr, status, error) {
+                   console.error('Error creating label:', error);
+                   console.log("Response Text:", xhr.responseText);
+                   alert('Failed to create the label. Please check the form and try again.');
+               }
+           });
+       });
+   });
+   
+     </script>
   <script type="text/javascript">
     var csrfToken = "{{ csrf_token }}";
 </script>

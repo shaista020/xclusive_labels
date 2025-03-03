@@ -289,7 +289,18 @@ class Referral(models.Model):
         return self.name
  
 class NewLabel(models.Model):
-    delivery_type = models.CharField(max_length=255)
+    delivery_type = [
+        ('select', 'Select'),
+        ('UPS Next Day Air', 'UPS Next Day Air'),
+        ('FedEx Ground', 'FedEx Ground'),
+        ('USPS Priority', 'USPS Priority'),
+        
+    ]
+    delivery_type = models.CharField(
+        max_length=100,
+        choices=delivery_type,
+        default='Select'
+    )
     package = models.ForeignKey(Package, on_delete=models.CASCADE)
     ship_from = models.ForeignKey(Address, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
@@ -313,11 +324,13 @@ class NewLabel(models.Model):
                 new_label=self,
                 batch_id=f"BATCH-{self.id}"
             )
+
+
 class Batch(models.Model):
     new_label = models.ForeignKey(NewLabel, on_delete=models.CASCADE)  
     batch_id = models.CharField(max_length=100, unique=True)
     ship_from_name = models.CharField(max_length=100, blank=True, null=True)
-    type = models.CharField(max_length=100, blank=True, null=True)
+    delivery_type = models.CharField(max_length=100, blank=True, null=True)   
     weight = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     cost = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     ship_date = models.DateField(blank=True, null=True)
@@ -327,7 +340,7 @@ class Batch(models.Model):
     def save(self, *args, **kwargs):
         if self.new_label:
             self.ship_from_name = self.new_label.name
-            self.type = self.new_label.delivery_type
+            self.delivery_type = self.new_label.delivery_type
             self.weight = self.new_label.package.weight  
             self.cost = self.new_label.package.total_cost   
             self.ship_date = self.new_label.ship_from.created_at   
